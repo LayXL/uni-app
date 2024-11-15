@@ -18,7 +18,7 @@
     --neutral-12: #202020;
   }
 
-  .dark {
+  [data-theme='dark'] {
     --neutral-1: #000000;
     --neutral-2: #121212;
     --neutral-3: #1F1F1F;
@@ -35,6 +35,6 @@
 
   body {
     font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
-    @apply bg-neutral-1 text-neutral-12
+    @apply bg-neutral-1 text-neutral-12 select-none
   }
 }

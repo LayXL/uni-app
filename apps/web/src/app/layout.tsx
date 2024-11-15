@@ -4,6 +4,7 @@ import Script from "next/script"
 import type { ReactNode } from "react"
 
 import "./globals.css"
+import { ThemeProvider } from "next-themes"
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -28,10 +29,10 @@ type LayoutProps = {
 
 export default function Layout({ children }: LayoutProps) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${geistMono.variable} ${geistSans.variable}`}>
         <Script src="https://telegram.org/js/telegram-web-app.js" />
-        {children}
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   )
