@@ -1,4 +1,4 @@
-import { LessonCard } from "@/feature/lesson/ui/lesson-card"
+import { LessonCard } from "@/features/lesson/ui/lesson-card"
 import { Fragment } from "react"
 import { checkIsGroup } from "shared/groups/check-is-group"
 import { checkIsTeacher } from "shared/groups/check-is-teacher"

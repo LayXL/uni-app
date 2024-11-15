@@ -1,4 +1,4 @@
-import { LessonCard } from "@/feature/lesson/ui/lesson-card"
+import { LessonCard } from "@/features/lesson/ui/lesson-card"
 import { addDays } from "date-fns/addDays"
 import { formatISO } from "date-fns/formatISO"
 import { subDays } from "date-fns/subDays"
