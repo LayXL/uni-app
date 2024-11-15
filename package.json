@@ -1,13 +1,13 @@
 {
+  "$schema": "https://json.schemastore.org/package.json",
   "name": "uni-app",
   "private": true,
   "scripts": {
     "build": "turbo build",
-    "dev": "turbo dev",
-    "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "dev": "turbo dev"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "prettier": "^3.2.5",
     "turbo": "^2.3.0",
     "typescript": "5.5.4"
@@ -16,8 +16,5 @@
     "node": ">=18"
   },
   "packageManager": "bun@1.1.30",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ]
+  "workspaces": ["apps/*", "packages/*"]
 }

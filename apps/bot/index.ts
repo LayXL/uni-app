@@ -1,1 +1,3 @@
-console.log("Hello via Bun!");
+import { bot } from "./bot.ts"
+
+void bot.start()
