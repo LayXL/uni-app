@@ -1,11 +1,9 @@
 import { Bot, InlineKeyboard } from "grammy"
+import config from "./config.ts"
 
-if (!Bun.env.TELEGRAM_BOT_TOKEN)
-  throw new Error("TELEGRAM_BOT_TOKEN is required")
-
-export const bot = new Bot(Bun.env.TELEGRAM_BOT_TOKEN, {
+export const bot = new Bot(config.botToken, {
   client: {
-    environment: Bun.env.TELEGRAM_BOT_ENV === "test" ? "test" : "prod",
+    environment: config.botEnv,
   },
 })
 
@@ -14,7 +12,7 @@ bot.command("start", async (ctx) => {
     reply_markup: {
       inline_keyboard: new InlineKeyboard().webApp(
         "Open webapp",
-        "http://127.0.0.1:3000/auth"
+        config.webAppUrl
       ).inline_keyboard,
     },
   })
