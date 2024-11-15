@@ -1,18 +1,26 @@
-import type { Config } from "tailwindcss";
+import type { Config } from "tailwindcss"
 
 export default {
-  content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
+  content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        neutral: {
+          1: "var(--neutral-1)",
+          2: "var(--neutral-2)",
+          3: "var(--neutral-3)",
+          4: "var(--neutral-4)",
+          5: "var(--neutral-5)",
+          6: "var(--neutral-6)",
+          7: "var(--neutral-7)",
+          8: "var(--neutral-8)",
+          9: "var(--neutral-9)",
+          10: "var(--neutral-10)",
+          11: "var(--neutral-11)",
+          12: "var(--neutral-12)",
+        },
       },
     },
   },
   plugins: [],
-} satisfies Config;
+} satisfies Config

@@ -1,8 +1,21 @@
 import type { Metadata } from "next"
+import localFont from "next/font/local"
 import Script from "next/script"
 import type { ReactNode } from "react"
 
 import "./globals.css"
+
+const geistSans = localFont({
+  src: "./fonts/GeistVF.woff",
+  variable: "--font-geist-sans",
+  weight: "100 900",
+})
+
+const geistMono = localFont({
+  src: "./fonts/GeistMonoVF.woff",
+  variable: "--font-geist-mono",
+  weight: "100 900",
+})
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -16,7 +29,7 @@ type LayoutProps = {
 export default function Layout({ children }: LayoutProps) {
   return (
     <html lang="en">
-      <body>
+      <body className={`${geistMono.variable} ${geistSans.variable}`}>
         <Script src="https://telegram.org/js/telegram-web-app.js" />
         {children}
       </body>

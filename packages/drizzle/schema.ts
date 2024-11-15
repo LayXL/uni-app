@@ -1,5 +1,6 @@
 import {
   bigint,
+  boolean,
   date,
   integer,
   pgTable,
@@ -13,12 +14,11 @@ export const users = pgTable("users", {
   group: integer().references(() => groups.id),
 })
 
-export const teachers = pgTable("teachers", {
-  id: serial().primaryKey(),
-})
-
 export const groups = pgTable("groups", {
   id: serial().primaryKey(),
+  bitrixId: text().notNull(),
+  displayName: text().notNull(),
+  isTeacher: boolean().notNull().default(false),
 })
 
 export const subjects = pgTable("subjects", {
@@ -26,23 +26,19 @@ export const subjects = pgTable("subjects", {
   name: text().notNull(),
 })
 
-export const classes = pgTable("classes", {
-  id: serial().primaryKey(),
-  date: date().notNull(),
-  order: integer().notNull(),
-  group: integer()
-    .notNull()
-    .references(() => groups.id),
-  subject: integer()
-    .notNull()
-    .references(() => subjects.id),
-})
-
-export const classTeachers = pgTable("class_teachers", {
-  classId: integer()
-    .notNull()
-    .references(() => classes.id),
-  teacherId: integer()
-    .notNull()
-    .references(() => teachers.id),
-})
+export const classes = pgTable(
+  "classes",
+  {
+    date: date().notNull(),
+    order: integer().notNull(),
+    subject: integer()
+      .notNull()
+      .references(() => subjects.id),
+    classroom: text().notNull(),
+    isCancelled: boolean().notNull().default(false),
+    groups: integer().array().notNull().default([]),
+  },
+  (table) => ({
+    pk: [table.date, table.order, table.subject, table.classroom],
+  })
+)

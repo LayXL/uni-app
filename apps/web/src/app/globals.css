@@ -4,12 +4,22 @@
 
 @layer base {
   :root {
-    --background: #ffffff;
-    --foreground: #171717;
+    --neutral-1: #fcfcfc;
+    --neutral-2: #f9f9f9;
+    --neutral-3: #efefef;
+    --neutral-4: #e8e8e8;
+    --neutral-5: #e0e0e0;
+    --neutral-6: #d9d9d9;
+    --neutral-7: #cecece;
+    --neutral-8: #bbbbbb;
+    --neutral-9: #8d8d8d;
+    --neutral-10: #838383;
+    --neutral-11: #646464;
+    --neutral-12: #202020;
   }
 
   body {
-    color: var(--foreground);
-    background: var(--background);
+    font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+    @apply bg-neutral-1 text-neutral-12
   }
 }
