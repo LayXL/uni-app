@@ -1,4 +1,4 @@
-import objectToQuery from "shared/objectToQuery"
+import objectToQuery from "shared/object-to-query.ts"
 
 export type Session = {
   cookie: string
