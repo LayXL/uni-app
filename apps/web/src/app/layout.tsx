@@ -1,10 +1,12 @@
+import { ThemeConfigProvider } from "@/shared/providers/theme-config-provider"
 import type { Metadata } from "next"
+import { ThemeProvider } from "next-themes"
 import localFont from "next/font/local"
 import Script from "next/script"
 import type { ReactNode } from "react"
 
 import "./globals.css"
-import { ThemeProvider } from "next-themes"
+import { TmaSdkProvider } from "@/shared/providers/tma-sdk-provider"
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -32,7 +34,11 @@ export default function Layout({ children }: LayoutProps) {
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistMono.variable} ${geistSans.variable}`}>
         <Script src="https://telegram.org/js/telegram-web-app.js" />
-        <ThemeProvider>{children}</ThemeProvider>
+        <TmaSdkProvider>
+          <ThemeProvider>
+            <ThemeConfigProvider>{children}</ThemeConfigProvider>
+          </ThemeProvider>
+        </TmaSdkProvider>
       </body>
     </html>
   )

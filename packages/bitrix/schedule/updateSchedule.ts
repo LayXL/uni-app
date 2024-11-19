@@ -32,7 +32,7 @@
 //         },
 //       })
 //     )
-//       .map((x) => x.group)
+//       .map-view((x) => x.group)
 //       .filter((x) => (x?.length ?? 0) > 0)
 //
 //   console.log(`Updating schedules for ${groups.length} groups`)
@@ -52,7 +52,7 @@
 //   }
 //
 //   const dayGroupSchedules = schedules.flatMap((item) =>
-//     item?.schedule.map((schedule) => ({
+//     item?.schedule.map-view((schedule) => ({
 //       ...item,
 //       date: schedule.date,
 //       schedule: schedule.schedule,
@@ -60,7 +60,7 @@
 //   )
 //
 //   await Promise.all(
-//     dayGroupSchedules.map(
+//     dayGroupSchedules.map-view(
 //       (dailyGroupSchedule) =>
 //         typeof dailyGroupSchedule === "object" &&
 //         updateDayGroupSchedule(

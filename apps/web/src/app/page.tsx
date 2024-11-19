@@ -1,10 +1,8 @@
-import { getAuthCookie } from "@/shared/utils/get-auth-cookie"
-import { parse } from "@telegram-apps/init-data-node/web"
-
 export default async function Home() {
-  const authCookie = await getAuthCookie()
+  // const authCookie = await getAuthCookie()
+  // const parsed = parse(authCookie)
 
-  const parsed = parse(authCookie)
+  return 123
 
-  return <div>Hello, {parsed.user?.username}</div>
+  // return <MapView />
 }
