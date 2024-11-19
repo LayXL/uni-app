@@ -1,4 +1,5 @@
 "use client"
+
 import { useClientOnce } from "@/shared/hooks/use-client-once"
 import {
   $debug,
@@ -15,7 +16,7 @@ type TmaSdkProviderProps = {
   children: ReactNode
 }
 
-export const TmaSdkProvider = (props: TmaSdkProviderProps) => {
+export const TmaSdkProvider = ({ children }: TmaSdkProviderProps) => {
   useClientOnce(() => {
     // TODO: make this configurable
     $debug.set(true)
@@ -49,5 +50,5 @@ export const TmaSdkProvider = (props: TmaSdkProviderProps) => {
     }
   })
 
-  return props.children
+  return children
 }

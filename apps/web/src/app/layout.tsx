@@ -1,11 +1,9 @@
-import { ThemeConfigProvider } from "@/shared/providers/theme-config-provider"
 import type { Metadata } from "next"
-import { ThemeProvider } from "next-themes"
 import localFont from "next/font/local"
 import type { ReactNode } from "react"
 
 import "./globals.css"
-import { TmaSdkProvider } from "@/shared/providers/tma-sdk-provider"
+import { Providers } from "@/app/providers"
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -32,11 +30,7 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistMono.variable} ${geistSans.variable}`}>
-        <TmaSdkProvider>
-          <ThemeProvider>
-            <ThemeConfigProvider>{children}</ThemeConfigProvider>
-          </ThemeProvider>
-        </TmaSdkProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   )

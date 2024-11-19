@@ -1,32 +1,22 @@
 "use client"
-import { backButton } from "@telegram-apps/sdk-react"
-import { usePathname, useRouter } from "next/navigation"
-import { type ReactNode, useEffect, useState } from "react"
+
+import { useSignal } from "@/shared/hooks/use-signal"
+import { miniApp } from "@telegram-apps/sdk-react"
+import { useTheme } from "next-themes"
+import { type ReactNode, useEffect } from "react"
 
 type ThemeConfigProviderProps = {
   children: ReactNode
 }
 
-export const ThemeConfigProvider = (props: ThemeConfigProviderProps) => {
-  const pathname = usePathname()
-  const router = useRouter()
-  const [canGoBack, setCanGoBack] = useState(false)
+export const ThemeConfigProvider = ({ children }: ThemeConfigProviderProps) => {
+  const { setTheme } = useTheme()
+
+  const isDark = useSignal(miniApp.isDark)
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      setCanGoBack(pathname !== "/" && window.history.length > 1)
-    }
-  }, [pathname])
+    setTheme(isDark ? "dark" : "light")
+  }, [setTheme, isDark])
 
-  useEffect(() => {
-    if (canGoBack) backButton.show()
-    else backButton.hide()
-
-    return backButton.onClick(() => {
-      console.log(true)
-      router.back()
-    })
-  }, [router.back, canGoBack])
-
-  return props.children
+  return children
 }
