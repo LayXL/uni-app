@@ -2,7 +2,6 @@ import { ThemeConfigProvider } from "@/shared/providers/theme-config-provider"
 import type { Metadata } from "next"
 import { ThemeProvider } from "next-themes"
 import localFont from "next/font/local"
-import Script from "next/script"
 import type { ReactNode } from "react"
 
 import "./globals.css"
@@ -33,7 +32,6 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistMono.variable} ${geistSans.variable}`}>
-        <Script src="https://telegram.org/js/telegram-web-app.js" />
         <TmaSdkProvider>
           <ThemeProvider>
             <ThemeConfigProvider>{children}</ThemeConfigProvider>

@@ -1,6 +1,7 @@
 "use client"
 import { useClientOnce } from "@/shared/hooks/use-client-once"
 import {
+  $debug,
   backButton,
   init,
   initData,
@@ -16,6 +17,9 @@ type TmaSdkProviderProps = {
 
 export const TmaSdkProvider = (props: TmaSdkProviderProps) => {
   useClientOnce(() => {
+    // TODO: make this configurable
+    $debug.set(true)
+
     init()
 
     if (backButton.isSupported()) {

@@ -4,22 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="207ad946-3ed0-4e90-a58e-b232760d0c1b" name="Changes" comment="accent colors in tailwind.config.ts">
-      <change afterPath="$PROJECT_DIR$/apps/web/src/features/map-view/ui/map-view.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/web/src/features/map-view/ui/transformable-element.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/web/src/shared/hocs/with-client-side.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/web/src/shared/hooks/use-client-once.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/web/src/shared/providers/theme-config-provider.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/web/src/shared/providers/tma-sdk-provider.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/6b27929b-abe1-43a4-9837-85eca0f2db3c/storage_v2/_src_/database/uni_app.Unbi7g/schema/pg_catalog.0S1ZNQ.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/6b27929b-abe1-43a4-9837-85eca0f2db3c/storage_v2/_src_/database/uni_app.Unbi7g/schema/pg_catalog.0S1ZNQ.zip" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/src/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/app/layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/src/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/app/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bun.lockb" beforeDir="false" afterPath="$PROJECT_DIR$/bun.lockb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/bitrix/schedule/updateSchedule.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/bitrix/schedule/updateSchedule.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/turbo.json" beforeDir="false" afterPath="$PROJECT_DIR$/turbo.json" afterDir="false" />
+    <list default="true" id="207ad946-3ed0-4e90-a58e-b232760d0c1b" name="Changes" comment="improvements">
+      <change afterPath="$PROJECT_DIR$/packages/shared/timetable.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,8 +15,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="TypeScript File" />
         <option value="TypeScript JSX File" />
+        <option value="TypeScript File" />
       </list>
     </option>
   </component>
@@ -136,7 +122,7 @@
       <workItem from="1731659646225" duration="1502000" />
       <workItem from="1731665453029" duration="28925000" />
       <workItem from="1731727115556" duration="5000" />
-      <workItem from="1731985566803" duration="4188000" />
+      <workItem from="1731985566803" duration="6748000" />
     </task>
     <task id="LOCAL-00001" summary="First commit">
       <option name="closed" value="true" />
@@ -250,7 +236,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731721749307</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="improvements">
+      <option name="closed" value="true" />
+      <created>1731991836648</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1731991836648</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -275,6 +269,7 @@
     <MESSAGE value="changes in css" />
     <MESSAGE value="renaming folder feature to features" />
     <MESSAGE value="accent colors in tailwind.config.ts" />
-    <option name="LAST_COMMIT_MESSAGE" value="accent colors in tailwind.config.ts" />
+    <MESSAGE value="improvements" />
+    <option name="LAST_COMMIT_MESSAGE" value="improvements" />
   </component>
 </project>

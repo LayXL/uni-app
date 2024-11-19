@@ -2,10 +2,12 @@
 
 import { useLaunchParams } from "@telegram-apps/sdk-react"
 import dynamic from "next/dynamic"
+import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 
 const Page = () => {
   const { initDataRaw } = useLaunchParams()
+  const router = useRouter()
 
   useEffect(() => {
     fetch("/api/auth", {
@@ -15,7 +17,7 @@ const Page = () => {
       },
     }).then((r) => {
       if (!r.ok) return
-      window.location.href = "/"
+      void router.replace("/")
     })
   }, [initDataRaw])
 
