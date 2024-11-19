@@ -8,7 +8,7 @@ export const getAuthCookie = async () => {
     | undefined
 
   return [
-    authCookie,
     authCookie ? parseAuthCookie(authCookie) : undefined,
+    authCookie,
   ] as const
 }

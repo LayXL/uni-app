@@ -3,9 +3,10 @@ import { db } from "drizzle"
 import { eq } from "drizzle-orm"
 import { users } from "drizzle/schema"
 import { redirect } from "next/navigation"
+import { returnFirst } from "shared/return-first"
 
 export async function GET() {
-  const [, authCookie] = await getAuthCookie()
+  const [authCookie] = await getAuthCookie()
 
   const userId = authCookie?.user?.id
 
@@ -14,7 +15,8 @@ export async function GET() {
         .select()
         .from(users)
         .where(eq(users.telegramId, userId))
-        .then((r) => r[0]?.group)
+        .then(returnFirst)
+        .then((r) => r?.group)
     : undefined
 
   if (groupId) redirect(`/schedule/${groupId}`)
