@@ -1,3 +1,4 @@
+import { collections, globals } from "@/payload"
 import { mongooseAdapter } from "@payloadcms/db-mongodb"
 import { lexicalEditor } from "@payloadcms/richtext-lexical"
 import { buildConfig } from "payload"
@@ -13,7 +14,8 @@ export default buildConfig({
     api: "/payload-api",
   },
   editor: lexicalEditor(),
-  collections: [],
+  collections,
+  globals,
   secret: process.env.PAYLOAD_SECRET,
   db: mongooseAdapter({ url: process.env.MONGO_DB_URL }),
   sharp,
