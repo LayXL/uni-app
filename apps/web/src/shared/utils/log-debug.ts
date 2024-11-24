@@ -1,4 +1,4 @@
-const isDebug = process.env.DEBUG === "true"
+const isDebug = process.env.NODE_ENV === "development"
 
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export const logDebug = (...args: any) => {
