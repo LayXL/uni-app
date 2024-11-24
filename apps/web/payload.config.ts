@@ -9,11 +9,12 @@ if (!process.env.PAYLOAD_SECRET)
 if (!process.env.MONGO_DB_URL) throw new Error("DATABASE_URL is not defined")
 
 export default buildConfig({
+  routes: {
+    api: "/payload-api",
+  },
   editor: lexicalEditor(),
   collections: [],
   secret: process.env.PAYLOAD_SECRET,
-  db: mongooseAdapter({
-    url: process.env.MONGO_DB_URL,
-  }),
+  db: mongooseAdapter({ url: process.env.MONGO_DB_URL }),
   sharp,
 })
