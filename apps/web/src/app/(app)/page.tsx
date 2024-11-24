@@ -4,5 +4,7 @@ export default async function Home() {
   // const authCookie = await getAuthCookie()
   // const parsed = parse(authCookie)
 
-  return <Link href={"/schedule"} children={"Schedule"} />
+  return (
+    <Link href={"/apps/web/src/app/(app)/schedule"} children={"Schedule"} />
+  )
 }

@@ -17,12 +17,12 @@ export default async function Page({ params }: PageProps) {
       <div className="pt-4 px-4 flex justify-between">
         <Link
           prefetch={true}
-          href={`/schedule/${group}/${formatISO(subDays(date, 1), { representation: "date" })}`}
+          href={`/apps/web/src/app/(app)/schedule/${group}/${formatISO(subDays(date, 1), { representation: "date" })}`}
           children={"Prev"}
         />
         <Link
           prefetch={true}
-          href={`/schedule/${group}/${formatISO(addDays(date, 1), { representation: "date" })}`}
+          href={`/apps/web/src/app/(app)/schedule/${group}/${formatISO(addDays(date, 1), { representation: "date" })}`}
           children={"Next"}
         />
       </div>
