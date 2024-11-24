@@ -4,7 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="207ad946-3ed0-4e90-a58e-b232760d0c1b" name="Changes" comment="payload cms" />
+    <list default="true" id="207ad946-3ed0-4e90-a58e-b232760d0c1b" name="Changes" comment="impr">
+      <change afterPath="$PROJECT_DIR$/apps/web/src/payload/collections/events.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/web/src/payload/collections/media.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/web/src/payload/collections/users.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/web/src/payload/globals/app-status.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/web/src/shared/ui/after-input-groups.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/web/src/shared/utils/read-only-access.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/payload.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/payload.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/src/app/(payload)/admin/importMap.js" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/app/(payload)/admin/importMap.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/src/payload/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/payload/index.ts" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,8 +24,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="TypeScript JSX File" />
         <option value="TypeScript File" />
+        <option value="TypeScript JSX File" />
       </list>
     </option>
   </component>
@@ -48,7 +59,7 @@
     "com.codeium.enabled": "true",
     "database.data.extractors.current.export.id": "Comma-separated (CSV)_id",
     "git-widget-placeholder": "main",
-    "last_opened_file_path": "/Users/layxl/WebstormProjects/uni-app/apps/web/src/app/(payload)",
+    "last_opened_file_path": "/Users/layxl/WebstormProjects/uni-app/apps/web/src/shared/utils",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -72,11 +83,11 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/apps/web/src/shared/utils" />
+      <recent name="$PROJECT_DIR$/apps/web/src/payload/collections" />
       <recent name="$PROJECT_DIR$/apps/web/src/app/(payload)" />
       <recent name="$PROJECT_DIR$/packages/shared" />
       <recent name="$PROJECT_DIR$/apps/web/src/app" />
-      <recent name="$PROJECT_DIR$/apps/schedule-updater" />
-      <recent name="$PROJECT_DIR$/packages/bitrix" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/apps/web" />
@@ -127,7 +138,7 @@
       <workItem from="1731985566803" duration="6748000" />
       <workItem from="1732175856039" duration="11000" />
       <workItem from="1732429057220" duration="142000" />
-      <workItem from="1732443145476" duration="2747000" />
+      <workItem from="1732443145476" duration="8544000" />
     </task>
     <task id="LOCAL-00001" summary="First commit">
       <option name="closed" value="true" />
@@ -305,7 +316,23 @@
       <option name="project" value="LOCAL" />
       <updated>1732445843521</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="payload cms">
+      <option name="closed" value="true" />
+      <created>1732445942960</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1732445942960</updated>
+    </task>
+    <task id="LOCAL-00024" summary="impr">
+      <option name="closed" value="true" />
+      <created>1732446003973</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1732446003973</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -344,8 +371,8 @@
     <MESSAGE value=".gitignore" />
     <MESSAGE value="env example files" />
     <MESSAGE value="refactoring" />
-    <MESSAGE value="impr" />
     <MESSAGE value="payload cms" />
-    <option name="LAST_COMMIT_MESSAGE" value="payload cms" />
+    <MESSAGE value="impr" />
+    <option name="LAST_COMMIT_MESSAGE" value="impr" />
   </component>
 </project>
