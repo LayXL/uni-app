@@ -7,7 +7,6 @@ import { returnFirst } from "shared/return-first"
 
 export async function GET() {
   const [authCookie] = await getAuthCookie()
-
   const userId = authCookie?.user?.id
 
   const groupId = userId
@@ -20,6 +19,5 @@ export async function GET() {
     : undefined
 
   if (groupId) redirect(`/schedule/${groupId}`)
-  // TODO:
-  else redirect("/trash")
+  else redirect("/selectGroup")
 }

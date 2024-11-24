@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.0",
     "@telegram-apps/init-data-node": "^1.1.1",
     "@telegram-apps/sdk-react": "^2.0.11",
     "@use-gesture/react": "^10.3.1",

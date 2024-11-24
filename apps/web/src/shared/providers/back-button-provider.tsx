@@ -20,13 +20,14 @@ export const BackButtonProvider = ({ children }: BackButtonProviderProps) => {
   }, [pathname])
 
   useEffect(() => {
-    if (canGoBack) backButton.show()
-    else backButton.hide()
+    if (backButton.isMounted()) {
+      if (canGoBack) backButton.show()
+      else backButton.hide()
 
-    return backButton.onClick(() => {
-      console.log(true)
-      router.back()
-    })
+      return backButton.onClick(() => {
+        router.back()
+      })
+    }
   }, [router.back, canGoBack])
 
   return children

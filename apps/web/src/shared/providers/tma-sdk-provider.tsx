@@ -18,36 +18,38 @@ type TmaSdkProviderProps = {
 
 export const TmaSdkProvider = ({ children }: TmaSdkProviderProps) => {
   useClientOnce(() => {
-    // TODO: make this configurable
-    $debug.set(true)
+    try {
+      // TODO: make this configurable
+      $debug.set(true)
 
-    init()
+      init()
 
-    if (backButton.isSupported()) {
-      backButton.mount()
-    }
+      if (backButton.isSupported()) {
+        backButton.mount()
+      }
 
-    if (!miniApp.isMounted()) {
-      miniApp.mount()
-      miniApp.bindCssVars()
-    }
+      if (!miniApp.isMounted()) {
+        miniApp.mount()
+        miniApp.bindCssVars()
+      }
 
-    if (!themeParams.isMounted()) {
-      themeParams.mount()
-      themeParams.bindCssVars()
-    }
+      if (!themeParams.isMounted()) {
+        themeParams.mount()
+        themeParams.bindCssVars()
+      }
 
-    initData.restore()
+      initData.restore()
 
-    if (!viewport.isMounted() && !viewport.isMounting()) {
-      void viewport.mount().catch((e) => {
-        console.error("Something went wrong mounting the viewport", e)
-      })
-    }
+      if (!viewport.isMounted() && !viewport.isMounting()) {
+        void viewport.mount().catch((e) => {
+          console.error("Something went wrong mounting the viewport", e)
+        })
+      }
 
-    if (viewport.isMounted()) {
-      viewport.bindCssVars()
-    }
+      if (viewport.isMounted()) {
+        viewport.bindCssVars()
+      }
+    } catch (e) {}
   })
 
   return children
