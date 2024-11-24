@@ -1,9 +1,7 @@
 const isDebug = process.env.NODE_ENV === "development"
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-export const logDebug = (...args: any) => {
+export const logDebug = (...args: Parameters<typeof console.info>) => {
   if (!isDebug) return
 
-  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-  console.log(args)
+  console.info(args)
 }
