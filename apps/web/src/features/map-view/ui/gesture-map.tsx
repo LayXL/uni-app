@@ -9,19 +9,17 @@ import {
 } from "react"
 import map from "./map.png"
 
-const getTouchDistance = (touches: TouchList) => {
-  return Math.hypot(
+const getTouchDistance = (touches: TouchList) =>
+  Math.hypot(
     touches[0].clientX - touches[1].clientX,
     touches[0].clientY - touches[1].clientY
   )
-}
 
-const getTouchAngle = (touches: TouchList) => {
-  return Math.atan2(
+const getTouchAngle = (touches: TouchList) =>
+  Math.atan2(
     touches[1].clientY - touches[0].clientY,
     touches[1].clientX - touches[0].clientX
   )
-}
 
 const GestureMap = () => {
   const [transform, setTransform] = useQueryStates(
