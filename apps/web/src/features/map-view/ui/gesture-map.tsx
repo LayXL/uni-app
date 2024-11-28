@@ -1,5 +1,27 @@
-import { useEffect, useRef, useState } from "react"
+import {
+  type MouseEventHandler,
+  type TouchEventHandler,
+  type TouchList,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react"
 import map from "./map.png"
+
+const getTouchDistance = (touches: TouchList) => {
+  return Math.hypot(
+    touches[0].clientX - touches[1].clientX,
+    touches[0].clientY - touches[1].clientY
+  )
+}
+
+const getTouchAngle = (touches: TouchList) => {
+  return Math.atan2(
+    touches[1].clientY - touches[0].clientY,
+    touches[1].clientX - touches[0].clientX
+  )
+}
 
 const GestureMap = () => {
   const [transform, setTransform] = useState({
@@ -9,17 +31,20 @@ const GestureMap = () => {
     rotation: 0,
   })
 
-  const svgRef = useRef(null)
+  const svgRef = useRef<SVGSVGElement>(null)
   const isDragging = useRef(false)
   const lastPosition = useRef({ x: 0, y: 0 })
   const touchDistance = useRef(0)
   const touchAngle = useRef(0)
   const touchCenter = useRef({ x: 0, y: 0 })
 
-  const handleWheel = (e) => {
+  const handleWheel = useCallback((e: WheelEvent) => {
     e.preventDefault()
     const scaleFactor = e.deltaY > 0 ? 0.9 : 1.1
-    const bounds = svgRef.current.getBoundingClientRect()
+    const bounds = svgRef.current?.getBoundingClientRect()
+
+    if (!bounds) return
+
     const mouseX = e.clientX - bounds.left
     const mouseY = e.clientY - bounds.top
 
@@ -29,14 +54,14 @@ const GestureMap = () => {
       x: prev.x - (mouseX - prev.x) * (scaleFactor - 1),
       y: prev.y - (mouseY - prev.y) * (scaleFactor - 1),
     }))
-  }
+  }, [])
 
-  const handleMouseDown = (e) => {
+  const handleMouseDown: MouseEventHandler<SVGSVGElement> = (e) => {
     isDragging.current = true
     lastPosition.current = { x: e.clientX, y: e.clientY }
   }
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove: MouseEventHandler<SVGSVGElement> = (e) => {
     if (!isDragging.current) return
 
     const dx = e.clientX - lastPosition.current.x
@@ -55,29 +80,18 @@ const GestureMap = () => {
     isDragging.current = false
   }
 
-  const getTouchDistance = (touches) => {
-    return Math.hypot(
-      touches[0].clientX - touches[1].clientX,
-      touches[0].clientY - touches[1].clientY
-    )
+  const getTouchCenter = (touches: TouchList) => {
+    const bounds = svgRef.current?.getBoundingClientRect()
+
+    return !bounds
+      ? { x: 0, y: 0 }
+      : {
+          x: (touches[0].clientX + touches[1].clientX) / 2 - bounds.left,
+          y: (touches[0].clientY + touches[1].clientY) / 2 - bounds.top,
+        }
   }
 
-  const getTouchAngle = (touches) => {
-    return Math.atan2(
-      touches[1].clientY - touches[0].clientY,
-      touches[1].clientX - touches[0].clientX
-    )
-  }
-
-  const getTouchCenter = (touches) => {
-    const bounds = svgRef.current.getBoundingClientRect()
-    return {
-      x: (touches[0].clientX + touches[1].clientX) / 2 - bounds.left,
-      y: (touches[0].clientY + touches[1].clientY) / 2 - bounds.top,
-    }
-  }
-
-  const handleTouchStart = (e) => {
+  const handleTouchStart: TouchEventHandler<SVGSVGElement> = (e) => {
     if (e.touches.length === 2) {
       touchDistance.current = getTouchDistance(e.touches)
       touchAngle.current = getTouchAngle(e.touches)
@@ -90,7 +104,7 @@ const GestureMap = () => {
     }
   }
 
-  const handleTouchMove = (e) => {
+  const handleTouchMove: TouchEventHandler<SVGSVGElement> = (e) => {
     e.preventDefault()
 
     if (e.touches.length === 2) {
@@ -104,18 +118,15 @@ const GestureMap = () => {
       setTransform((prev) => {
         const newScale = Math.max(0.1, Math.min(10, prev.scale * scaleFactor))
 
-        // Convert global coordinates to object space
         const localOldCenter = {
           x: (touchCenter.current.x - prev.x) / prev.scale,
           y: (touchCenter.current.y - prev.y) / prev.scale,
         }
 
-        // Apply rotation around the touch center
         const rad = (rotationDelta * Math.PI) / 180
         const cos = Math.cos(rad)
         const sin = Math.sin(rad)
 
-        // Calculate new position that keeps the touch center fixed
         const dx = newCenter.x - touchCenter.current.x
         const dy = newCenter.y - touchCenter.current.y
 
@@ -154,10 +165,9 @@ const GestureMap = () => {
   }
 
   useEffect(() => {
-    const svg = svgRef.current
-    svg.addEventListener("wheel", handleWheel, { passive: false })
-    return () => svg.removeEventListener("wheel", handleWheel)
-  }, [])
+    svgRef.current?.addEventListener("wheel", handleWheel, { passive: false })
+    return () => svgRef.current?.removeEventListener("wheel", handleWheel)
+  }, [handleWheel])
 
   return (
     <div className="w-screen h-screen overflow-hidden touch-none">
@@ -171,6 +181,7 @@ const GestureMap = () => {
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
       >
+        <title>Map View</title>
         <g
           transform={`translate(${transform.x},${transform.y}) scale(${transform.scale}) rotate(${transform.rotation})`}
         >
