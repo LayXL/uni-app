@@ -1,3 +1,4 @@
+import { parseAsFloat, useQueryStates } from "nuqs"
 import {
   type MouseEventHandler,
   type TouchEventHandler,
@@ -5,7 +6,6 @@ import {
   useCallback,
   useEffect,
   useRef,
-  useState,
 } from "react"
 import map from "./map.png"
 
@@ -24,12 +24,17 @@ const getTouchAngle = (touches: TouchList) => {
 }
 
 const GestureMap = () => {
-  const [transform, setTransform] = useState({
-    x: 0,
-    y: 0,
-    scale: 1,
-    rotation: 0,
-  })
+  const [transform, setTransform] = useQueryStates(
+    {
+      x: parseAsFloat.withDefault(0),
+      y: parseAsFloat.withDefault(0),
+      scale: parseAsFloat.withDefault(1),
+      rotation: parseAsFloat.withDefault(0),
+    },
+    {
+      history: "replace",
+    }
+  )
 
   const svgRef = useRef<SVGSVGElement>(null)
   const isDragging = useRef(false)
@@ -38,49 +43,55 @@ const GestureMap = () => {
   const touchAngle = useRef(0)
   const touchCenter = useRef({ x: 0, y: 0 })
 
-  const handleWheel = useCallback((e: WheelEvent) => {
-    e.preventDefault()
-    const scaleFactor = e.deltaY > 0 ? 0.9 : 1.1
-    const bounds = svgRef.current?.getBoundingClientRect()
+  const handleWheel = useCallback(
+    (e: WheelEvent) => {
+      e.preventDefault()
+      const scaleFactor = e.deltaY > 0 ? 0.9 : 1.1
+      const bounds = svgRef.current?.getBoundingClientRect()
 
-    if (!bounds) return
+      if (!bounds) return
 
-    const mouseX = e.clientX - bounds.left
-    const mouseY = e.clientY - bounds.top
+      const mouseX = e.clientX - bounds.left
+      const mouseY = e.clientY - bounds.top
 
-    setTransform((prev) => ({
-      ...prev,
-      scale: Math.max(0.1, Math.min(10, prev.scale * scaleFactor)),
-      x: prev.x - (mouseX - prev.x) * (scaleFactor - 1),
-      y: prev.y - (mouseY - prev.y) * (scaleFactor - 1),
-    }))
-  }, [])
+      void setTransform((prev) => ({
+        ...prev,
+        scale: Math.max(0.1, Math.min(10, prev.scale * scaleFactor)),
+        x: prev.x - (mouseX - prev.x) * (scaleFactor - 1),
+        y: prev.y - (mouseY - prev.y) * (scaleFactor - 1),
+      }))
+    },
+    [setTransform]
+  )
 
-  const handleMouseDown: MouseEventHandler<SVGSVGElement> = (e) => {
+  const handleMouseDown: MouseEventHandler<SVGSVGElement> = useCallback((e) => {
     isDragging.current = true
     lastPosition.current = { x: e.clientX, y: e.clientY }
-  }
+  }, [])
 
-  const handleMouseMove: MouseEventHandler<SVGSVGElement> = (e) => {
-    if (!isDragging.current) return
+  const handleMouseMove: MouseEventHandler<SVGSVGElement> = useCallback(
+    (e) => {
+      if (!isDragging.current) return
 
-    const dx = e.clientX - lastPosition.current.x
-    const dy = e.clientY - lastPosition.current.y
+      const dx = e.clientX - lastPosition.current.x
+      const dy = e.clientY - lastPosition.current.y
 
-    setTransform((prev) => ({
-      ...prev,
-      x: prev.x + dx,
-      y: prev.y + dy,
-    }))
+      void setTransform((prev) => ({
+        ...prev,
+        x: prev.x + dx,
+        y: prev.y + dy,
+      }))
 
-    lastPosition.current = { x: e.clientX, y: e.clientY }
-  }
+      lastPosition.current = { x: e.clientX, y: e.clientY }
+    },
+    [setTransform]
+  )
 
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback(() => {
     isDragging.current = false
-  }
+  }, [])
 
-  const getTouchCenter = (touches: TouchList) => {
+  const getTouchCenter = useCallback((touches: TouchList) => {
     const bounds = svgRef.current?.getBoundingClientRect()
 
     return bounds
@@ -89,80 +100,86 @@ const GestureMap = () => {
           y: (touches[0].clientY + touches[1].clientY) / 2 - bounds.top,
         }
       : { x: 0, y: 0 }
-  }
+  }, [])
 
-  const handleTouchStart: TouchEventHandler<SVGSVGElement> = (e) => {
-    if (e.touches.length === 2) {
-      touchDistance.current = getTouchDistance(e.touches)
-      touchAngle.current = getTouchAngle(e.touches)
-      touchCenter.current = getTouchCenter(e.touches)
-    } else if (e.touches.length === 1) {
-      lastPosition.current = {
-        x: e.touches[0].clientX,
-        y: e.touches[0].clientY,
-      }
-    }
-  }
-
-  const handleTouchMove: TouchEventHandler<SVGSVGElement> = (e) => {
-    e.preventDefault()
-
-    if (e.touches.length === 2) {
-      const newDistance = getTouchDistance(e.touches)
-      const newAngle = getTouchAngle(e.touches)
-      const newCenter = getTouchCenter(e.touches)
-
-      const scaleFactor = newDistance / touchDistance.current
-      const rotationDelta = ((newAngle - touchAngle.current) * 180) / Math.PI
-
-      setTransform((prev) => {
-        const newScale = Math.max(0.1, Math.min(10, prev.scale * scaleFactor))
-
-        const localOldCenter = {
-          x: (touchCenter.current.x - prev.x) / prev.scale,
-          y: (touchCenter.current.y - prev.y) / prev.scale,
+  const handleTouchStart: TouchEventHandler<SVGSVGElement> = useCallback(
+    (e) => {
+      if (e.touches.length === 2) {
+        touchDistance.current = getTouchDistance(e.touches)
+        touchAngle.current = getTouchAngle(e.touches)
+        touchCenter.current = getTouchCenter(e.touches)
+      } else if (e.touches.length === 1) {
+        lastPosition.current = {
+          x: e.touches[0].clientX,
+          y: e.touches[0].clientY,
         }
-
-        const rad = (rotationDelta * Math.PI) / 180
-        const cos = Math.cos(rad)
-        const sin = Math.sin(rad)
-
-        const dx = newCenter.x - touchCenter.current.x
-        const dy = newCenter.y - touchCenter.current.y
-
-        return {
-          scale: newScale,
-          rotation: prev.rotation + rotationDelta,
-          x:
-            newCenter.x -
-            (localOldCenter.x * cos - localOldCenter.y * sin) * newScale +
-            dx,
-          y:
-            newCenter.y -
-            (localOldCenter.x * sin + localOldCenter.y * cos) * newScale +
-            dy,
-        }
-      })
-
-      touchDistance.current = newDistance
-      touchAngle.current = newAngle
-      touchCenter.current = newCenter
-    } else if (e.touches.length === 1) {
-      const dx = e.touches[0].clientX - lastPosition.current.x
-      const dy = e.touches[0].clientY - lastPosition.current.y
-
-      setTransform((prev) => ({
-        ...prev,
-        x: prev.x + dx,
-        y: prev.y + dy,
-      }))
-
-      lastPosition.current = {
-        x: e.touches[0].clientX,
-        y: e.touches[0].clientY,
       }
-    }
-  }
+    },
+    [getTouchCenter]
+  )
+
+  const handleTouchMove: TouchEventHandler<SVGSVGElement> = useCallback(
+    (e) => {
+      e.preventDefault()
+
+      if (e.touches.length === 2) {
+        const newDistance = getTouchDistance(e.touches)
+        const newAngle = getTouchAngle(e.touches)
+        const newCenter = getTouchCenter(e.touches)
+
+        const scaleFactor = newDistance / touchDistance.current
+        const rotationDelta = ((newAngle - touchAngle.current) * 180) / Math.PI
+
+        void setTransform((prev) => {
+          const newScale = Math.max(0.1, Math.min(10, prev.scale * scaleFactor))
+
+          const localOldCenter = {
+            x: (touchCenter.current.x - prev.x) / prev.scale,
+            y: (touchCenter.current.y - prev.y) / prev.scale,
+          }
+
+          const rad = (rotationDelta * Math.PI) / 180
+          const cos = Math.cos(rad)
+          const sin = Math.sin(rad)
+
+          const dx = newCenter.x - touchCenter.current.x
+          const dy = newCenter.y - touchCenter.current.y
+
+          return {
+            scale: newScale,
+            rotation: prev.rotation + rotationDelta,
+            x:
+              newCenter.x -
+              (localOldCenter.x * cos - localOldCenter.y * sin) * newScale +
+              dx,
+            y:
+              newCenter.y -
+              (localOldCenter.x * sin + localOldCenter.y * cos) * newScale +
+              dy,
+          }
+        })
+
+        touchDistance.current = newDistance
+        touchAngle.current = newAngle
+        touchCenter.current = newCenter
+      } else if (e.touches.length === 1) {
+        const dx = e.touches[0].clientX - lastPosition.current.x
+        const dy = e.touches[0].clientY - lastPosition.current.y
+
+        void setTransform((prev) => ({
+          ...prev,
+          x: prev.x + dx,
+          y: prev.y + dy,
+        }))
+
+        lastPosition.current = {
+          x: e.touches[0].clientX,
+          y: e.touches[0].clientY,
+        }
+      }
+    },
+    [setTransform, getTouchCenter]
+  )
 
   useEffect(() => {
     svgRef.current?.addEventListener("wheel", handleWheel, { passive: false })
