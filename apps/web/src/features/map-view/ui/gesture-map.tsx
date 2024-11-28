@@ -1,324 +1,182 @@
-import type React from "react"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import map from "./map.png"
 
-interface Transform {
-  x: number
-  y: number
-  scale: number
-  rotation: number
-}
-
-interface Point {
-  x: number
-  y: number
-}
-
-interface GestureMapProps {
-  children: React.ReactNode
-  className?: string
-  minScale?: number
-  maxScale?: number
-}
-
-const GestureMap: React.FC<GestureMapProps> = ({
-  children,
-  className = "",
-  minScale = 0.5,
-  maxScale = 3,
-}) => {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [transform, setTransform] = useState<Transform>({
+const GestureMap = () => {
+  const [transform, setTransform] = useState({
     x: 0,
     y: 0,
     scale: 1,
     rotation: 0,
   })
 
-  // State for tracking gesture information
-  const gestureRef = useRef({
-    isDragging: false,
-    startX: 0,
-    startY: 0,
-    startTransform: { x: 0, y: 0, scale: 1, rotation: 0 },
-    previousTouchDistance: 0,
-    previousTouchAngle: 0,
-    lastCenter: { x: 0, y: 0 },
-  })
+  const svgRef = useRef(null)
+  const isDragging = useRef(false)
+  const lastPosition = useRef({ x: 0, y: 0 })
+  const touchDistance = useRef(0)
+  const touchAngle = useRef(0)
+  const touchCenter = useRef({ x: 0, y: 0 })
 
-  // Get relative position within the container
-  const getRelativePosition = useCallback(
-    (clientX: number, clientY: number): Point => {
-      if (!containerRef.current) return { x: 0, y: 0 }
+  const handleWheel = (e) => {
+    e.preventDefault()
+    const scaleFactor = e.deltaY > 0 ? 0.9 : 1.1
+    const bounds = svgRef.current.getBoundingClientRect()
+    const mouseX = e.clientX - bounds.left
+    const mouseY = e.clientY - bounds.top
 
-      const rect = containerRef.current.getBoundingClientRect()
-      return {
-        x: clientX - rect.left,
-        y: clientY - rect.top,
-      }
-    },
-    []
-  )
-
-  // Calculate distance between two touch points
-  const getTouchDistance = (touch1: Touch, touch2: Touch): number => {
-    const dx = touch1.clientX - touch2.clientX
-    const dy = touch1.clientY - touch2.clientY
-    return Math.sqrt(dx * dx + dy * dy)
+    setTransform((prev) => ({
+      ...prev,
+      scale: Math.max(0.1, Math.min(10, prev.scale * scaleFactor)),
+      x: prev.x - (mouseX - prev.x) * (scaleFactor - 1),
+      y: prev.y - (mouseY - prev.y) * (scaleFactor - 1),
+    }))
   }
 
-  // Calculate angle between two touch points
-  const getTouchAngle = (touch1: Touch, touch2: Touch): number => {
-    return (
-      Math.atan2(
-        touch2.clientY - touch1.clientY,
-        touch2.clientX - touch1.clientX
-      ) *
-      (180 / Math.PI)
+  const handleMouseDown = (e) => {
+    isDragging.current = true
+    lastPosition.current = { x: e.clientX, y: e.clientY }
+  }
+
+  const handleMouseMove = (e) => {
+    if (!isDragging.current) return
+
+    const dx = e.clientX - lastPosition.current.x
+    const dy = e.clientY - lastPosition.current.y
+
+    setTransform((prev) => ({
+      ...prev,
+      x: prev.x + dx,
+      y: prev.y + dy,
+    }))
+
+    lastPosition.current = { x: e.clientX, y: e.clientY }
+  }
+
+  const handleMouseUp = () => {
+    isDragging.current = false
+  }
+
+  const getTouchDistance = (touches) => {
+    return Math.hypot(
+      touches[0].clientX - touches[1].clientX,
+      touches[0].clientY - touches[1].clientY
     )
   }
 
-  // Handle the start of a gesture (mouse down or touch start)
-  const handleGestureStart = useCallback(
-    (clientX: number, clientY: number) => {
-      if (!containerRef.current) return
+  const getTouchAngle = (touches) => {
+    return Math.atan2(
+      touches[1].clientY - touches[0].clientY,
+      touches[1].clientX - touches[0].clientX
+    )
+  }
 
-      gestureRef.current = {
-        ...gestureRef.current,
-        isDragging: true,
-        startX: clientX,
-        startY: clientY,
-        startTransform: { ...transform },
-        previousTouchDistance: 0,
-        previousTouchAngle: 0,
-        lastCenter: { x: clientX, y: clientY },
+  const getTouchCenter = (touches) => {
+    const bounds = svgRef.current.getBoundingClientRect()
+    return {
+      x: (touches[0].clientX + touches[1].clientX) / 2 - bounds.left,
+      y: (touches[0].clientY + touches[1].clientY) / 2 - bounds.top,
+    }
+  }
+
+  const handleTouchStart = (e) => {
+    if (e.touches.length === 2) {
+      touchDistance.current = getTouchDistance(e.touches)
+      touchAngle.current = getTouchAngle(e.touches)
+      touchCenter.current = getTouchCenter(e.touches)
+    } else if (e.touches.length === 1) {
+      lastPosition.current = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY,
       }
-    },
-    [transform]
-  )
+    }
+  }
 
-  // Handle gesture movement (mouse move or touch move)
-  const handleGestureMove = useCallback(
-    (
-      clientX: number,
-      clientY: number,
-      scale?: number,
-      rotation?: number,
-      center?: Point
-    ) => {
-      if (!gestureRef.current.isDragging || !containerRef.current) return
+  const handleTouchMove = (e) => {
+    e.preventDefault()
 
-      const deltaX = clientX - gestureRef.current.startX
-      const deltaY = clientY - gestureRef.current.startY
+    if (e.touches.length === 2) {
+      const newDistance = getTouchDistance(e.touches)
+      const newAngle = getTouchAngle(e.touches)
+      const newCenter = getTouchCenter(e.touches)
 
-      const newTransform = { ...gestureRef.current.startTransform }
+      const scaleFactor = newDistance / touchDistance.current
+      const rotationDelta = ((newAngle - touchAngle.current) * 180) / Math.PI
 
-      // Apply translation
-      if (!scale && !rotation) {
-        newTransform.x += deltaX
-        newTransform.y += deltaY
-      }
+      setTransform((prev) => {
+        const newScale = Math.max(0.1, Math.min(10, prev.scale * scaleFactor))
 
-      // Apply scale if provided (relative to center point)
-      if (scale !== undefined && center) {
-        const prevScale = newTransform.scale
-        const newScale = Math.min(
-          maxScale,
-          Math.max(minScale, prevScale * scale)
-        )
+        // Convert global coordinates to object space
+        const localOldCenter = {
+          x: (touchCenter.current.x - prev.x) / prev.scale,
+          y: (touchCenter.current.y - prev.y) / prev.scale,
+        }
 
-        // Adjust position to make zoom relative to center point
-        const scaleRatio = newScale / prevScale
-        const dx = center.x - gestureRef.current.lastCenter.x
-        const dy = center.y - gestureRef.current.lastCenter.y
-
-        newTransform.x += dx * (1 - scaleRatio)
-        newTransform.y += dy * (1 - scaleRatio)
-        newTransform.scale = newScale
-
-        gestureRef.current.lastCenter = center
-      }
-
-      // Apply rotation if provided (relative to center point)
-      if (rotation !== undefined && center) {
-        const newRotation = newTransform.rotation + rotation
-
-        // Convert rotation to radians
-        const rad = (rotation * Math.PI) / 180
+        // Apply rotation around the touch center
+        const rad = (rotationDelta * Math.PI) / 180
         const cos = Math.cos(rad)
         const sin = Math.sin(rad)
 
-        // Rotate around center point
-        const dx = center.x - gestureRef.current.lastCenter.x
-        const dy = center.y - gestureRef.current.lastCenter.y
+        // Calculate new position that keeps the touch center fixed
+        const dx = newCenter.x - touchCenter.current.x
+        const dy = newCenter.y - touchCenter.current.y
 
-        newTransform.x += dx * (1 - cos) + dy * sin
-        newTransform.y += dy * (1 - cos) - dx * sin
-        newTransform.rotation = newRotation
+        return {
+          scale: newScale,
+          rotation: prev.rotation + rotationDelta,
+          x:
+            newCenter.x -
+            (localOldCenter.x * cos - localOldCenter.y * sin) * newScale +
+            dx,
+          y:
+            newCenter.y -
+            (localOldCenter.x * sin + localOldCenter.y * cos) * newScale +
+            dy,
+        }
+      })
 
-        gestureRef.current.lastCenter = center
+      touchDistance.current = newDistance
+      touchAngle.current = newAngle
+      touchCenter.current = newCenter
+    } else if (e.touches.length === 1) {
+      const dx = e.touches[0].clientX - lastPosition.current.x
+      const dy = e.touches[0].clientY - lastPosition.current.y
+
+      setTransform((prev) => ({
+        ...prev,
+        x: prev.x + dx,
+        y: prev.y + dy,
+      }))
+
+      lastPosition.current = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY,
       }
+    }
+  }
 
-      setTransform(newTransform)
-    },
-    [maxScale, minScale]
-  )
-
-  // Handle the end of a gesture (mouse up or touch end)
-  const handleGestureEnd = useCallback(() => {
-    gestureRef.current.isDragging = false
+  useEffect(() => {
+    const svg = svgRef.current
+    svg.addEventListener("wheel", handleWheel, { passive: false })
+    return () => svg.removeEventListener("wheel", handleWheel)
   }, [])
 
-  // Mouse event handlers
-  const handleMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault()
-      handleGestureStart(e.clientX, e.clientY)
-    },
-    [handleGestureStart]
-  )
-
-  const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
-      e.preventDefault()
-      handleGestureMove(e.clientX, e.clientY)
-    },
-    [handleGestureMove]
-  )
-
-  const handleWheel = useCallback(
-    (e: WheelEvent) => {
-      e.preventDefault()
-      const scaleFactor = e.deltaY > 0 ? 0.9 : 1.1
-      const center = getRelativePosition(e.clientX, e.clientY)
-
-      handleGestureStart(e.clientX, e.clientY)
-      handleGestureMove(e.clientX, e.clientY, scaleFactor, undefined, center)
-      handleGestureEnd()
-    },
-    [
-      handleGestureStart,
-      handleGestureMove,
-      handleGestureEnd,
-      getRelativePosition,
-    ]
-  )
-
-  // Touch event handlers
-  const handleTouchStart = useCallback(
-    (e: React.TouchEvent) => {
-      e.preventDefault()
-      const touch = e.touches[0]
-      handleGestureStart(touch.clientX, touch.clientY)
-
-      if (e.touches.length === 2) {
-        const touch1 = e.touches[0]
-        const touch2 = e.touches[1]
-        gestureRef.current.previousTouchDistance = getTouchDistance(
-          touch1,
-          touch2
-        )
-        gestureRef.current.previousTouchAngle = getTouchAngle(touch1, touch2)
-
-        // Set initial center for two-finger gestures
-        gestureRef.current.lastCenter = getRelativePosition(
-          (touch1.clientX + touch2.clientX) / 2,
-          (touch1.clientY + touch2.clientY) / 2
-        )
-      }
-    },
-    [handleGestureStart, getRelativePosition]
-  )
-
-  const handleTouchMove = useCallback(
-    (e: TouchEvent) => {
-      e.preventDefault()
-      const touch = e.touches[0]
-
-      if (e.touches.length === 2) {
-        const touch1 = e.touches[0]
-        const touch2 = e.touches[1]
-
-        // Calculate center point of the two touches
-        const center = getRelativePosition(
-          (touch1.clientX + touch2.clientX) / 2,
-          (touch1.clientY + touch2.clientY) / 2
-        )
-
-        // Calculate scale change
-        const currentDistance = getTouchDistance(touch1, touch2)
-        const scale = currentDistance / gestureRef.current.previousTouchDistance
-        gestureRef.current.previousTouchDistance = currentDistance
-
-        // Calculate rotation change
-        const currentAngle = getTouchAngle(touch1, touch2)
-        const rotation = currentAngle - gestureRef.current.previousTouchAngle
-        gestureRef.current.previousTouchAngle = currentAngle
-
-        handleGestureMove(center.x, center.y, scale, rotation, center)
-      } else {
-        handleGestureMove(touch.clientX, touch.clientY)
-      }
-    },
-    [handleGestureMove, getRelativePosition]
-  )
-
-  // Set up event listeners
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
-
-    const handleMouseUp = (e: MouseEvent) => {
-      e.preventDefault()
-      handleGestureEnd()
-    }
-
-    const handleTouchEnd = (e: TouchEvent) => {
-      e.preventDefault()
-      handleGestureEnd()
-    }
-
-    // Mouse events
-    window.addEventListener("mousemove", handleMouseMove)
-    window.addEventListener("mouseup", handleMouseUp)
-    container.addEventListener("wheel", handleWheel)
-
-    // Touch events
-    window.addEventListener("touchmove", handleTouchMove, { passive: false })
-    window.addEventListener("touchend", handleTouchEnd)
-    window.addEventListener("touchcancel", handleTouchEnd)
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove)
-      window.removeEventListener("mouseup", handleMouseUp)
-      container.removeEventListener("wheel", handleWheel)
-
-      window.removeEventListener("touchmove", handleTouchMove)
-      window.removeEventListener("touchend", handleTouchEnd)
-      window.removeEventListener("touchcancel", handleTouchEnd)
-    }
-  }, [handleGestureEnd, handleMouseMove, handleTouchMove, handleWheel])
-
   return (
-    <div
-      ref={containerRef}
-      className={`relative overflow-hidden touch-none ${className}`}
-      onMouseDown={handleMouseDown}
-      onTouchStart={handleTouchStart}
-      style={{
-        cursor: gestureRef.current.isDragging ? "grabbing" : "grab",
-      }}
-    >
-      <div
-        style={{
-          transform: `translate(${transform.x}px, ${transform.y}px) 
-                     scale(${transform.scale}) 
-                     rotate(${transform.rotation}deg)`,
-          transformOrigin: "center",
-          willChange: "transform",
-        }}
+    <div className="w-screen h-screen overflow-hidden touch-none">
+      <svg
+        ref={svgRef}
+        className="w-full h-full"
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
       >
-        {children}
-      </div>
+        <g
+          transform={`translate(${transform.x},${transform.y}) scale(${transform.scale}) rotate(${transform.rotation})`}
+        >
+          <image href={map.src} width={840} height={840} />
+        </g>
+      </svg>
     </div>
   )
 }
