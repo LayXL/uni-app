@@ -29,9 +29,7 @@ const GestureMap = () => {
       scale: parseAsFloat.withDefault(1),
       rotation: parseAsFloat.withDefault(0),
     },
-    {
-      history: "replace",
-    }
+    { history: "replace" }
   )
 
   const svgRef = useRef<SVGSVGElement>(null)
