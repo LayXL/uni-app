@@ -83,12 +83,12 @@ const GestureMap = () => {
   const getTouchCenter = (touches: TouchList) => {
     const bounds = svgRef.current?.getBoundingClientRect()
 
-    return !bounds
-      ? { x: 0, y: 0 }
-      : {
+    return bounds
+      ? {
           x: (touches[0].clientX + touches[1].clientX) / 2 - bounds.left,
           y: (touches[0].clientY + touches[1].clientY) / 2 - bounds.top,
         }
+      : { x: 0, y: 0 }
   }
 
   const handleTouchStart: TouchEventHandler<SVGSVGElement> = (e) => {
