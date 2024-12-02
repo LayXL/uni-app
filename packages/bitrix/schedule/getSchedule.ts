@@ -1,4 +1,5 @@
 import { delay } from "shared/delay.ts"
+import { env } from "../env.ts"
 import parseSchedule, { type Schedule } from "./parseSchedule.ts"
 
 export default async function (
@@ -11,7 +12,7 @@ export default async function (
 
   console.info(`Getting schedule for ${group}`)
 
-  const url = `${<string>Bun.env.BITRIX_URL}mobile/teacher/schedule/spo_and_vo.php?name=${transformedGroup}`
+  const url = `${env.BITRIX_URL}mobile/teacher/schedule/spo_and_vo.php?name=${transformedGroup}`
 
   const response = await fetch(url, {
     headers: {

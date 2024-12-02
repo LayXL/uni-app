@@ -1,4 +1,5 @@
 import objectToQuery from "shared/object-to-query.ts"
+import { env } from "../env.ts"
 
 export type Session = {
   cookie: string
@@ -11,7 +12,7 @@ export default async function (
   login: string,
   password: string
 ): Promise<Session> {
-  const authUrl = `${<string>Bun.env.BITRIX_URL}auth/index.php?login=yes`
+  const authUrl = `${env.BITRIX_URL}auth/index.php?login=yes`
 
   const authResponse = await fetch(authUrl, {
     method: "POST",
@@ -54,7 +55,7 @@ export default async function (
   return {
     cookie,
     session_id: bitrix_sessid,
-    user_id: +USER_ID,
+    user_id: Number.parseInt(USER_ID),
     timestamp: Date.now(),
   }
 }

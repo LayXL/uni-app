@@ -12,7 +12,7 @@ type ProvidersProps = {
 export const Providers = ({ children }: ProvidersProps) => {
   return (
     <NuqsAdapter>
-      <ThemeProvider>
+      <ThemeProvider forcedTheme={"dark"}>
         <TmaSdkProvider>
           <BackButtonProvider>
             <ThemeConfigProvider>{children}</ThemeConfigProvider>
