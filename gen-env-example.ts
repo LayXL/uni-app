@@ -8,11 +8,8 @@ function findAndCreateEnvExample(dirPath: string) {
     const filePath = join(dirPath, file)
     const stats = statSync(filePath)
 
-    if (stats.isDirectory()) {
-      findAndCreateEnvExample(filePath)
-    } else if (file === ".env") {
-      createEnvExample(filePath)
-    }
+    if (stats.isDirectory()) findAndCreateEnvExample(filePath)
+    else if (file === ".env") createEnvExample(filePath)
   }
 }
 
