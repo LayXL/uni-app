@@ -10,7 +10,7 @@
     "attributePosition": "auto"
   },
   "files": {
-    "ignore": [".next"]
+    "ignore": [".next", "emojis"]
   },
   "organizeImports": { "enabled": true },
   "linter": {
