@@ -3,6 +3,7 @@ import {
   boolean,
   date,
   integer,
+  json,
   pgTable,
   serial,
   text,
@@ -36,6 +37,9 @@ export const classes = pgTable(
       .references(() => subjects.id),
     classroom: text().notNull(),
     isCancelled: boolean().notNull().default(false),
+    isDistance: boolean().notNull().default(false),
+    isChanged: boolean().notNull().default(false),
+    original: json(),
     groups: integer().array().notNull().default([]),
   },
   (table) => ({

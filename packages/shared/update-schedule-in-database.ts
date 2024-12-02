@@ -36,39 +36,35 @@ export const updateScheduleInDatabase = async () => {
 
     if (!data) continue
 
-    for (const scheduleItem of data.schedule) {
-      for (const item of scheduleItem.schedule) {
-        const subjectName = item.subject?.trim()
-        const classroom = item.classroom?.trim()
+    for (const scheduleItem of data) {
+      const date = format(scheduleItem.date, "yyyy-MM-dd")
+      const subjectId = await getSubjectIdByName(scheduleItem.subject)
 
-        if (!subjectName || !classroom) continue
+      const existingClassIndex = newClasses.findIndex(
+        (x) =>
+          x.date === date &&
+          x.order === scheduleItem.order &&
+          x.subject === subjectId &&
+          x.classroom === scheduleItem.classroom
+      )
 
-        const date = format(scheduleItem.date, "yyyy-MM-dd")
-        const subjectId = await getSubjectIdByName(subjectName)
-
-        const existingClassIndex = newClasses.findIndex(
-          (x) =>
-            x.date === date &&
-            x.order === item.number &&
-            x.subject === subjectId &&
-            x.classroom === classroom
-        )
-
-        if (
-          existingClassIndex !== -1 &&
-          !newClasses[existingClassIndex].groups.includes(group.id)
-        ) {
-          newClasses[existingClassIndex].groups.push(group.id)
-        } else {
-          newClasses.push({
-            date: date,
-            order: item.number,
-            subject: subjectId,
-            classroom,
-            groups: [group.id],
-            isCancelled: item.cancelled ?? false,
-          })
-        }
+      if (
+        existingClassIndex !== -1 &&
+        !newClasses[existingClassIndex].groups.includes(group.id)
+      ) {
+        newClasses[existingClassIndex].groups.push(group.id)
+      } else {
+        newClasses.push({
+          date: date,
+          order: scheduleItem.order,
+          subject: subjectId,
+          classroom: scheduleItem.classroom,
+          groups: [group.id],
+          isCancelled: scheduleItem.isCancelled,
+          isDistance: scheduleItem.isDistance,
+          isChanged: scheduleItem.isChanged,
+          original: scheduleItem.original,
+        })
       }
     }
   }

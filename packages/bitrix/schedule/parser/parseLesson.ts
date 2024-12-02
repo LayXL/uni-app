@@ -1,17 +1,19 @@
-import type {HTMLElement} from "node-html-parser";
+import type { HTMLElement } from "node-html-parser"
 
 export const parseLesson = (lesson: HTMLElement) => {
   const colsCount = lesson.childNodes.length
   const isTeacher = colsCount === 9
 
-  const classroom = lesson
-    .querySelector(`td:nth-child(${isTeacher ? 4 : 3})`)
-    ?.innerText.trim()
+  const classroom =
+    lesson
+      .querySelector(`td:nth-child(${isTeacher ? 4 : 3})`)
+      ?.innerText.trim() ?? ""
 
-  const subject = lesson
-    .querySelector(`td:nth-child(${isTeacher ? 3 : 2})`)
-    ?.innerText.replaceAll(/\s{2,}/g, " ")
-    .trim()
+  const subject =
+    lesson
+      .querySelector(`td:nth-child(${isTeacher ? 3 : 2})`)
+      ?.innerText.replaceAll(/\s{2,}/g, " ")
+      .trim() ?? ""
 
   return {
     order: Number(lesson.querySelector("th:nth-child(1)")?.innerText),

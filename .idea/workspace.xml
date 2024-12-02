@@ -4,28 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="207ad946-3ed0-4e90-a58e-b232760d0c1b" name="Changes" comment="chore: removed public folder content because its template">
-      <change afterPath="$PROJECT_DIR$/apps/web/src/app/(app)/oauth/page.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/packages/bitrix/env.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/packages/bitrix/schedule/parser/formatScheduleHtml.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/packages/bitrix/schedule/parser/getDifferences.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/packages/bitrix/schedule/parser/parseLesson.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/packages/bitrix/schedule/parser/parseSchedule.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/packages/bitrix/schedule/parser/removeBreakingElements.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/packages/bitrix/schedule/parser/removeHeadElement.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/packages/bitrix/schedule/parser/removeHtmlComments.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/packages/bitrix/schedule/parser/removeScriptElements.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/packages/bitrix/schedule/parser/test-html/cancelled-lesson.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/packages/bitrix/schedule/parser/test-html/table-danger.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/packages/bitrix/schedule/parser/test-html/test.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/packages/bitrix/schedule/parser/test-html/with-subgroups.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/packages/bitrix/user/getUserData.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/src/app/(app)/providers.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/app/(app)/providers.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bun.lockb" beforeDir="false" afterPath="$PROJECT_DIR$/bun.lockb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/bitrix/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/bitrix/package.json" afterDir="false" />
+    <list default="true" id="207ad946-3ed0-4e90-a58e-b232760d0c1b" name="Changes" comment="feat(schedule-parser): new schedule parser">
       <change beforePath="$PROJECT_DIR$/packages/bitrix/schedule/getSchedule.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/bitrix/schedule/getSchedule.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/bitrix/session/getSession.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/bitrix/session/getSession.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/bitrix/schedule/getTeacherSchedule.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/bitrix/schedule/getTeacherSchedule.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/bitrix/schedule/parseSchedule.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/bitrix/schedule/parseTeacherSchedule.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/bitrix/schedule/parser/parseLesson.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/bitrix/schedule/parser/parseLesson.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/update-schedule-in-database.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/update-schedule-in-database.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -180,7 +165,7 @@
       <workItem from="1732869744350" duration="17000" />
       <workItem from="1733045503592" duration="21000" />
       <workItem from="1733047234363" duration="35000" />
-      <workItem from="1733161159428" duration="7840000" />
+      <workItem from="1733161159428" duration="8173000" />
     </task>
     <task id="LOCAL-00001" summary="First commit">
       <option name="closed" value="true" />
@@ -430,7 +415,15 @@
       <option name="project" value="LOCAL" />
       <updated>1732825844414</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="feat(schedule-parser): new schedule parser">
+      <option name="closed" value="true" />
+      <created>1733169173664</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1733169173664</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -474,7 +467,8 @@
     <MESSAGE value="refactor: gesture-map impr" />
     <MESSAGE value="refactor: invert ternary operator" />
     <MESSAGE value="chore: removed public folder content because its template" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore: removed public folder content because its template" />
+    <MESSAGE value="feat(schedule-parser): new schedule parser" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(schedule-parser): new schedule parser" />
   </component>
   <component name="com.gk646.codestats.settings.Save">
     <option name="genericTimePoints">
