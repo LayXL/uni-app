@@ -6,6 +6,7 @@ import { db } from "drizzle"
 import { gte } from "drizzle-orm"
 import { classes } from "drizzle/schema.ts"
 import { z } from "zod"
+import { delay } from "./delay.ts"
 import { getSubjectIdByName } from "./get-subject-id-by-name.ts"
 
 const config = z
@@ -29,7 +30,15 @@ export const updateScheduleInDatabase = async () => {
 
   const newClasses: (typeof classes.$inferSelect)[] = []
 
+  let i = 0
+
   for (const group of groups) {
+    console.info(
+      `[${i + 1}/${groups.length}] Parsing ${group.id} — ${group.displayName}`
+    )
+
+    await delay(100)
+
     const data = group.isTeacher
       ? await getTeacherSchedule(group.bitrixId, cookie)
       : await getSchedule(group.bitrixId, cookie)
@@ -67,6 +76,8 @@ export const updateScheduleInDatabase = async () => {
         })
       }
     }
+
+    i++
   }
 
   const minDate = newClasses[0].date
@@ -76,5 +87,5 @@ export const updateScheduleInDatabase = async () => {
     await tx.insert(classes).values(newClasses)
   })
 
-  console.info("Updated schedule in database")
+  console.info("Schedule in database updated")
 }

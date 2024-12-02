@@ -4,12 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="207ad946-3ed0-4e90-a58e-b232760d0c1b" name="Changes" comment="feat(schedule-parser): new schedule parser">
-      <change beforePath="$PROJECT_DIR$/packages/bitrix/schedule/getSchedule.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/bitrix/schedule/getSchedule.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/bitrix/schedule/getTeacherSchedule.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/bitrix/schedule/getTeacherSchedule.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/bitrix/schedule/parseSchedule.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/bitrix/schedule/parseTeacherSchedule.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/bitrix/schedule/parser/parseLesson.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/bitrix/schedule/parser/parseLesson.ts" afterDir="false" />
+    <list default="true" id="207ad946-3ed0-4e90-a58e-b232760d0c1b" name="Changes" comment="feat(schedule-updater): impl new parser to updater">
+      <change afterPath="$PROJECT_DIR$/apps/schedule-updater/force-update.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/schedule-updater/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/schedule-updater/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/bitrix/schedule/parser/parseSchedule.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/bitrix/schedule/parser/parseSchedule.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/drizzle/migrations/meta/_journal.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/drizzle/migrations/meta/_journal.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/shared/update-schedule-in-database.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/update-schedule-in-database.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -68,7 +68,7 @@
     "com.codeium.enabled": "true",
     "database.data.extractors.current.export.id": "Comma-separated (CSV)_id",
     "git-widget-placeholder": "main",
-    "last_opened_file_path": "/Users/layxl/WebstormProjects/uni-app/packages/bitrix/schedule",
+    "last_opened_file_path": "/Users/layxl/WebstormProjects/uni-app/apps/schedule-updater",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -94,11 +94,11 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/apps/schedule-updater" />
       <recent name="$PROJECT_DIR$/packages/bitrix/schedule" />
       <recent name="$PROJECT_DIR$/apps/web/src/shared/utils" />
       <recent name="$PROJECT_DIR$/apps/web/src/payload/collections" />
       <recent name="$PROJECT_DIR$/apps/web/src/app/(payload)" />
-      <recent name="$PROJECT_DIR$/packages/shared" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/packages/bitrix/schedule/parser/test-html" />
@@ -165,7 +165,7 @@
       <workItem from="1732869744350" duration="17000" />
       <workItem from="1733045503592" duration="21000" />
       <workItem from="1733047234363" duration="35000" />
-      <workItem from="1733161159428" duration="8173000" />
+      <workItem from="1733161159428" duration="9463000" />
     </task>
     <task id="LOCAL-00001" summary="First commit">
       <option name="closed" value="true" />
@@ -423,7 +423,15 @@
       <option name="project" value="LOCAL" />
       <updated>1733169173664</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary="feat(schedule-updater): impl new parser to updater">
+      <option name="closed" value="true" />
+      <created>1733169731937</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1733169731938</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -468,7 +476,8 @@
     <MESSAGE value="refactor: invert ternary operator" />
     <MESSAGE value="chore: removed public folder content because its template" />
     <MESSAGE value="feat(schedule-parser): new schedule parser" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(schedule-parser): new schedule parser" />
+    <MESSAGE value="feat(schedule-updater): impl new parser to updater" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(schedule-updater): impl new parser to updater" />
   </component>
   <component name="com.gk646.codestats.settings.Save">
     <option name="genericTimePoints">

@@ -44,8 +44,10 @@ export const parseSchedule = async (html: string, groupName: string) => {
       const originalLesson = originalCards[i].querySelectorAll("tbody>tr")[j]
 
       const parsedLesson = parseLesson(lesson)
-      const { isChanged: _, ...originalParsedLesson } =
-        parseLesson(originalLesson)
+
+      const { isChanged: _, ...originalParsedLesson } = originalLesson
+        ? parseLesson(originalLesson)
+        : { isChanged: false }
 
       output.push({
         date,

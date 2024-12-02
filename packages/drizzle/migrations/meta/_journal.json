@@ -15,6 +15,13 @@
       "when": 1731684899829,
       "tag": "0001_handy_warbound",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1733170639354,
+      "tag": "0002_fine_bushwacker",
+      "breakpoints": true
     }
   ]
 }
