@@ -6,7 +6,6 @@ import { db } from "drizzle"
 import { gte } from "drizzle-orm"
 import { classes } from "drizzle/schema.ts"
 import { z } from "zod"
-import { delay } from "./delay.ts"
 import { getSubjectIdByName } from "./get-subject-id-by-name.ts"
 
 const config = z
@@ -36,8 +35,6 @@ export const updateScheduleInDatabase = async () => {
     console.info(
       `[${i + 1}/${groups.length}] Parsing ${group.id} — ${group.displayName}`
     )
-
-    await delay(100)
 
     const data = group.isTeacher
       ? await getTeacherSchedule(group.bitrixId, cookie)
