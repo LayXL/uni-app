@@ -1,5 +1,5 @@
 import { env } from "../env.ts"
-import { parseSchedule } from "./parser/parseSchedule.ts"
+import { parseSchedule } from "./parser/parse-schedule.ts"
 
 export default async function (group: string, cookie: string) {
   const transformedGroup = group.split("(")[0]

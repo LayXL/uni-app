@@ -1,4 +1,4 @@
-import { parseSchedule } from "./parser/parseSchedule.ts"
+import { parseSchedule } from "./parser/parse-schedule.ts"
 
 export default async function (teacher: string, cookie: string) {
   const url = `${<string>Bun.env.BITRIX_URL}mobile/teacher/schedule/teacher.php?id=${teacher}`

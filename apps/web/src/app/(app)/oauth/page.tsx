@@ -1,5 +1,5 @@
-import getSession from "bitrix/session/getSession"
-import { getUserData } from "bitrix/user/getUserData"
+import getSession from "bitrix/session/get-session"
+import { getUserData } from "bitrix/user/get-user-data"
 
 export default function Page() {
   async function auth(formData: FormData) {

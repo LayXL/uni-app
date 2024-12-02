@@ -1,9 +1,9 @@
 import { format } from "date-fns/format"
 import { parse as parseDate } from "date-fns/parse"
 import parseHtml from "node-html-parser"
-import { formatScheduleHtml } from "./formatScheduleHtml.ts"
-import { getDifferences } from "./getDifferences.ts"
-import { parseLesson } from "./parseLesson.ts"
+import { formatScheduleHtml } from "./format-schedule-html.ts"
+import { getDifferences } from "./get-differences.ts"
+import { parseLesson } from "./parse-lesson.ts"
 
 export const parseSchedule = async (html: string, groupName: string) => {
   const root = parseHtml(await formatScheduleHtml(html))
