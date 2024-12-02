@@ -8,6 +8,7 @@ export const getDailyLessons = async (date: string, group: number) => {
     .select()
     .from(classes)
     .where(and(eq(classes.date, date), arrayContains(classes.groups, [group])))
+    .orderBy(classes.date, classes.order)
 
   return populateLessons(dailyLessons, group)
 }
