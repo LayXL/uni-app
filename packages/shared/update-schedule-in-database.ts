@@ -1,7 +1,6 @@
 import getSchedule from "bitrix/schedule/getSchedule.ts"
 import getTeacherSchedule from "bitrix/schedule/getTeacherSchedule.ts"
 import getSession from "bitrix/session/getSession.ts"
-import { format } from "date-fns/format"
 import { db } from "drizzle"
 import { gte } from "drizzle-orm"
 import { classes } from "drizzle/schema.ts"
@@ -43,25 +42,22 @@ export const updateScheduleInDatabase = async () => {
     if (!data) continue
 
     for (const scheduleItem of data) {
-      const date = format(scheduleItem.date, "yyyy-MM-dd")
       const subjectId = await getSubjectIdByName(scheduleItem.subject)
 
       const existingClassIndex = newClasses.findIndex(
         (x) =>
-          x.date === date &&
+          x.date === scheduleItem.date &&
           x.order === scheduleItem.order &&
           x.subject === subjectId &&
           x.classroom === scheduleItem.classroom
       )
 
-      if (
-        existingClassIndex !== -1 &&
-        !newClasses[existingClassIndex].groups.includes(group.id)
-      ) {
-        newClasses[existingClassIndex].groups.push(group.id)
+      if (existingClassIndex !== -1) {
+        if (!newClasses[existingClassIndex].groups.includes(group.id))
+          newClasses[existingClassIndex].groups.push(group.id)
       } else {
         newClasses.push({
-          date: date,
+          date: scheduleItem.date,
           order: scheduleItem.order,
           subject: subjectId,
           classroom: scheduleItem.classroom,

@@ -4,12 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="207ad946-3ed0-4e90-a58e-b232760d0c1b" name="Changes" comment="feat(schedule-updater): impl new parser to updater">
-      <change afterPath="$PROJECT_DIR$/apps/schedule-updater/force-update.ts" afterDir="false" />
+    <list default="true" id="207ad946-3ed0-4e90-a58e-b232760d0c1b" name="Changes" comment="feat(schedule-updater): removed delay in parser">
+      <change afterPath="$PROJECT_DIR$/packages/bitrix/schedule/parser/teacher.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/schedule-updater/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/schedule-updater/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/src/app/(app)/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/app/(app)/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/bitrix/schedule/parser/parseSchedule.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/bitrix/schedule/parser/parseSchedule.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/drizzle/migrations/meta/_journal.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/drizzle/migrations/meta/_journal.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/shared/lessons/get-upcoming-lessons.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/lessons/get-upcoming-lessons.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/shared/update-schedule-in-database.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/update-schedule-in-database.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -41,7 +41,7 @@
   }
 }</component>
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="CurrentFile" />
+    <option name="selectedTabId" value="ProjectErrors" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3
@@ -101,8 +101,8 @@
       <recent name="$PROJECT_DIR$/apps/web/src/app/(payload)" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/packages/bitrix/schedule/parser/test-html" />
       <recent name="$PROJECT_DIR$/packages/bitrix/schedule/parser" />
+      <recent name="$PROJECT_DIR$/packages/bitrix/schedule/parser/test-html" />
       <recent name="$PROJECT_DIR$/packages/bitrix/schedule" />
       <recent name="$PROJECT_DIR$/apps/web" />
       <recent name="$PROJECT_DIR$/apps/web/src" />
@@ -165,7 +165,7 @@
       <workItem from="1732869744350" duration="17000" />
       <workItem from="1733045503592" duration="21000" />
       <workItem from="1733047234363" duration="35000" />
-      <workItem from="1733161159428" duration="9463000" />
+      <workItem from="1733161159428" duration="11908000" />
     </task>
     <task id="LOCAL-00001" summary="First commit">
       <option name="closed" value="true" />
@@ -431,7 +431,39 @@
       <option name="project" value="LOCAL" />
       <updated>1733169731938</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL-00034" summary="feat(schedule-updater): impl new parser to updater">
+      <option name="closed" value="true" />
+      <created>1733170834418</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1733170834418</updated>
+    </task>
+    <task id="LOCAL-00035" summary="feat(schedule-updater): impl new parser to updater">
+      <option name="closed" value="true" />
+      <created>1733170837923</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1733170837923</updated>
+    </task>
+    <task id="LOCAL-00036" summary="refactor(schedule-updater): removed unused files">
+      <option name="closed" value="true" />
+      <created>1733170993401</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1733170993401</updated>
+    </task>
+    <task id="LOCAL-00037" summary="feat(schedule-updater): removed delay in parser">
+      <option name="closed" value="true" />
+      <created>1733171059236</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1733171059236</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -477,7 +509,9 @@
     <MESSAGE value="chore: removed public folder content because its template" />
     <MESSAGE value="feat(schedule-parser): new schedule parser" />
     <MESSAGE value="feat(schedule-updater): impl new parser to updater" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(schedule-updater): impl new parser to updater" />
+    <MESSAGE value="refactor(schedule-updater): removed unused files" />
+    <MESSAGE value="feat(schedule-updater): removed delay in parser" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(schedule-updater): removed delay in parser" />
   </component>
   <component name="com.gk646.codestats.settings.Save">
     <option name="genericTimePoints">

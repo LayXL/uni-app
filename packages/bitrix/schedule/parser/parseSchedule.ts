@@ -10,11 +10,14 @@ export const parseSchedule = async (html: string, groupName: string) => {
 
   const subgroup = groupName.split("(")?.[1]?.split(")")?.[0] ?? 0
 
+  const withoutSubgroups =
+    root.querySelectorAll("#withoutReplacements_subgroupNum_0").length === 0
+
   const cards = root.querySelectorAll(
-    `#withReplacements_subgroupNum_${subgroup} .card-body`
+    `${withoutSubgroups ? ".withReplacements" : `#withReplacements_subgroupNum_${subgroup}`} .card-body`
   )
   const originalCards = root.querySelectorAll(
-    `#withoutReplacements_subgroupNum_${subgroup} .card-body`
+    `${withoutSubgroups ? ".withoutReplacements" : `#withoutReplacements_subgroupNum_${subgroup}`} .card-body`
   )
 
   let i = 0

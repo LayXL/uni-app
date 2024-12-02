@@ -14,6 +14,7 @@ export const getUpcomingLessons = async (group: number) => {
         arrayContains(classes.groups, [group])
       )
     )
+    .orderBy(classes.date, classes.order)
 
   return populateLessons(upcomingLessons, group)
 }
