@@ -4,13 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="207ad946-3ed0-4e90-a58e-b232760d0c1b" name="Changes" comment="feat(schedule-updater): removed delay in parser">
-      <change afterPath="$PROJECT_DIR$/packages/bitrix/schedule/parser/teacher.html" afterDir="false" />
+    <list default="true" id="207ad946-3ed0-4e90-a58e-b232760d0c1b" name="Changes" comment="fix: orderby in get-daily-lessons.ts">
+      <change afterPath="$PROJECT_DIR$/apps/web/src/shared/providers/save-location-provider.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/src/app/(app)/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/app/(app)/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/bitrix/schedule/parser/parseSchedule.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/bitrix/schedule/parser/parseSchedule.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/shared/lessons/get-upcoming-lessons.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/lessons/get-upcoming-lessons.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/shared/update-schedule-in-database.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/shared/update-schedule-in-database.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,8 +17,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="TypeScript JSX File" />
         <option value="TypeScript File" />
+        <option value="TypeScript JSX File" />
       </list>
     </option>
   </component>
@@ -165,7 +162,7 @@
       <workItem from="1732869744350" duration="17000" />
       <workItem from="1733045503592" duration="21000" />
       <workItem from="1733047234363" duration="35000" />
-      <workItem from="1733161159428" duration="11908000" />
+      <workItem from="1733161159428" duration="12586000" />
     </task>
     <task id="LOCAL-00001" summary="First commit">
       <option name="closed" value="true" />
@@ -463,7 +460,31 @@
       <option name="project" value="LOCAL" />
       <updated>1733171059236</updated>
     </task>
-    <option name="localTasksCounter" value="38" />
+    <task id="LOCAL-00038" summary="fix(schedule-parser): changes in teachers parsing">
+      <option name="closed" value="true" />
+      <created>1733173304931</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1733173304931</updated>
+    </task>
+    <task id="LOCAL-00039" summary="refactor: renaming files to kebab-case">
+      <option name="closed" value="true" />
+      <created>1733173387462</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1733173387462</updated>
+    </task>
+    <task id="LOCAL-00040" summary="fix: orderby in get-daily-lessons.ts">
+      <option name="closed" value="true" />
+      <created>1733173427637</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1733173427637</updated>
+    </task>
+    <option name="localTasksCounter" value="41" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -511,7 +532,10 @@
     <MESSAGE value="feat(schedule-updater): impl new parser to updater" />
     <MESSAGE value="refactor(schedule-updater): removed unused files" />
     <MESSAGE value="feat(schedule-updater): removed delay in parser" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(schedule-updater): removed delay in parser" />
+    <MESSAGE value="fix(schedule-parser): changes in teachers parsing" />
+    <MESSAGE value="refactor: renaming files to kebab-case" />
+    <MESSAGE value="fix: orderby in get-daily-lessons.ts" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: orderby in get-daily-lessons.ts" />
   </component>
   <component name="com.gk646.codestats.settings.Save">
     <option name="genericTimePoints">

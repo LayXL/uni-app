@@ -1,8 +1,18 @@
-import Link from "next/link"
+"use client"
 
-export default async function Home() {
-  // const authCookie = await getAuthCookie()
-  // const parsed = parse(authCookie)
+import { useEffect } from "react"
 
-  return <Link href={"/schedule"} children={"Schedule"} />
+export default function Page() {
+  useEffect(() => {
+    const location = window.localStorage.getItem("location")
+
+    if (!location || location === window.location.pathname) {
+      window.location.replace("/map")
+      return
+    }
+
+    window.location.replace(location)
+  }, [])
+
+  return null
 }
