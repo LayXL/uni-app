@@ -1,3 +1,3 @@
 export const env = {
-  BITRIX_URL: (process.env.BITRIX_URL ?? Bun.env.BITRIX_URL) as string,
+  BITRIX_URL: process.env.BITRIX_URL ?? "https://portal.midis.info/",
 }

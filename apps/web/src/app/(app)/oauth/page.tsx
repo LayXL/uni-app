@@ -1,5 +1,6 @@
 import getSession from "bitrix/session/get-session"
 import { getUserData } from "bitrix/user/get-user-data"
+import { redirect } from "next/navigation"
 
 export default function Page() {
   async function auth(formData: FormData) {
@@ -19,7 +20,7 @@ export default function Page() {
 
     const userData = await getUserData(session.user_id, session.cookie)
 
-    console.log(userData)
+    redirect("/")
   }
 
   return (
