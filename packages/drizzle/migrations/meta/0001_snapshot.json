@@ -53,12 +53,8 @@
           "name": "classes_subject_subjects_id_fk",
           "tableFrom": "classes",
           "tableTo": "subjects",
-          "columnsFrom": [
-            "subject"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["subject"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -161,12 +157,8 @@
           "name": "users_group_groups_id_fk",
           "tableFrom": "users",
           "tableTo": "groups",
-          "columnsFrom": [
-            "group"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["group"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }

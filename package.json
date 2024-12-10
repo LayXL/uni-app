@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/package.json",
   "name": "uni-app",
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
@@ -6,7 +7,6 @@
     "turbo": "^2.3.3",
     "typescript": "5.5.4"
   },
-  "$schema": "https://json.schemastore.org/package.json",
   "engines": {
     "node": ">=18"
   },
