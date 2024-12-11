@@ -154,6 +154,17 @@
 
   body {
     font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+    --ma-viewport-height: var(--tg-viewport-height);
+    --safe-area-bottom: calc(100vh - var(--tg-viewport-height));
     @apply bg-neutral-1 text-neutral-12 select-none
+  }
+
+  body.vk {
+    --ma-viewport-height: calc(100vh - env(safe-area-inset-bottom));
+    --safe-area-bottom: env(safe-area-inset-bottom);
+  }
+
+  a {
+    @apply cursor-default
   }
 }

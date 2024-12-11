@@ -41,13 +41,14 @@ export const TmaSdkProvider = ({ children }: TmaSdkProviderProps) => {
       initData.restore()
 
       if (!viewport.isMounted() && !viewport.isMounting()) {
-        void viewport.mount().catch((e) => {
-          console.error("Something went wrong mounting the viewport", e)
-        })
-      }
-
-      if (viewport.isMounted()) {
-        viewport.bindCssVars()
+        void viewport
+          .mount()
+          .catch((e) => {
+            console.error("Something went wrong mounting the viewport", e)
+          })
+          .then(() => {
+            viewport.bindCssVars()
+          })
       }
     } catch (e) {}
   })

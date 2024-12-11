@@ -3,7 +3,6 @@ import Providers from "@/app/(app)/providers"
 import cn from "@/shared/utils/cn"
 import type { Metadata } from "next"
 import type { ReactNode } from "react"
-
 import "./globals.css"
 
 // TODO: update title and description
