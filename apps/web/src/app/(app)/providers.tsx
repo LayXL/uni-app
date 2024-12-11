@@ -6,22 +6,20 @@ import { ThemeProvider } from "next-themes"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 import type { ReactNode } from "react"
 
-type ProvidersProps = {
-  children: ReactNode
-}
+type ProvidersProps = { children: ReactNode }
 
-export const Providers = ({ children }: ProvidersProps) => {
-  return (
-    <NuqsAdapter>
-      <ThemeProvider forcedTheme={"dark"}>
-        <TmaSdkProvider>
-          <BackButtonProvider>
-            <ThemeConfigProvider>
-              <SaveLocationProvider>{children}</SaveLocationProvider>
-            </ThemeConfigProvider>
-          </BackButtonProvider>
-        </TmaSdkProvider>
-      </ThemeProvider>
-    </NuqsAdapter>
-  )
-}
+const Providers = ({ children }: ProvidersProps) => (
+  <NuqsAdapter>
+    <ThemeProvider forcedTheme={"dark"}>
+      <TmaSdkProvider>
+        <BackButtonProvider>
+          <ThemeConfigProvider>
+            <SaveLocationProvider>{children}</SaveLocationProvider>
+          </ThemeConfigProvider>
+        </BackButtonProvider>
+      </TmaSdkProvider>
+    </ThemeProvider>
+  </NuqsAdapter>
+)
+
+export default Providers
