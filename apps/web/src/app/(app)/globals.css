@@ -167,4 +167,12 @@
   a {
     @apply cursor-default
   }
+
+  html,
+  body {
+    overflow: hidden;
+    height: 100vh;
+    min-height: 100vh;
+    overscroll-behavior: none;
+  }
 }

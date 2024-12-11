@@ -20,7 +20,7 @@ export default function ClientSelectGroup(props: ClientSelectGroupProps) {
 
     const form = inputRef.current.parentElement as HTMLFormElement
 
-    form.submit()
+    form.requestSubmit()
   }
 
   return (

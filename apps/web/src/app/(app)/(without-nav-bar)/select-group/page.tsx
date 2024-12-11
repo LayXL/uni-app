@@ -1,5 +1,5 @@
-import { updateGroup } from "@/app/(app)/select-group/actions"
-import ClientSelectGroup from "@/app/(app)/select-group/client"
+import { updateGroup } from "@/app/(app)/(without-nav-bar)/select-group/actions"
+import ClientSelectGroup from "@/app/(app)/(without-nav-bar)/select-group/client"
 import { db } from "drizzle"
 import { asc } from "drizzle-orm"
 import { groups } from "drizzle/schema"

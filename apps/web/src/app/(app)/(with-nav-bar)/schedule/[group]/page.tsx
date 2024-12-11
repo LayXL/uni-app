@@ -1,4 +1,5 @@
 import { LessonCard } from "@/features/lesson/ui/lesson-card"
+import Link from "next/link"
 import { Fragment } from "react"
 import { checkIsGroup } from "shared/groups/check-is-group"
 import { checkIsTeacher } from "shared/groups/check-is-teacher"
@@ -18,6 +19,9 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <div className="p-4 flex flex-col gap-3">
+      <div>
+        <Link href="/select-group" children="Select group" />
+      </div>
       {Object.entries(groupedUpcomingLessons).map(([date, lessons]) => (
         <Fragment key={date}>
           <div className="px-4 pt-2 text-lg font-medium">{date}</div>

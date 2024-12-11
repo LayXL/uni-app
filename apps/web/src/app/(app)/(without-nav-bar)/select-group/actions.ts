@@ -24,9 +24,7 @@ export async function updateGroup(formData: FormData) {
   const user = await getUserFromCookie()
 
   if (user) {
-    db.update(users)
-      .set({ group: group.id })
-      .where(eq(users.telegramId, user.id))
+    await db.update(users).set({ group: group.id }).where(eq(users.id, user.id))
   } else {
     const cookieStore = await cookies()
     cookieStore.set("groupId", groupId.toString())
