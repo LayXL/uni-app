@@ -1,10 +1,10 @@
 import { geistMono, geistSans } from "@/app/(app)/fonts"
 import { Providers } from "@/app/(app)/providers"
+import { cn } from "@/shared/utils/cn"
 import type { Metadata } from "next"
 import type { ReactNode } from "react"
 
 import "./globals.css"
-import { cn } from "@/shared/utils/cn"
 
 export const metadata: Metadata = {
   title: "Create Next App",
