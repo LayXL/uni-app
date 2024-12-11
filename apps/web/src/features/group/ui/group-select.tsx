@@ -5,25 +5,7 @@ import type { groups } from "drizzle/schema"
 import { useState } from "react"
 import { getGroupType } from "shared/groups/get-group-type"
 
-type GroupList = {
-  name: string
-  filter: (group: typeof groups.$inferSelect) => boolean
-}
-
-const groupsList: GroupList[] = [
-  {
-    name: "higher",
-    filter: (group) => getGroupType(group) === "higher",
-  },
-  {
-    name: "college",
-    filter: (group) => getGroupType(group) === "college",
-  },
-  {
-    name: "teacher",
-    filter: (group) => getGroupType(group) === "teacher",
-  },
-]
+const listGroups = ["higher", "college", "teacher"]
 
 export type GroupSelectProps = {
   groups: (typeof groups.$inferSelect)[]
@@ -69,17 +51,19 @@ export const GroupSelect = (props: GroupSelectProps) => {
         ))}
 
       {searchValue.length === 0 &&
-        groupsList.map((listGroup) => (
-          <div key={listGroup.name} className="flex flex-col gap-2">
-            <h3>{listGroup.name}</h3>
+        listGroups.map((listGroup) => (
+          <div key={listGroup} className="flex flex-col gap-2">
+            <h3>{listGroup}</h3>
             <div className="flex flex-wrap gap-2">
-              {props.groups.filter(listGroup.filter).map((group) => (
-                <GroupSelectItem
-                  key={group.id}
-                  name={group.displayName}
-                  onClick={() => props.onSelect?.(group)}
-                />
-              ))}
+              {props.groups
+                .filter((group) => getGroupType(group) === listGroup)
+                .map((group) => (
+                  <GroupSelectItem
+                    key={group.id}
+                    name={group.displayName}
+                    onClick={() => props.onSelect?.(group)}
+                  />
+                ))}
             </div>
           </div>
         ))}

@@ -19,7 +19,10 @@ export default async function Page() {
     )
 
   return (
-    <div className="p-4">
+    <div className="p-4 flex flex-col gap-4">
+      <div>
+        <h2>Choose your group below</h2>
+      </div>
       <Form action={updateGroup}>
         <ClientSelectGroup groups={allGroups} />
       </Form>
