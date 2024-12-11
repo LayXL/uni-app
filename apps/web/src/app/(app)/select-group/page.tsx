@@ -1,7 +1,9 @@
-import { GroupSelect } from "@/features/group/ui/group-select"
+import { updateGroup } from "@/app/(app)/select-group/actions"
+import ClientSelectGroup from "@/app/(app)/select-group/client"
 import { db } from "drizzle"
 import { asc } from "drizzle-orm"
 import { groups } from "drizzle/schema"
+import Form from "next/form"
 import { transformToGroupName } from "shared/groups/transform-to-group-name"
 
 export default async function Page() {
@@ -18,7 +20,9 @@ export default async function Page() {
 
   return (
     <div className="p-4">
-      <GroupSelect groups={allGroups} />
+      <Form action={updateGroup}>
+        <ClientSelectGroup groups={allGroups} />
+      </Form>
     </div>
   )
 }

@@ -1,19 +1,21 @@
+import { env } from "@/shared/utils/env"
 import { isValid as checkIsValid } from "@telegram-apps/init-data-node"
 import { cookies } from "next/headers"
 import type { NextRequest } from "next/server"
 
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN as string
-
-if (!TELEGRAM_BOT_TOKEN) throw new Error("TELEGRAM_BOT_TOKEN is not defined")
+const unauthorized = new Response("Unauthorized", { status: 401 })
 
 export async function POST(request: NextRequest) {
   const authHeader = request.headers.get("Authorization")
 
-  if (!authHeader) return new Response("Unauthorized", { status: 401 })
+  if (!authHeader) return unauthorized
 
-  const isValid = checkIsValid(authHeader.split("tma ")[1], TELEGRAM_BOT_TOKEN)
+  const isValid = checkIsValid(
+    authHeader.split("tma ")[1],
+    env.TELEGRAM_BOT_TOKEN
+  )
 
-  if (!isValid) return new Response("Unauthorized", { status: 401 })
+  if (!isValid) return unauthorized
 
   const cookieStore = await cookies()
 
