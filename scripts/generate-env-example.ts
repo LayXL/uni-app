@@ -5,6 +5,13 @@ function findAndCreateEnvExample(dirPath: string) {
   const files = readdirSync(dirPath)
 
   for (const file of files) {
+    if (
+      file === "node_modules" ||
+      file.includes(".next") ||
+      file.includes(".git")
+    )
+      continue
+
     const filePath = join(dirPath, file)
     const stats = statSync(filePath)
 
@@ -21,6 +28,6 @@ function createEnvExample(envFilePath: string): void {
   writeFileSync(envExamplePath, envExampleContent)
 }
 
-findAndCreateEnvExample(process.cwd())
+findAndCreateEnvExample(join(process.cwd(), ".."))
 
 console.info("Created .env-example files")
