@@ -9,7 +9,7 @@ type NavBarItemProps = {
 
 export const NavBarItem = (props: NavBarItemProps) => {
   const body = (
-    <div className="py-2 px-1">
+    <div className="py-2 px-1 h-full grid place-items-center">
       <p className="text-center">{props.label}</p>
     </div>
   )
