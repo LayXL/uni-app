@@ -1,21 +1,10 @@
+import { geistMono, geistSans } from "@/app/(app)/fonts"
+import { Providers } from "@/app/(app)/providers"
 import type { Metadata } from "next"
-import localFont from "next/font/local"
 import type { ReactNode } from "react"
 
 import "./globals.css"
-import { Providers } from "@/app/(app)/providers"
-
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-})
-
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-})
+import { cn } from "@/shared/utils/cn"
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -29,7 +18,10 @@ type LayoutProps = {
 export default function Layout({ children }: LayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistMono.variable} ${geistSans.variable}`}>
+      <body
+        className={cn(geistMono.variable, geistSans.variable)}
+        suppressHydrationWarning
+      >
         <Providers>{children}</Providers>
       </body>
     </html>
