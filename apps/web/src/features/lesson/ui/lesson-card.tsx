@@ -8,7 +8,7 @@ type LessonCardProps = {
 
 export const LessonCard = (props: LessonCardProps) => {
   return (
-    <div className="p-4 bg-neutral-2 border border-neutral-6 flex flex-col gap-2 rounded-xl">
+    <div className="p-4 bg-neutral-2 flex flex-col gap-2 rounded-xl">
       <div className="text-sm text-neutral-11">
         <p children={`${props.order} пара`} />
       </div>

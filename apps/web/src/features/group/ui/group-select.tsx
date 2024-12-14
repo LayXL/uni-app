@@ -1,6 +1,7 @@
 "use client"
 
 import { GroupSelectItem } from "@/features/group/ui/group-select-item"
+import { RecentGroups } from "@/widgets/recent-groups"
 import type { groups } from "drizzle/schema"
 import { useTranslations } from "next-intl"
 import { useState } from "react"
@@ -55,6 +56,15 @@ export const GroupSelect = (props: GroupSelectProps) => {
             onClick={() => props.onSelect?.(group)}
           />
         ))}
+
+      {value.length === 0 && (
+        <div className="flex gap-2">
+          <RecentGroups
+            groups={props.groups}
+            onSelect={(group) => props.onSelect?.(group)}
+          />
+        </div>
+      )}
 
       {value.length === 0 &&
         listGroups.map((listGroup) => (

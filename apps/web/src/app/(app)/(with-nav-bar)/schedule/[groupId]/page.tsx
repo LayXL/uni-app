@@ -1,9 +1,10 @@
 import { Timer } from "@/features/countdown/ui/timer"
 import { LessonCard } from "@/features/lesson/ui/lesson-card"
+import { Link } from "@/shared/ui/link"
+import cn, { hover } from "@/shared/utils/cn"
 import { addMinutes } from "date-fns/addMinutes"
 import { db } from "drizzle"
 import { getTranslations } from "next-intl/server"
-import Link from "next/link"
 import { Fragment } from "react"
 import { checkIsGroup } from "shared/groups/check-is-group"
 import { checkIsTeacher } from "shared/groups/check-is-teacher"
@@ -39,13 +40,16 @@ export default async function Page({ params }: PageProps) {
           <Link
             prefetch
             href="/select-group"
-            className="block p-4 bg-neutral-2 rounded-xl border border-neutral-6"
+            className={cn(
+              "block p-4 bg-neutral-2 rounded-xl transition-colors",
+              hover("bg-neutral-4")
+            )}
           >
             <p children={group?.displayName} />
           </Link>
         </div>
 
-        <div className="p-4 bg-neutral-2 rounded-xl border border-neutral-6 grid place-items-center">
+        <div className="p-4 bg-neutral-2 rounded-xl grid place-items-center">
           <Timer
             className="text-3xl font-semibold"
             endsAt={addMinutes(new Date(), 60)}

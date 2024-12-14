@@ -2,7 +2,7 @@ import { geistMono, geistSans } from "@/app/(app)/fonts"
 import Providers from "@/app/(app)/providers"
 import cn from "@/shared/utils/cn"
 import type { Metadata } from "next"
-import { type ReactNode, use } from "react"
+import type { ReactNode } from "react"
 import "./globals.css"
 import { NextIntlClientProvider } from "next-intl"
 import { getLocale, getMessages } from "next-intl/server"
@@ -17,9 +17,9 @@ type LayoutProps = {
   children: ReactNode
 }
 
-export default function Layout({ children }: LayoutProps) {
-  const messages = use(getMessages())
-  const locale = use(getLocale())
+export default async function Layout({ children }: LayoutProps) {
+  const messages = await getMessages()
+  const locale = await getLocale()
 
   return (
     <html lang={locale} suppressHydrationWarning>

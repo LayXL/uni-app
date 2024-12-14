@@ -1,18 +1,5 @@
-"use client"
+import { RestoreLocation } from "@/shared/ui/restore-location"
 
-import { useEffect } from "react"
-
-export default function Page() {
-  useEffect(() => {
-    const location = window.localStorage.getItem("location")
-
-    if (!location || location === window.location.pathname) {
-      window.location.replace("/map")
-      return
-    }
-
-    window.location.replace(location)
-  }, [])
-
-  return null
+export default async function Page() {
+  return <RestoreLocation />
 }

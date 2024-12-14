@@ -3,6 +3,7 @@ import type { GlobalConfig } from "payload"
 export const AppStatus: GlobalConfig = {
   slug: "app-status",
   label: "Статус приложения",
+  admin: { hideAPIURL: true },
   fields: [
     {
       name: "notAvailable",
@@ -10,16 +11,21 @@ export const AppStatus: GlobalConfig = {
       label: "Сделать недоступным",
     },
     {
+      name: "message",
+      type: "text",
+      label: "Сообщение",
+    },
+    {
       label: "Плашка при входе",
       type: "collapsible",
       fields: [
         {
-          name: "show",
+          name: "showSnackbar",
           type: "checkbox",
           label: "Показывать плашку при входе в приложение",
         },
         {
-          name: "type",
+          name: "snackbarType",
           type: "select",
           label: "Тип",
           options: [
@@ -38,7 +44,7 @@ export const AppStatus: GlobalConfig = {
           ],
         },
         {
-          name: "message",
+          name: "snackbarMessage",
           type: "text",
           label: "Сообщение",
         },

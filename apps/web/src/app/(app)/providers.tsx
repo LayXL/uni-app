@@ -1,4 +1,5 @@
 import { BackButtonProvider } from "@/shared/providers/back-button-provider"
+import { QueryClientProvider } from "@/shared/providers/query-client-provider"
 import { SaveLocationProvider } from "@/shared/providers/save-location-provider"
 import { ThemeConfigProvider } from "@/shared/providers/theme-config-provider"
 import { TmaSdkProvider } from "@/shared/providers/tma-sdk-provider"
@@ -10,15 +11,17 @@ type ProvidersProps = { children: ReactNode }
 
 const Providers = async ({ children }: ProvidersProps) => (
   <NuqsAdapter>
-    <ThemeProvider forcedTheme={"dark"}>
-      <TmaSdkProvider>
-        <BackButtonProvider>
-          <ThemeConfigProvider>
-            <SaveLocationProvider>{children}</SaveLocationProvider>
-          </ThemeConfigProvider>
-        </BackButtonProvider>
-      </TmaSdkProvider>
-    </ThemeProvider>
+    <QueryClientProvider>
+      <ThemeProvider forcedTheme={"dark"}>
+        <TmaSdkProvider>
+          <BackButtonProvider>
+            <ThemeConfigProvider>
+              <SaveLocationProvider>{children}</SaveLocationProvider>
+            </ThemeConfigProvider>
+          </BackButtonProvider>
+        </TmaSdkProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   </NuqsAdapter>
 )
 
