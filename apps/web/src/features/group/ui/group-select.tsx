@@ -31,7 +31,7 @@ export const GroupSelect = (props: GroupSelectProps) => {
   return (
     <div className="flex flex-col gap-4">
       <input
-        autoFocus
+        id="focusInput"
         value={value}
         onChange={({ target: { value } }) => setValue(value)}
         className="bg-neutral-3 border border-neutral-6 rounded-lg px-2 py-1"
