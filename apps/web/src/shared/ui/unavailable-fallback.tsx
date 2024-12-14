@@ -1,14 +1,30 @@
-import { payload } from "@/shared/utils/payload"
+"use client"
 
-export const UnavailableFallback = async () => {
-  const appStatus = await payload.findGlobal({ slug: "app-status" })
+import { useQuery } from "@tanstack/react-query"
+import ky from "ky"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 
-  if (appStatus.notAvailable) {
-    const currentUrl = request.nextUrl.pathname + request.nextUrl.search
+export const UnavailableFallback = () => {
+  const router = useRouter()
 
-    const redirectUrl = new URL("/unavailable", request.url)
-    redirectUrl.searchParams.set("from", currentUrl)
+  const appStatusQuery = useQuery({
+    queryKey: ["appStatus"],
+    queryFn: () =>
+      ky.get("/api/status").json<{
+        notAvailable?: boolean
+        message?: string
+        showSnackbar?: boolean
+        snackbarMessage?: string
+        snackbarType?: "info" | "warning" | "error"
+      }>(),
+  })
 
-    return NextResponse.redirect(redirectUrl)
-  }
+  useEffect(() => {
+    if (appStatusQuery.data?.notAvailable === true) {
+      router.push(`/unavailable?from=${window.location.pathname}`)
+    }
+  }, [appStatusQuery.data?.notAvailable, router])
+
+  return null
 }

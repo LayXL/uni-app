@@ -2,10 +2,13 @@
 
 import { useQuery } from "@tanstack/react-query"
 import ky from "ky"
+import { useTranslations } from "next-intl"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 
 export default function Page() {
+  const t = useTranslations("unavailable")
+
   const router = useRouter()
   const searchParams = new URLSearchParams(window.location.search)
 
@@ -31,8 +34,8 @@ export default function Page() {
 
   return (
     <div className="h-screen w-screen flex flex-col justify-center items-center">
-      <h1>App is unavailable</h1>
-      <p>Please try again later</p>
+      <h1 children={t("title")} />
+      <p children={appStatusQuery.data?.message || t("message")} />
     </div>
   )
 }

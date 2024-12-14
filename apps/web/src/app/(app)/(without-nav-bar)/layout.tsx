@@ -1,3 +1,4 @@
+import { UnavailableFallback } from "@/shared/ui/unavailable-fallback"
 import type { ReactNode } from "react"
 
 type LayoutProps = {
@@ -10,6 +11,7 @@ export default function Layout({ children }: LayoutProps) {
       <div className="flex-1 overflow-scroll overscroll-contain">
         {children}
       </div>
+      <UnavailableFallback />
     </div>
   )
 }

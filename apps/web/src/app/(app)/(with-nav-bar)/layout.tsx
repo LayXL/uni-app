@@ -1,5 +1,6 @@
 import { NavBarItem } from "@/features/nav-bar/ui/nav-bar-item"
 import { NavBarRoot } from "@/features/nav-bar/ui/nav-bar-root"
+import { UnavailableFallback } from "@/shared/ui/unavailable-fallback"
 import { useTranslations } from "next-intl"
 import type { ReactNode } from "react"
 
@@ -18,6 +19,7 @@ export default function Layout({ children }: LayoutProps) {
           <NavBarItem key={item} label={t(item)} href={`/${item}`} />
         ))}
       </NavBarRoot>
+      <UnavailableFallback />
     </div>
   )
 }
