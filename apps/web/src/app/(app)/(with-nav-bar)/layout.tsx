@@ -13,7 +13,7 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen h-screen max-h-screen overflow-hidden flex flex-col">
-      <div className="flex-1 overflow-scroll" children={children} />
+      <div className="flex-1 overflow-y-scroll" children={children} />
       <NavBarRoot>
         {["map", "schedule", "feed"].map((item) => (
           <NavBarItem key={item} label={t(item)} href={`/${item}`} />

@@ -8,7 +8,7 @@ type LayoutProps = {
 export default function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen h-screen max-h-screen overflow-hidden flex flex-col">
-      <div className="flex-1 overflow-scroll overscroll-contain">
+      <div className="flex-1 overflow-y-scroll overscroll-contain">
         {children}
       </div>
       <UnavailableFallback />

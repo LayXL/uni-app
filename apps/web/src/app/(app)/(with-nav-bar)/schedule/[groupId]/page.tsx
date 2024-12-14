@@ -8,6 +8,7 @@ import { getTranslations } from "next-intl/server"
 import { Fragment } from "react"
 import { checkIsGroup } from "shared/groups/check-is-group"
 import { checkIsTeacher } from "shared/groups/check-is-teacher"
+import { transformFullNameToInitials } from "shared/groups/transform-full-name-to-initials"
 import { transformToGroupName } from "shared/groups/transform-to-group-name"
 import { getUpcomingLessons } from "shared/lessons/get-upcoming-lessons"
 
@@ -21,6 +22,10 @@ export default async function Page({ params }: PageProps) {
   const group = await db.query.groups.findFirst({
     where: (groups, { eq }) => eq(groups.id, Number(groupId)),
   })
+
+  if (!group) return null
+
+  const groupName = transformToGroupName(group)
 
   const upcomingLessons = await getUpcomingLessons(Number(groupId))
   const groupedUpcomingLessons = Object.groupBy(
@@ -45,7 +50,13 @@ export default async function Page({ params }: PageProps) {
               hover("bg-neutral-4")
             )}
           >
-            <p children={group?.displayName} />
+            <p
+              children={
+                group.isTeacher
+                  ? transformFullNameToInitials(groupName)
+                  : groupName
+              }
+            />
           </Link>
         </div>
 
@@ -57,7 +68,7 @@ export default async function Page({ params }: PageProps) {
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 sm:overflow-scroll sm:h-[calc(100%+32px)] sm:-my-4 sm:py-4">
+      <div className="flex flex-col gap-3 sm:overflow-y-scroll sm:h-[calc(100%+32px)] sm:-my-4 sm:py-4">
         {Object.entries(groupedUpcomingLessons).map(([date, lessons]) => (
           <Fragment key={date}>
             <p className="px-4 pt-2 text-lg font-medium" children={date} />
