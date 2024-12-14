@@ -2,8 +2,10 @@ import { geistMono, geistSans } from "@/app/(app)/fonts"
 import Providers from "@/app/(app)/providers"
 import cn from "@/shared/utils/cn"
 import type { Metadata } from "next"
-import type { ReactNode } from "react"
+import { type ReactNode, use } from "react"
 import "./globals.css"
+import { NextIntlClientProvider } from "next-intl"
+import { getLocale, getMessages } from "next-intl/server"
 
 // TODO: update title and description
 export const metadata: Metadata = {
@@ -16,13 +18,18 @@ type LayoutProps = {
 }
 
 export default function Layout({ children }: LayoutProps) {
+  const messages = use(getMessages())
+  const locale = use(getLocale())
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <body
         className={cn(geistMono.variable, geistSans.variable)}
         suppressHydrationWarning
       >
-        <Providers>{children}</Providers>
+        <NextIntlClientProvider messages={messages}>
+          <Providers>{children}</Providers>
+        </NextIntlClientProvider>
       </body>
     </html>
   )

@@ -1,0 +1,11 @@
+{
+  "navigation-bar": {
+    "map": "Карта",
+    "schedule": "Расписание",
+    "feed": "Новости"
+  },
+  "schedule": {
+    "title": "Расписание",
+    "choose-group-button": "Выбрать группу"
+  }
+}

@@ -1,6 +1,11 @@
 import { withPayload } from "@payloadcms/next/withPayload"
 import type { NextConfig } from "next"
+import createNextIntlPlugin from "next-intl/plugin"
 
-const nextConfig: NextConfig = {}
+const withNextIntl = createNextIntlPlugin()
 
-export default withPayload(nextConfig)
+const nextConfig: NextConfig = {
+  reactStrictMode: true,
+}
+
+export default withNextIntl(withPayload(nextConfig))

@@ -8,7 +8,7 @@ import type { ReactNode } from "react"
 
 type ProvidersProps = { children: ReactNode }
 
-const Providers = ({ children }: ProvidersProps) => (
+const Providers = async ({ children }: ProvidersProps) => (
   <NuqsAdapter>
     <ThemeProvider forcedTheme={"dark"}>
       <TmaSdkProvider>
