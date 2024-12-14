@@ -19,29 +19,22 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <div className="p-4 flex flex-col gap-3">
-      <div>
-        <Link href="/select-group" children="Select group" />
-      </div>
+      <Link prefetch href="/select-group" children="Select group" />
       {Object.entries(groupedUpcomingLessons).map(([date, lessons]) => (
         <Fragment key={date}>
-          <div className="px-4 pt-2 text-lg font-medium">{date}</div>
-          {lessons?.map((lesson) => {
-            const key = `${lesson.order}-${lesson.subject}-${lesson.classroom}`
-
-            const teachers = lesson.groups.filter(checkIsTeacher)
-            const groups = lesson.groups.filter(checkIsGroup)
-
-            return (
-              <LessonCard
-                key={key}
-                order={lesson.order}
-                subject={lesson.subject}
-                classroom={lesson.classroom}
-                teacherNames={teachers.map(transformToGroupName)}
-                groupNames={groups.map(transformToGroupName)}
-              />
-            )
-          })}
+          <p className="px-4 pt-2 text-lg font-medium" children={date} />
+          {lessons?.map(({ classroom, groups, order, subject }) => (
+            <LessonCard
+              key={[order, subject, classroom].join("-")}
+              order={order}
+              subject={subject}
+              classroom={classroom}
+              teacherNames={groups
+                .filter(checkIsTeacher)
+                .map(transformToGroupName)}
+              groupNames={groups.filter(checkIsGroup).map(transformToGroupName)}
+            />
+          ))}
         </Fragment>
       ))}
     </div>

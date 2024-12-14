@@ -25,6 +25,9 @@
       "style": {
         "noVar": "error"
       },
+      "a11y": {
+        "noAutofocus": "off"
+      },
       "complexity": {
         "noUselessSwitchCase": "error",
         "useFlatMap": "error"
