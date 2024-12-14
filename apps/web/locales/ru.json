@@ -7,5 +7,14 @@
   "schedule": {
     "title": "Расписание",
     "choose-group-button": "Выбрать группу"
+  },
+  "select-group": {
+    "title": "Выберите группу ниже",
+    "placeholder": "или напишите её название сюда",
+    "groups": {
+      "higher": "Вышка",
+      "college": "Колледж",
+      "teacher": "Преподаватели"
+    }
   }
 }

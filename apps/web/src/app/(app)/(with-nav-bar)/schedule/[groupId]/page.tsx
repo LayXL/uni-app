@@ -28,7 +28,7 @@ export default async function Page({ params }: PageProps) {
   )
 
   return (
-    <div className="p-4 grid gap-3 sm:grid-cols-[1fr_2fr] items-start">
+    <div className="p-4 grid gap-3 sm:grid-cols-[1fr_2fr] items-start sm:h-full sm:overflow-hidden">
       <div className="flex flex-col gap-3">
         <div className="flex gap-3 items-center sm:flex-col sm:items-stretch">
           <p
@@ -39,13 +39,13 @@ export default async function Page({ params }: PageProps) {
           <Link
             prefetch
             href="/select-group"
-            className="block p-4 bg-neutral-2 rounded-xl"
+            className="block p-4 bg-neutral-2 rounded-xl border border-neutral-6"
           >
             <p children={group?.displayName} />
           </Link>
         </div>
 
-        <div className="p-4 bg-neutral-2 rounded-xl grid place-items-center">
+        <div className="p-4 bg-neutral-2 rounded-xl border border-neutral-6 grid place-items-center">
           <Timer
             className="text-3xl font-semibold"
             endsAt={addMinutes(new Date(), 60)}
@@ -53,7 +53,7 @@ export default async function Page({ params }: PageProps) {
         </div>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 sm:overflow-scroll sm:h-[calc(100%+32px)] sm:-my-4 sm:py-4">
         {Object.entries(groupedUpcomingLessons).map(([date, lessons]) => (
           <Fragment key={date}>
             <p className="px-4 pt-2 text-lg font-medium" children={date} />
