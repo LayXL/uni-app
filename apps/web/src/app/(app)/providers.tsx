@@ -2,9 +2,9 @@ import { BackButtonProvider } from "@/shared/providers/back-button-provider"
 import { QueryClientProvider } from "@/shared/providers/query-client-provider"
 import { SaveLocationProvider } from "@/shared/providers/save-location-provider"
 import { ThemeConfigProvider } from "@/shared/providers/theme-config-provider"
-import { nestProviders } from "@/shared/utils/nest-providers"
 import { ThemeProvider } from "next-themes"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
+import { nestProviders } from "react-nest-providers"
 
 const Providers = nestProviders()
   .push(NuqsAdapter)
