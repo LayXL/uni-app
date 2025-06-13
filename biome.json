@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.3/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.0.0-beta.6/schema.json",
   "formatter": {
     "enabled": true,
     "formatWithErrors": true,
@@ -10,9 +10,9 @@
     "attributePosition": "auto"
   },
   "files": {
-    "ignore": [".next", "emojis"]
+    "includes": ["**", "!**/.next", "!**/emojis"]
   },
-  "organizeImports": { "enabled": true },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "linter": {
     "enabled": true,
     "rules": {
@@ -23,7 +23,16 @@
       },
       "nursery": {},
       "style": {
-        "noVar": "error"
+        "noParameterAssign": "error",
+        "useAsConstAssertion": "error",
+        "useDefaultParameterLast": "error",
+        "useEnumInitializers": "error",
+        "useSelfClosingElements": "error",
+        "useSingleVarDeclarator": "error",
+        "noUnusedTemplateLiteral": "error",
+        "useNumberNamespace": "error",
+        "noInferrableTypes": "error",
+        "noUselessElse": "error"
       },
       "a11y": {
         "noAutofocus": "off"
@@ -35,8 +44,9 @@
       "suspicious": {
         "noDoubleEquals": "error",
         "noCommentText": "warn",
-        "noConsoleLog": "info",
-        "noSelfCompare": "error"
+        "noSelfCompare": "error",
+        "noVar": "error",
+        "noConsole": { "level": "info", "options": { "allow": ["log"] } }
       }
     }
   },
