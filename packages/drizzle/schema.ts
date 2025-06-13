@@ -4,7 +4,9 @@ import {
   date,
   integer,
   json,
+  pgEnum,
   pgTable,
+  primaryKey,
   serial,
   text,
 } from "drizzle-orm/pg-core"
@@ -15,11 +17,13 @@ export const users = pgTable("users", {
   group: integer().references(() => groups.id),
 })
 
+export const groupType = pgEnum("group_type", ["teacher", "studentsGroup"])
+
 export const groups = pgTable("groups", {
   id: serial().primaryKey(),
   bitrixId: text().notNull(),
   displayName: text().notNull(),
-  isTeacher: boolean().notNull().default(false),
+  type: groupType().notNull().default("studentsGroup"),
 })
 
 export const subjects = pgTable("subjects", {
@@ -42,7 +46,9 @@ export const classes = pgTable(
     original: json(),
     groups: integer().array().notNull().default([]),
   },
-  (table) => ({
-    pk: [table.date, table.order, table.subject, table.classroom],
-  })
+  (table) => [
+    primaryKey({
+      columns: [table.date, table.order, table.subject, table.classroom],
+    }),
+  ]
 )
