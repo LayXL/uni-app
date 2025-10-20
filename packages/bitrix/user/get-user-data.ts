@@ -1,16 +1,16 @@
 import parse from "node-html-parser"
 
-import { env } from "@repo/env"
+import { bitrix } from "../ky"
 
 export async function getUserData(userId: number, cookie: string) {
-	const url = `${env.bitrixUrl}mobile/users/?user_id=${userId}`
-
-	const response = await fetch(url, {
-		headers: {
-			Cookie: cookie,
-			"Content-Type": "application/x-www-form-urlencoded",
-		},
-	}).then((res) => res.text())
+	const response = await bitrix
+		.get(`mobile/users/?user_id=${userId}`, {
+			headers: {
+				Cookie: cookie,
+				"Content-Type": "application/x-www-form-urlencoded",
+			},
+		})
+		.text()
 
 	const root = parse(response)
 

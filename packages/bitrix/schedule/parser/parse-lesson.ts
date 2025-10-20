@@ -19,7 +19,7 @@ export const parseLesson = (lesson: HTMLElement) => {
 		order: Number(lesson.querySelector("th:nth-child(1)")?.innerText),
 		subject,
 		classroom,
-		isCancelled: Boolean(subject?.includes("отменено")),
+		isCancelled: Boolean(classroom?.includes("отменено")),
 		isDistance: Boolean(classroom?.includes("дистант")),
 		isChanged: lesson.classNames.includes("table-danger"),
 	}

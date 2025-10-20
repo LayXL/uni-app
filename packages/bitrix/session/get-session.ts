@@ -1,5 +1,6 @@
-import { env } from "@repo/env"
 import objectToQuery from "@repo/shared/object-to-query"
+
+import { bitrix } from "../ky"
 
 export type Session = {
 	cookie: string
@@ -12,10 +13,7 @@ export async function getSession(
 	login: string,
 	password: string,
 ): Promise<Session> {
-	const authUrl = `${env.bitrixUrl}auth/index.php?login=yes`
-
-	const authResponse = await fetch(authUrl, {
-		method: "POST",
+	const authResponse = await bitrix.post("auth/index.php?login=yes", {
 		body: objectToQuery({
 			AUTH_FORM: "Y",
 			TYPE: "AUTH",

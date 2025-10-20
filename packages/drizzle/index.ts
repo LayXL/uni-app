@@ -1,11 +1,11 @@
 import { drizzle } from "drizzle-orm/postgres-js"
 import postgres from "postgres"
 
+import { env } from "@repo/env"
+
 import * as schema from "./schema"
 
-if (!process.env.DB_URL) throw new Error("DB_URL is not defined")
-
-const queryClient = postgres(process.env.DB_URL)
+const queryClient = postgres(env.databaseUrl)
 
 export const db = drizzle(queryClient, { schema })
 

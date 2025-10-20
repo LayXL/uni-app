@@ -1,37 +1,31 @@
-import { env } from "@repo/env"
+import { bitrix } from "../ky"
 
 export async function getAllGroups(cookie: string) {
-	const groups: string[] = []
-	const teachers: { id: string; name: string }[] = []
+	const groups: {
+		bitrixId: string
+		displayName: string
+		type: "teacher" | "studentsGroup"
+	}[] = []
 
 	const grades = [3, 4]
 
 	for (const grade of grades) {
-		const response = await fetch(
-			`${env.bitrixUrl}local/handlers/schedule/groups.php`,
-			{
-				method: "POST",
+		const data = await bitrix
+			.post("local/handlers/schedule/groups.php", {
 				body: `gradeLevel=${grade}`,
 				headers: {
 					Cookie: cookie,
 					"Content-Type": "application/x-www-form-urlencoded",
 				},
-			},
-		)
+			})
+			.json<Record<string, { GROUP_NAME: string; GROUP_ID: string }>>()
 
-		const body = (await response.json()) as Record<
-			string,
-			{ GROUP_NAME: string }
-		>
+		for (const group of Object.values(data)) {
+			console.info(`Parsing ${group.GROUP_NAME}`)
 
-		for (const group of Object.values(body).map(
-			({ GROUP_NAME }) => GROUP_NAME,
-		)) {
-			console.info(`Parsing ${group}`)
-
-			const groupSchedule = await (
-				await fetch(
-					`${<string>Bun.env.BITRIX_URL}mobile/teacher/schedule/spo_and_vo.php?name=${group}`,
+			const groupSchedule = await bitrix
+				.get(
+					`mobile/teacher/schedule/spo_and_vo.php?name=${group.GROUP_NAME}`,
 					{
 						method: "GET",
 						headers: {
@@ -40,12 +34,12 @@ export async function getAllGroups(cookie: string) {
 						},
 					},
 				)
-			).text()
+				.text()
 
 			if (!groupSchedule.includes("subgroupContent")) continue
 
 			if (groupSchedule.includes("Выберите подгруппу")) {
-				console.info(`Group ${group} has subgroups!`)
+				console.info(`Group ${group.GROUP_NAME} has subgroups!`)
 
 				groups.push(
 					...groupSchedule
@@ -53,9 +47,18 @@ export async function getAllGroups(cookie: string) {
 						.split("</select")[0]
 						.split('">')
 						.toSpliced(0, 1)
-						.map((x) => x.split("</")[0]),
+						.map((x: string) => ({
+							displayName: x.split("</")[0],
+							bitrixId: group.GROUP_ID,
+							type: "studentsGroup" as const,
+						})),
 				)
-			} else groups.push(group)
+			} else
+				groups.push({
+					bitrixId: group.GROUP_ID,
+					displayName: group.GROUP_NAME,
+					type: "studentsGroup",
+				})
 		}
 	}
 
@@ -64,50 +67,40 @@ export async function getAllGroups(cookie: string) {
 	const departments = await getAllDepartments(cookie)
 
 	for (const department of departments) {
-		const response = await fetch(
-			`${<string>Bun.env.BITRIX_URL}local/handlers/schedule/users.php`,
-			{
-				method: "POST",
+		const data = await bitrix
+			.post("local/handlers/schedule/users.php", {
 				body: `gradeLevel=57&group=${department}`,
 				headers: {
 					Cookie: cookie,
 					"Content-Type": "application/x-www-form-urlencoded",
 				},
-			},
-		)
+			})
+			.json<{ USER_ID: string; NAME: string }[]>()
 
-		const body = (await response.json()) as { USER_ID: string; NAME: string }[]
-
-		teachers.push(
-			...body.map((teacher) => ({
-				name: teacher.NAME.replace(" нет", " "),
-				id: teacher.USER_ID,
+		groups.push(
+			...data.map((teacher) => ({
+				bitrixId: teacher.USER_ID,
+				displayName: teacher.NAME.replace(" нет", " "),
+				type: "teacher" as const,
 			})),
 		)
 	}
 
 	console.info("Teachers parsed")
 
-	return {
-		groups,
-		teachers,
-	}
+	return groups
 }
 
-async function getAllDepartments(cookie: string) {
-	return Object.values(
-		(await (
-			await fetch(
-				`${<string>Bun.env.BITRIX_URL}local/handlers/schedule/groups.php`,
-				{
-					method: "POST",
-					body: "gradeLevel=57",
-					headers: {
-						Cookie: cookie,
-						"Content-Type": "application/x-www-form-urlencoded",
-					},
-				},
-			)
-		).json()) as Record<string, { GROUP_ID: string }>,
-	).map(({ GROUP_ID }) => GROUP_ID)
+async function getAllDepartments(cookie: string): Promise<string[]> {
+	const data = await bitrix
+		.post("local/handlers/schedule/groups.php", {
+			body: "gradeLevel=57",
+			headers: {
+				Cookie: cookie,
+				"Content-Type": "application/x-www-form-urlencoded",
+			},
+		})
+		.json<Record<string, { GROUP_ID: string }>>()
+
+	return Object.values(data).map(({ GROUP_ID }) => GROUP_ID)
 }

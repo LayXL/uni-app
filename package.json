@@ -4,7 +4,11 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
-    "dev": "turbo dev"
+    "dev": "turbo dev",
+    "update-schedule": "bun run apps/schedule-updater/force-update",
+    "db:push": "cd packages/drizzle && bun run --env-file ../../.env push",
+    "db:generate": "cd packages/drizzle && bun run --env-file ../../.env generate",
+    "db:migrate": "cd packages/drizzle && bun run --env-file ../../.env migrate"
   },
   "workspaces": [
     "apps/*",

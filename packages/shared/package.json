@@ -6,7 +6,8 @@
 		"drizzle-orm": "^0.44.6",
 		"zod": "^3.23.8",
 		"@repo/drizzle": "workspace:*",
-		"@repo/bitrix": "workspace:*"
+		"@repo/bitrix": "workspace:*",
+		"@repo/env": "workspace:*"
 	},
 	"devDependencies": {
 		"typescript-config": "workspace:*",
