@@ -12,6 +12,9 @@
 		"date-fns": "^4.1.0",
 		"node-html-parser": "^6.1.13",
 		"prettier": "^3.6.2",
-		"@repo/shared": "workspace:*"
+		"@repo/shared": "workspace:*",
+		"lodash-es": "^4.17.21",
+		"@types/lodash-es": "^4.17.12",
+		"@repo/env": "workspace:*"
 	}
 }

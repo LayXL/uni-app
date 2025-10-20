@@ -1,9 +1,9 @@
 import parse from "node-html-parser"
 
-import { env } from "../env"
+import { env } from "@repo/env"
 
 export async function getUserData(userId: number, cookie: string) {
-	const url = `${env.BITRIX_URL}mobile/users/?user_id=${userId}`
+	const url = `${env.bitrixUrl}mobile/users/?user_id=${userId}`
 
 	const response = await fetch(url, {
 		headers: {

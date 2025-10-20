@@ -1,3 +1,5 @@
 export const transformToGroupName = ({
-  displayName,
-}: { displayName: string }) => displayName.replace(/\s\(.+\)/, "")
+	displayName,
+}: {
+	displayName: string
+}) => displayName.replace(/\s\(.+\)/, "")

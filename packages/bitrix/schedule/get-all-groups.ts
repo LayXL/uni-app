@@ -1,3 +1,5 @@
+import { env } from "@repo/env"
+
 export async function getAllGroups(cookie: string) {
 	const groups: string[] = []
 	const teachers: { id: string; name: string }[] = []
@@ -6,7 +8,7 @@ export async function getAllGroups(cookie: string) {
 
 	for (const grade of grades) {
 		const response = await fetch(
-			`${<string>Bun.env.BITRIX_URL}local/handlers/schedule/groups.php`,
+			`${env.bitrixUrl}local/handlers/schedule/groups.php`,
 			{
 				method: "POST",
 				body: `gradeLevel=${grade}`,

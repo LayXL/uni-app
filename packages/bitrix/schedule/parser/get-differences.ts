@@ -1,14 +1,13 @@
-export function getDifferences(
-  obj1: Record<string, unknown>,
-  obj2: Record<string, unknown>
-) {
-  const differences: Record<string, unknown> = {}
+type Object = Record<string, unknown>
 
-  for (const key in obj2) {
-    if (obj2[key] !== obj1[key]) {
-      differences[key] = obj2[key]
-    }
-  }
+export function getDifferences(obj1: Object, obj2: Object) {
+	const differences: Object = {}
 
-  return differences
+	for (const key in obj2) {
+		if (obj2[key] !== obj1[key]) {
+			differences[key] = obj2[key]
+		}
+	}
+
+	return differences
 }

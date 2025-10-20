@@ -1,0 +1,14 @@
+{
+	"name": "@repo/env",
+	"private": true,
+	"dependencies": {
+		"zod": "^4.1.12"
+	},
+	"devDependencies": {
+		"@types/bun": "latest",
+		"typescript-config": "workspace:*"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	}
+}

@@ -1,19 +1,16 @@
 import { Bot, InlineKeyboard } from "grammy"
-import config from "./config"
 
-export const bot = new Bot(config.botToken, {
-  client: {
-    environment: config.botEnv,
-  },
+import { env } from "@repo/env"
+
+export const bot = new Bot(env.botToken, {
+	client: { environment: env.botEnv },
 })
 
+const startInlineKeyboard = new InlineKeyboard().webApp(
+	"Open webapp",
+	env.webAppUrl,
+)
+
 bot.command("start", async (ctx) => {
-  await ctx.reply("Hello", {
-    reply_markup: {
-      inline_keyboard: new InlineKeyboard().webApp(
-        "Open webapp",
-        config.webAppUrl
-      ).inline_keyboard,
-    },
-  })
+	await ctx.reply("Hello", { reply_markup: startInlineKeyboard })
 })

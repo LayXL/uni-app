@@ -1,7 +1,9 @@
+import { env } from "@repo/env"
+
 import { parseSchedule } from "./parser/parse-schedule"
 
 export async function getTeacherSchedule(teacher: string, cookie: string) {
-	const url = `${<string>Bun.env.BITRIX_URL}mobile/teacher/schedule/teacher.php?id=${teacher}`
+	const url = `${env.bitrixUrl}mobile/teacher/schedule/teacher.php?id=${teacher}`
 
 	const response = await fetch(url, {
 		headers: {
