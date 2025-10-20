@@ -1,17 +1,19 @@
 {
-  "name": "schedule-updater",
+  "name": "@repo/schedule-updater",
   "module": "index.ts",
   "type": "module",
   "scripts": {
     "dev": "bun --watch ."
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "typescript-config": "workspace:*"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "croner": "^9.0.0"
+    "croner": "^9.0.0",
+    "@repo/shared": "workspace:*"
   }
 }

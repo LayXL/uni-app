@@ -1,5 +1,5 @@
 import { Bot, InlineKeyboard } from "grammy"
-import config from "./config.ts"
+import config from "./config"
 
 export const bot = new Bot(config.botToken, {
   client: {

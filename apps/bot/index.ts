@@ -1,3 +1,3 @@
-import { bot } from "./bot.ts"
+import { bot } from "./bot"
 
-void bot.start()
+bot.start()

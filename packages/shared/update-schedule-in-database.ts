@@ -1,84 +1,86 @@
-import getSchedule from "bitrix/schedule/get-schedule.ts"
-import getTeacherSchedule from "bitrix/schedule/get-teacher-schedule.ts"
-import getSession from "bitrix/session/get-session.ts"
-import { db } from "drizzle"
 import { gte } from "drizzle-orm"
-import { classes } from "drizzle/schema.ts"
 import { z } from "zod"
-import { getSubjectIdByName } from "./get-subject-id-by-name.ts"
+
+import { getSchedule } from "@repo/bitrix/schedule/get-schedule"
+import { getTeacherSchedule } from "@repo/bitrix/schedule/get-teacher-schedule"
+import { getSession } from "@repo/bitrix/session/get-session"
+import { classesTable, db } from "@repo/drizzle"
+
+import { getSubjectIdByName } from "./get-subject-id-by-name"
 
 const config = z
-  .object({
-    login: z.string(),
-    password: z.string(),
-    bitrixUrl: z.string().url(),
-  })
-  .parse({
-    login: Bun.env.BITRIX_LOGIN,
-    password: Bun.env.BITRIX_PASSWORD,
-    bitrixUrl: Bun.env.BITRIX_URL,
-  })
+	.object({
+		login: z.string(),
+		password: z.string(),
+		bitrixUrl: z.string().url(),
+	})
+	.parse({
+		login: Bun.env.BITRIX_LOGIN,
+		password: Bun.env.BITRIX_PASSWORD,
+		bitrixUrl: Bun.env.BITRIX_URL,
+	})
 
 export const updateScheduleInDatabase = async () => {
-  console.info("Updating schedule in database")
+	console.info("Updating schedule in database")
 
-  const { cookie } = await getSession(config.login, config.password)
+	const { cookie } = await getSession(config.login, config.password)
 
-  const groups = await db.query.groups.findMany()
+	const groups = await db.query.groupsTable.findMany()
 
-  const newClasses: (typeof classes.$inferSelect)[] = []
+	const newClasses: (typeof classesTable.$inferSelect)[] = []
 
-  let i = 0
+	let i = 0
 
-  for (const group of groups) {
-    console.info(
-      `[${i + 1}/${groups.length}] Parsing ${group.id} — ${group.displayName}`
-    )
+	for (const group of groups) {
+		console.info(
+			`[${i + 1}/${groups.length}] Parsing ${group.id} — ${group.displayName}`,
+		)
 
-    const data = group.isTeacher
-      ? await getTeacherSchedule(group.bitrixId, cookie)
-      : await getSchedule(group.bitrixId, cookie)
+		const data =
+			group.type === "teacher"
+				? await getTeacherSchedule(group.bitrixId, cookie)
+				: await getSchedule(group.bitrixId, cookie)
 
-    if (!data) continue
+		if (!data) continue
 
-    for (const scheduleItem of data) {
-      const subjectId = await getSubjectIdByName(scheduleItem.subject)
+		for (const scheduleItem of data) {
+			const subjectId = await getSubjectIdByName(scheduleItem.subject)
 
-      const existingClassIndex = newClasses.findIndex(
-        (x) =>
-          x.date === scheduleItem.date &&
-          x.order === scheduleItem.order &&
-          x.subject === subjectId &&
-          x.classroom === scheduleItem.classroom
-      )
+			const existingClassIndex = newClasses.findIndex(
+				(x) =>
+					x.date === scheduleItem.date &&
+					x.order === scheduleItem.order &&
+					x.subject === subjectId &&
+					x.classroom === scheduleItem.classroom,
+			)
 
-      if (existingClassIndex !== -1) {
-        if (!newClasses[existingClassIndex].groups.includes(group.id))
-          newClasses[existingClassIndex].groups.push(group.id)
-      } else {
-        newClasses.push({
-          date: scheduleItem.date,
-          order: scheduleItem.order,
-          subject: subjectId,
-          classroom: scheduleItem.classroom,
-          groups: [group.id],
-          isCancelled: scheduleItem.isCancelled,
-          isDistance: scheduleItem.isDistance,
-          isChanged: scheduleItem.isChanged,
-          original: scheduleItem.original,
-        })
-      }
-    }
+			if (existingClassIndex !== -1) {
+				if (!newClasses[existingClassIndex].groups.includes(group.id))
+					newClasses[existingClassIndex].groups.push(group.id)
+			} else {
+				newClasses.push({
+					date: scheduleItem.date,
+					order: scheduleItem.order,
+					subject: subjectId,
+					classroom: scheduleItem.classroom,
+					groups: [group.id],
+					isCancelled: scheduleItem.isCancelled,
+					isDistance: scheduleItem.isDistance,
+					isChanged: scheduleItem.isChanged,
+					original: scheduleItem.original,
+				})
+			}
+		}
 
-    i++
-  }
+		i++
+	}
 
-  const minDate = newClasses[0].date
+	const minDate = newClasses[0].date
 
-  await db.transaction(async (tx) => {
-    await tx.delete(classes).where(gte(classes.date, minDate))
-    await tx.insert(classes).values(newClasses)
-  })
+	await db.transaction(async (tx) => {
+		await tx.delete(classesTable).where(gte(classesTable.date, minDate))
+		await tx.insert(classesTable).values(newClasses)
+	})
 
-  console.info("Schedule in database updated")
+	console.info("Schedule in database updated")
 }

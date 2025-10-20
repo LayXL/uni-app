@@ -1,16 +1,16 @@
-import { parseSchedule } from "./parser/parse-schedule.ts"
+import { parseSchedule } from "./parser/parse-schedule"
 
-export default async function (teacher: string, cookie: string) {
-  const url = `${<string>Bun.env.BITRIX_URL}mobile/teacher/schedule/teacher.php?id=${teacher}`
+export async function getTeacherSchedule(teacher: string, cookie: string) {
+	const url = `${<string>Bun.env.BITRIX_URL}mobile/teacher/schedule/teacher.php?id=${teacher}`
 
-  const response = await fetch(url, {
-    headers: {
-      Cookie: cookie,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-  })
+	const response = await fetch(url, {
+		headers: {
+			Cookie: cookie,
+			"Content-Type": "application/x-www-form-urlencoded",
+		},
+	})
 
-  const body = await response.text()
+	const body = await response.text()
 
-  return parseSchedule(body, "")
+	return parseSchedule(body, "")
 }

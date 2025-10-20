@@ -1,0 +1,40 @@
+{
+	"name": "@repo/orpc",
+	"type": "module",
+	"private": true,
+	"exports": {
+		"./router": "./src/router.ts",
+		"./client": "./src/client.ts",
+		"./react": "./src/react.ts",
+		"./base": "./src/base.ts",
+		"./procedures/private": "./src/procedures/private.ts",
+		"./middlewares/auth": "./src/middlewares/auth.ts",
+		"./routes/*": "./src/routes/*.ts"
+	},
+	"dependencies": {
+		"@langchain/core": "^1.0.1",
+		"@langchain/google-genai": "^1.0.0",
+		"@orpc/client": "^1.10.0",
+		"@orpc/server": "^1.10.0",
+		"@orpc/tanstack-query": "^1.10.0",
+		"@vkontakte/vk-bridge": "^2.15.9",
+		"blurhash": "^2.0.5",
+		"date-fns": "^4.1.0",
+		"drizzle-orm": "^0.44.6",
+		"drizzle-zod": "^0.8.3",
+		"heic-convert": "^2.1.0",
+		"ky": "^1.12.0",
+		"langchain": "^1.0.1",
+		"sharp": "^0.34.4",
+		"zod": "^4.1.12",
+		"@repo/drizzle": "workspace:*"
+	},
+	"devDependencies": {
+		"@types/bun": "^1.3.0",
+		"@types/heic-convert": "^2.1.0",
+		"typescript-config": "workspace:*"
+	},
+	"peerDependencies": {
+		"typescript": "^5.9.3"
+	}
+}

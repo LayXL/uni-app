@@ -1,14 +1,20 @@
-import { db } from "drizzle"
 import { and, arrayContains, eq } from "drizzle-orm"
-import { classes } from "drizzle/schema.ts"
-import { populateLessons } from "./populate-lessons.ts"
+
+import { classesTable, db } from "@repo/drizzle"
+
+import { populateLessons } from "./populate-lessons"
 
 export const getDailyLessons = async (date: string, group: number) => {
-  const dailyLessons = await db
-    .select()
-    .from(classes)
-    .where(and(eq(classes.date, date), arrayContains(classes.groups, [group])))
-    .orderBy(classes.date, classes.order)
+	const dailyLessons = await db
+		.select()
+		.from(classesTable)
+		.where(
+			and(
+				eq(classesTable.date, date),
+				arrayContains(classesTable.groups, [group]),
+			),
+		)
+		.orderBy(classesTable.date, classesTable.order)
 
-  return populateLessons(dailyLessons, group)
+	return populateLessons(dailyLessons, group)
 }

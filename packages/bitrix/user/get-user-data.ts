@@ -1,21 +1,22 @@
 import parse from "node-html-parser"
-import { env } from "../env.ts"
 
-export const getUserData = async (userId: number, cookie: string) => {
-  const url = `${env.BITRIX_URL}mobile/users/?user_id=${userId}`
+import { env } from "../env"
 
-  const response = await fetch(url, {
-    headers: {
-      Cookie: cookie,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-  }).then((res) => res.text())
+export async function getUserData(userId: number, cookie: string) {
+	const url = `${env.BITRIX_URL}mobile/users/?user_id=${userId}`
 
-  const root = parse(response)
+	const response = await fetch(url, {
+		headers: {
+			Cookie: cookie,
+			"Content-Type": "application/x-www-form-urlencoded",
+		},
+	}).then((res) => res.text())
 
-  const name = root.querySelector(".emp-profile-name")?.innerText
+	const root = parse(response)
 
-  return {
-    name,
-  }
+	const name = root.querySelector(".emp-profile-name")?.innerText
+
+	return {
+		name,
+	}
 }

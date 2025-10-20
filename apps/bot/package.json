@@ -1,12 +1,13 @@
 {
-  "name": "bot",
+  "name": "@repo/bot",
   "module": "index.ts",
   "type": "module",
   "scripts": {
     "dev": "bun --watch ."
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "typescript-config": "workspace:*"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"

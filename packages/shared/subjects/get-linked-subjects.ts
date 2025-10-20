@@ -1,6 +1,6 @@
-import { db } from "drizzle"
 import { inArray } from "drizzle-orm"
-import { subjects } from "drizzle/schema.ts"
+
+import { db, subjectsTable } from "@repo/drizzle"
 
 export const getLinkedSubjects = (subjectIds: number[]) =>
-  db.select().from(subjects).where(inArray(subjects.id, subjectIds))
+	db.select().from(subjectsTable).where(inArray(subjectsTable.id, subjectIds))
