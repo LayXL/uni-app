@@ -1,13 +1,10 @@
-import { gte } from "drizzle-orm"
-
 import { getAllGroups } from "@repo/bitrix/schedule/get-all-groups"
 import { getSchedule } from "@repo/bitrix/schedule/get-schedule"
 import { getTeacherSchedule } from "@repo/bitrix/schedule/get-teacher-schedule"
 import { getSession } from "@repo/bitrix/session/get-session"
-import { classesTable, db, groupsTable } from "@repo/drizzle"
+import { classesTable, db, groupsTable, gte } from "@repo/drizzle"
 import { env } from "@repo/env"
-
-import { getSubjectIdByName } from "./get-subject-id-by-name"
+import { getSubjectIdByName } from "@repo/shared/get-subject-id-by-name"
 
 export const updateScheduleInDatabase = async () => {
 	console.info("Updating schedule in database")

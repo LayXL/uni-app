@@ -3,10 +3,8 @@
 	"private": true,
 	"dependencies": {
 		"date-fns": "^4.1.0",
-		"drizzle-orm": "^0.44.6",
 		"zod": "^3.23.8",
 		"@repo/drizzle": "workspace:*",
-		"@repo/bitrix": "workspace:*",
 		"@repo/env": "workspace:*"
 	},
 	"devDependencies": {

@@ -9,4 +9,7 @@ const queryClient = postgres(env.databaseUrl)
 
 export const db = drizzle(queryClient, { schema })
 
+export * from "drizzle-orm"
+export * from "drizzle-zod"
+
 export * from "./schema"

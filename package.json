@@ -22,9 +22,5 @@
     "@biomejs/biome": "^2.2.6",
     "turbo": "^2.5.8",
     "typescript": "^5.9.3"
-  },
-  "dependencies": {
-    "@types/lodash-es": "^4.17.12",
-    "lodash-es": "^4.17.21"
   }
 }
