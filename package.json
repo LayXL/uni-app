@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
-    "dev": "turbo dev",
+    "dev": "dotenv -- turbo dev",
     "update-schedule": "bun run apps/schedule-updater/force-update",
     "db:push": "cd packages/drizzle && bun run --env-file ../../.env push",
     "db:generate": "cd packages/drizzle && bun run --env-file ../../.env generate",
@@ -21,6 +21,7 @@
   "packageManager": "bun@1.2.16",
   "devDependencies": {
     "@biomejs/biome": "^2.3.8",
+    "dotenv-cli": "^11.0.0",
     "turbo": "^2.6.3",
     "typescript": "^5.9.3"
   }

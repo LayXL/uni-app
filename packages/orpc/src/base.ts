@@ -1,3 +1,7 @@
 import { os } from "@orpc/server"
 
-export const base = os.$context<{ headers?: Headers }>()
+export type Context = {
+	headers?: Headers
+}
+
+export const base = os.$context<Context>()

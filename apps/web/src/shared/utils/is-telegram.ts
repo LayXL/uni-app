@@ -1,1 +1,2 @@
-export const isTelegram = "Telegram" in window
+export const isTelegram =
+	typeof window !== "undefined" && "TelegramWebviewProxy" in window

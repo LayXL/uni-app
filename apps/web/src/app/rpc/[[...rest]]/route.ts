@@ -1,10 +1,11 @@
 import { onError } from "@orpc/server"
 import { RPCHandler } from "@orpc/server/fetch"
 
+import { router } from "@repo/orpc/router"
+
 export const dynamic = "force-dynamic"
 
 async function handleRequest(request: Request) {
-	const { router } = await import("@repo/orpc/router")
 	const handler = new RPCHandler(router, {
 		interceptors: [
 			onError((error) => {
