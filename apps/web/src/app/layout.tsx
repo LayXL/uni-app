@@ -11,9 +11,7 @@ export default function ({ children }: LayoutProps) {
 	return (
 		<html lang="ru" suppressHydrationWarning>
 			<body suppressHydrationWarning>
-				<Providers>
-					{children}
-				</Providers>
+				<Providers>{children}</Providers>
 			</body>
 		</html>
 	)

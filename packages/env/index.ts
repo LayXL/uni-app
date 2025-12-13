@@ -12,6 +12,7 @@ const envSchema = z.object({
 	databaseUrl: z
 		.string()
 		.default("postgresql://postgres:postgres@localhost:5432/schedule"),
+	vkClientSecret: z.string(),
 })
 
 export const env = envSchema.parse({
@@ -22,4 +23,5 @@ export const env = envSchema.parse({
 	bitrixLogin: processEnv.BITRIX_LOGIN,
 	bitrixPassword: processEnv.BITRIX_PASSWORD,
 	databaseUrl: processEnv.DATABASE_URL,
+	vkClientSecret: processEnv.VK_CLIENT_SECRET,
 })

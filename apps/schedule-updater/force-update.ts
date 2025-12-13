@@ -1,4 +1,4 @@
-import { updateScheduleInDatabase } from "@repo/shared/update-schedule-in-database"
+import { updateScheduleInDatabase } from "./update-schedule-in-database"
 
 await updateScheduleInDatabase()
 

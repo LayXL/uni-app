@@ -1,8 +1,8 @@
 import * as crypto from "node:crypto"
 import { ORPCError } from "@orpc/client"
-import { and, desc, eq, isNotNull } from "drizzle-orm"
 
-import { db, usersTable } from "@repo/drizzle"
+import { db, eq, usersTable } from "@repo/drizzle"
+import { env } from "@repo/env"
 
 import { base } from "../base"
 
@@ -28,44 +28,10 @@ export const authMiddleware = base.middleware(async ({ context, next }) => {
 
 	if (!user) throw new ORPCError("UNAUTHORIZED")
 
-	const subscription = await db
-		.select()
-		.from(subscriptionStatusesTable)
-		.where(
-			and(
-				eq(subscriptionStatusesTable.userId, user.id),
-				isNotNull(subscriptionStatusesTable.nextBillTime),
-			),
-		)
-		.orderBy(desc(subscriptionStatusesTable.nextBillTime))
-		.limit(1)
-		.then((res) => res[0])
-
-	const lastStatus = subscription
-		? await db
-				.select()
-				.from(subscriptionStatusesTable)
-				.where(eq(subscriptionStatusesTable.userId, user.id))
-				.orderBy(desc(subscriptionStatusesTable.createdAt))
-				.limit(1)
-				.then((res) => res[0])
-		: null
-
-	const isActive =
-		subscription?.nextBillTime &&
-		new Date(subscription.nextBillTime) > new Date()
-
 	return next({
 		context: {
 			user,
 			verifiedData,
-			premium: {
-				isActive: Boolean(isActive),
-				wasActive: Boolean(subscription),
-				activeUntil: subscription?.nextBillTime ?? undefined,
-				subscriptionId: subscription?.subscriptionId ?? undefined,
-				status: lastStatus?.status ?? undefined,
-			},
 		},
 	})
 })
@@ -104,7 +70,7 @@ const verifyVKInitData = (initData?: string) => {
 		)
 
 	const paramsHash = crypto
-		.createHmac("sha256", env.VK_CLIENT_SECRET)
+		.createHmac("sha256", env.vkClientSecret)
 		.update(queryString)
 		.digest()
 		.toString("base64")

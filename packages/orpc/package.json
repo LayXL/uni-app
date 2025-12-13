@@ -25,7 +25,8 @@
 		"langchain": "^1.0.1",
 		"sharp": "^0.34.4",
 		"zod": "^4.1.12",
-		"@repo/drizzle": "workspace:*"
+		"@repo/drizzle": "workspace:*",
+		"@repo/env": "workspace:*"
 	},
 	"devDependencies": {
 		"@types/bun": "^1.3.0",
