@@ -25,6 +25,7 @@ export const groupsTable = pgTable("groups", {
 	bitrixId: varchar({ length: 255 }).notNull(),
 	displayName: varchar({ length: 255 }).notNull(),
 	type: groupTypeEnum().notNull().default("studentsGroup"),
+	isDeleted: boolean().notNull().default(false),
 })
 
 export const subjectsTable = pgTable("subjects", {

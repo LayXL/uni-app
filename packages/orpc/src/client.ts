@@ -14,7 +14,7 @@ const link = new RPCLink<Context>({
 		return process.env.NEXT_PUBLIC_ORPC_URL ?? "http://localhost:3000/rpc"
 	},
 	headers: ({ context }) => {
-		if (context?.headers) {
+		if (context.headers) {
 			return context.headers
 		}
 

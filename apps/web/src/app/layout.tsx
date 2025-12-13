@@ -10,7 +10,7 @@ type LayoutProps = {
 export default function ({ children }: LayoutProps) {
 	return (
 		<html lang="ru" suppressHydrationWarning>
-			<body suppressHydrationWarning>
+			<body suppressHydrationWarning className="bg-background text-foreground">
 				<Providers>{children}</Providers>
 			</body>
 		</html>

@@ -1,17 +1,17 @@
-import { cookies } from "next/headers"
+import Link from "next/link"
 
 import { client } from "@repo/orpc/client"
 
+import { fetch } from "@/shared/utils/fetch"
+
 export default async function () {
-	const cookiesMap = await cookies()
+	const user = await fetch(client.users.me, undefined)
 
-	const headers = new Headers()
-
-	headers.set("authorization", cookiesMap.get("session")?.value ?? "")
-
-	const user = await client.users.me(undefined, {
-		context: { headers },
-	})
-
-	return <div>Hello there, {user.name}</div>
+	return (
+		<div>
+			<p>Hello there, {user.telegramId}</p>
+			<p>Group: {user.group?.displayName}</p>
+			<Link href="/onboarding">Onboarding</Link>
+		</div>
+	)
 }

@@ -1,11 +1,11 @@
 import { onError } from "@orpc/server"
 import { RPCHandler } from "@orpc/server/fetch"
 
-import { router } from "@repo/orpc/router"
-
 export const dynamic = "force-dynamic"
 
 async function handleRequest(request: Request) {
+	const { router } = await import("@repo/orpc/router")
+
 	const handler = new RPCHandler(router, {
 		interceptors: [
 			onError((error) => {
@@ -14,9 +14,24 @@ async function handleRequest(request: Request) {
 		],
 	})
 
+	const headers = new Headers(request.headers)
+
+	const cookie = request.headers.get("cookie")
+
+	const session = decodeURIComponent(
+		cookie
+			?.split("; ")
+			.find((cookie) => cookie.startsWith("session="))
+			?.split("=")[1] ?? "",
+	)
+
+	if (session.length > 0) {
+		headers.set("authorization", session)
+	}
+
 	const { response } = await handler.handle(request, {
 		prefix: "/rpc",
-		context: { headers: request.headers },
+		context: { headers },
 	})
 
 	return response ?? new Response("Not found", { status: 404 })
