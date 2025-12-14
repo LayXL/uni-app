@@ -25,7 +25,7 @@ export const updateScheduleInDatabase = async () => {
 		const data =
 			group.type === "teacher"
 				? await getTeacherSchedule(group.bitrixId, cookie)
-				: await getSchedule(group.bitrixId, cookie)
+				: await getSchedule(group.displayName, cookie)
 
 		if (!data) continue
 
@@ -61,7 +61,12 @@ export const updateScheduleInDatabase = async () => {
 		i++
 	}
 
-	const minDate = newClasses[0].date
+	const minDate = newClasses[0]?.date
+
+	if (!minDate) {
+		console.info("No classes found in database, skipping update")
+		return
+	}
 
 	await db.transaction(async (tx) => {
 		await tx.delete(classesTable).where(gte(classesTable.date, minDate))
