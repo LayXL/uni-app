@@ -23,7 +23,8 @@
 				"useKeyWithClickEvents": "off"
 			},
 			"suspicious": {
-				"noArrayIndexKey": "off"
+				"noArrayIndexKey": "off",
+				"noConsole": "warn"
 			},
 			"performance": {
 				"noImgElement": "off"

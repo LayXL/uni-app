@@ -2,10 +2,11 @@
 	"name": "@repo/shared",
 	"private": true,
 	"dependencies": {
-		"date-fns": "^4.1.0",
-		"zod": "^4.1.13",
 		"@repo/drizzle": "workspace:*",
-		"@repo/env": "workspace:*"
+		"@repo/env": "workspace:*",
+		"date-fns": "^4.1.0",
+		"date-fns-tz": "^3.2.0",
+		"zod": "^4.1.13"
 	},
 	"devDependencies": {
 		"typescript-config": "workspace:*",

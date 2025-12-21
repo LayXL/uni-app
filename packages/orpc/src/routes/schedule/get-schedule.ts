@@ -13,24 +13,23 @@ import {
 	sql,
 	subjectsTable,
 } from "@repo/drizzle"
+import { lessonSchema } from "@repo/shared/lessons/types/lesson"
 
 import { publicProcedure } from "../../procedures/public"
 
 export const getSchedule = publicProcedure
 	.input(
 		z.object({
-			date: z
-				.date()
-				.transform(
-					(date) =>
-						`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`,
-				)
+			dates: z
+				.string()
+				.regex(/^\d{4}-\d{2}-\d{2}$/)
 				.array(),
 			group: z.number(),
 		}),
 	)
+	.output(lessonSchema.array())
 	.handler(async ({ input }) => {
-		const { date, group } = input
+		const { dates, group } = input
 
 		const schedule = await db
 			.select({
@@ -58,11 +57,11 @@ export const getSchedule = publicProcedure
 			.innerJoin(subjectsTable, eq(classesTable.subject, subjectsTable.id))
 			.where(
 				and(
-					inArray(classesTable.date, date),
+					inArray(classesTable.date, dates),
 					arrayContains(classesTable.groups, [group]),
 				),
 			)
-			.orderBy(asc(classesTable.order))
+			.orderBy(asc(classesTable.date), asc(classesTable.order))
 
 		return schedule
 	})

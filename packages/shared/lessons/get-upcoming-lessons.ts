@@ -1,7 +1,6 @@
 import { formatISO } from "date-fns/formatISO"
-import { and, arrayContains, gte } from "drizzle-orm"
 
-import { classesTable, db } from "@repo/drizzle"
+import { and, arrayContains, classesTable, db, gte } from "@repo/drizzle"
 
 import { populateLessons } from "./populate-lessons"
 

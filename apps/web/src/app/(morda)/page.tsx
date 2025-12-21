@@ -1,49 +1,26 @@
-import { addDays } from "date-fns"
-import Link from "next/link"
+import { HydrationBoundary } from "@tanstack/react-query"
 
-import { client } from "@repo/orpc/client"
+import { orpc } from "@repo/orpc/react"
+import { getNextTwoWeeksDates } from "@repo/shared/lessons/get-next-two-weeks-dates"
 
-import { fetch } from "@/shared/utils/fetch"
+import { Fetcher } from "@/shared/utils/fetcher"
+import { ScheduleViewer } from "@/widgets/schedule-viewer"
 
 export default async function () {
-	const user = await fetch(client.users.me, undefined)
+	const fetcher = new Fetcher()
 
-	const schedule = user.group
-		? await fetch(client.schedule.getSchedule, {
-				date: Array.from({ length: 14 }, (_, i) => addDays(new Date(), i)),
-				group: user.group?.id,
-			})
-		: null
+	const user = await fetcher.fetch(orpc.users.me, undefined)
 
-	console.log(schedule)
+	if (user.group) {
+		await fetcher.fetch(orpc.schedule.getSchedule, {
+			dates: getNextTwoWeeksDates(),
+			group: user.group.id,
+		})
+	}
 
 	return (
-		<div>
-			<p>Hello there, {user.telegramId}</p>
-			<p>Group: {user.group?.displayName}</p>
-			<Link href="/onboarding">Onboarding</Link>
-
-			<div className="flex flex-col gap-2 p-4">
-				{schedule?.map((lesson, i) => (
-					<div
-						key={i}
-						className="flex flex-col gap-2 bg-secondary p-3 rounded-2xl border border-border"
-					>
-						<p>{lesson.subject.name}</p>
-						<p>{lesson.classroom}</p>
-						<p>
-							{lesson.groups
-								.filter((group) => group.id !== user.group?.id)
-								.map((group) =>
-									group.type === "studentsGroup"
-										? group.displayName
-										: group.displayName.split("(")[0],
-								)
-								.join(", ")}
-						</p>
-					</div>
-				))}
-			</div>
-		</div>
+		<HydrationBoundary state={fetcher.dehydrate()}>
+			<ScheduleViewer />
+		</HydrationBoundary>
 	)
 }
