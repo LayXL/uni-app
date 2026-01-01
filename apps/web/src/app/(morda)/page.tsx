@@ -25,10 +25,10 @@ export default async function () {
 	return (
 		<HydrationBoundary state={fetcher.dehydrate()}>
 			<div className="flex flex-col bg-muted">
-				<div className="h-[80vh] -mb-4">
+				<div className="fixed w-full h-[calc(80vh+1rem)]">
 					<MapViewer />
 				</div>
-				<div className="flex flex-col bg-background rounded-t-2xl">
+				<div className="mt-[80vh] flex flex-col bg-background rounded-t-2xl z-10">
 					<ScheduleHeader />
 					<ScheduleViewer />
 				</div>
