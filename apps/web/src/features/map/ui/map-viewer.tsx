@@ -74,7 +74,7 @@ export const MapViewer = () => {
 
 	useFloorRender({
 		fabricRef,
-		filteredFloors,
+		data,
 		activeFloor,
 		applyViewport,
 		viewportRef,

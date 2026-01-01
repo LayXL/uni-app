@@ -14,7 +14,7 @@ import type { ViewportState } from "../types"
 
 type UseFloorRenderParams = {
 	fabricRef: React.MutableRefObject<fabric.Canvas | null>
-	filteredFloors: Floor[] | undefined
+	data: Floor[] | undefined
 	activeFloor: number
 	applyViewport: (next: ViewportState) => void
 	viewportRef: React.MutableRefObject<ViewportState>
@@ -24,7 +24,7 @@ type UseFloorRenderParams = {
 
 export const useFloorRender = ({
 	fabricRef,
-	filteredFloors,
+	data,
 	activeFloor,
 	applyViewport,
 	viewportRef,
@@ -35,7 +35,7 @@ export const useFloorRender = ({
 		const canvas = fabricRef.current
 		if (!canvas) return
 
-		const floor = filteredFloors?.find((f) => f.id === activeFloor)
+		const floor = data?.find((f) => f.id === activeFloor)
 		if (!floor) {
 			canvas.clear()
 			return
@@ -156,7 +156,7 @@ export const useFloorRender = ({
 		activeFloor,
 		applyViewport,
 		fabricRef,
-		filteredFloors,
+		data,
 		labelBaseSizeRef,
 		textObjectsRef,
 		viewportRef,

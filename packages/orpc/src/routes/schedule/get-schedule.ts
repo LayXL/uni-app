@@ -28,7 +28,8 @@ export const getSchedule = publicProcedure
 			dates: z
 				.string()
 				.regex(/^\d{4}-\d{2}-\d{2}$/)
-				.array(),
+				.array()
+				.max(90),
 			group: z.number(),
 		}),
 	)
@@ -69,6 +70,12 @@ export const getSchedule = publicProcedure
 				),
 			)
 			.orderBy(asc(classesTable.date), asc(classesTable.order))
+
+		// const daysWithoutClasses = dates.filter(
+		// 	(date) => !schedule.some((lesson) => lesson.date === date),
+		// )
+
+		// TODO: add days without classes
 
 		return schedule.map((lesson) => {
 			const weekday = new Date(lesson.date).getDay()

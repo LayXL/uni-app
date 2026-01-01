@@ -3,6 +3,8 @@ import "./globals.css"
 
 import { Inter } from "next/font/google"
 
+import { cn } from "@/shared/utils/cn"
+
 import Providers from "./providers"
 
 const inter = Inter({
@@ -17,7 +19,10 @@ type LayoutProps = {
 export default function ({ children }: LayoutProps) {
 	return (
 		<html lang="ru" suppressHydrationWarning>
-			<body suppressHydrationWarning className="bg-background text-foreground">
+			<body
+				suppressHydrationWarning
+				className={cn(inter.className, "bg-background text-foreground")}
+			>
 				<Providers>{children}</Providers>
 			</body>
 		</html>

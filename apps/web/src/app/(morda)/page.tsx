@@ -4,6 +4,7 @@ import { orpc } from "@repo/orpc/react"
 import { getNextTwoWeeksDates } from "@repo/shared/lessons/get-next-two-weeks-dates"
 
 import { MapViewer } from "@/features/map/ui/map-viewer"
+import { MapViewerHome } from "@/features/map/ui/map-viewer-home"
 import { ScheduleHeader } from "@/features/schedule/ui/schedule-header"
 import { ScheduleViewer } from "@/features/schedule/ui/schedule-viewer"
 import { Fetcher } from "@/shared/utils/fetcher"
@@ -24,10 +25,10 @@ export default async function () {
 
 	return (
 		<HydrationBoundary state={fetcher.dehydrate()}>
-			<div className="flex flex-col bg-muted">
-				<div className="fixed w-full h-[calc(80vh+1rem)]">
+			<div className="flex flex-col">
+				<MapViewerHome>
 					<MapViewer />
-				</div>
+				</MapViewerHome>
 				<div className="mt-[80vh] flex flex-col bg-background rounded-t-2xl z-10">
 					<ScheduleHeader />
 					<ScheduleViewer />
