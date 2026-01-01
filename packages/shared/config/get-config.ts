@@ -1,9 +1,11 @@
 import { configTable, db, eq } from "@repo/drizzle"
 
+import type { BuildingScheme } from "../building-scheme"
 import type { Timetable } from "../timetable"
 
 type CONFIG_KEY_TO_TYPE = {
 	timetable: Timetable
+	buildingScheme: BuildingScheme
 }
 
 export const getConfig = async <T extends keyof CONFIG_KEY_TO_TYPE>(
