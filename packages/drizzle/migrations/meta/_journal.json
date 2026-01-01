@@ -8,6 +8,20 @@
       "when": 1765664487481,
       "tag": "0000_greedy_metal_master",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1767280118053,
+      "tag": "0001_cool_spacker_dave",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1767280123305,
+      "tag": "0002_wild_thunderbolt",
+      "breakpoints": true
     }
   ]
 }

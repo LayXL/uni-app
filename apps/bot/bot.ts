@@ -1,16 +1,19 @@
-import { Bot, InlineKeyboard } from "grammy"
+import { Bot } from "grammy"
 
 import { env } from "@repo/env"
 
-export const bot = new Bot(env.botToken, {
+import { setupComposer } from "./composers/setup"
+import { startComposer } from "./composers/start"
+import { userMiddleware } from "./middlewares/user"
+import type { Context } from "./types/context"
+
+export const bot = new Bot<Context>(env.botToken, {
 	client: { environment: env.botEnv },
 })
 
-const startInlineKeyboard = new InlineKeyboard().webApp(
-	"Open webapp",
-	env.webAppUrl,
-)
+// Middlewares
+bot.use(userMiddleware)
 
-bot.command("start", async (ctx) => {
-	await ctx.reply("Hello", { reply_markup: startInlineKeyboard })
-})
+// Composers
+bot.use(startComposer)
+bot.use(setupComposer)

@@ -3,6 +3,7 @@ import z from "zod"
 const processEnv = process.env
 
 const envSchema = z.object({
+	nodeEnv: z.enum(["development", "production"]).default("production"),
 	botToken: z.string(),
 	botEnv: z.enum(["test", "prod"]).default("prod"),
 	webAppUrl: z.string().default("http://127.0.0.1:3000/auth"),
@@ -16,6 +17,7 @@ const envSchema = z.object({
 })
 
 export const env = envSchema.parse({
+	nodeEnv: processEnv.NODE_ENV,
 	botToken: processEnv.TELEGRAM_BOT_TOKEN,
 	botEnv: processEnv.TELEGRAM_BOT_ENV,
 	webAppUrl: processEnv.WEB_APP_URL,

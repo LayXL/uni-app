@@ -8,14 +8,21 @@ import {
 	pgTable,
 	primaryKey,
 	serial,
+	text,
 	varchar,
 } from "drizzle-orm/pg-core"
+
+export const configTable = pgTable("config", {
+	id: text().primaryKey().notNull().unique(),
+	json: json().notNull(),
+})
 
 export const usersTable = pgTable("users", {
 	id: serial().primaryKey(),
 	telegramId: bigint({ mode: "number" }),
 	vkId: integer(),
 	group: integer().references(() => groupsTable.id),
+	isAdmin: boolean().notNull().default(false),
 })
 
 export const groupTypeEnum = pgEnum("group_type", ["teacher", "studentsGroup"])

@@ -7,34 +7,29 @@ import { ru } from "date-fns/locale"
 import { orpc } from "@repo/orpc/react"
 import { getNextTwoWeeksDates } from "@repo/shared/lessons/get-next-two-weeks-dates"
 
+import { LessonCard } from "@/entities/lesson/ui/lesson-card"
 import { useUser } from "@/entities/user/hooks/useUser"
 import { groupScheduleItems } from "@/features/schedule/lib/group-schedule-items"
 
 const ScheduleViewerWithGroup = ({ group }: { group: number }) => {
 	const { data } = useQuery(
 		orpc.schedule.getSchedule.queryOptions({
-			input: {
-				group,
-				dates: getNextTwoWeeksDates(),
-			},
+			input: { group, dates: getNextTwoWeeksDates() },
 		}),
 	)
 
 	const groupedSchedule = data ? groupScheduleItems(data) : []
 
 	return (
-		<div>
-			{groupedSchedule.map((group, i) => (
-				<div key={group.date}>
-					{i > 0 && <div className="bg-border h-px w-full" />}
-					<div className="p-4">
-						<h2 className="text-lg font-semibold">
-							{format(group.date, "dd MMMM", { locale: ru })}
-						</h2>
-						{group.lessons.map((lesson, i) => (
-							<div key={i}>
-								{lesson.order}. {lesson.subject.name}
-							</div>
+		<div className="pb-2">
+			{groupedSchedule.map(({ date, lessons }) => (
+				<div key={date} className="px-2">
+					<h2 className="text-lg font-semibold px-2 pt-4 pb-2">
+						{format(date, "d MMMM", { locale: ru })}
+					</h2>
+					<div className="flex flex-col gap-2">
+						{lessons.map((lesson, i) => (
+							<LessonCard key={i} group={group} lesson={lesson} />
 						))}
 					</div>
 				</div>

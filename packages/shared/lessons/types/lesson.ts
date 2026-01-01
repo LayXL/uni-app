@@ -19,6 +19,8 @@ export const lessonSchema = z.object({
 			type: z.enum(["studentsGroup", "teacher"]),
 		}),
 	),
+	startTime: z.string(),
+	endTime: z.string(),
 })
 
 export type Lesson = z.infer<typeof lessonSchema>
