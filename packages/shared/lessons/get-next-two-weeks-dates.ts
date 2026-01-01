@@ -1,4 +1,4 @@
-import { addDays } from "date-fns"
+import { addDays, getDay } from "date-fns"
 import { formatInTimeZone } from "date-fns-tz"
 
 export const getNextTwoWeeksDates = () => {
@@ -8,5 +8,5 @@ export const getNextTwoWeeksDates = () => {
 			"Asia/Yekaterinburg",
 			"yyyy-MM-dd",
 		),
-	)
+	).filter((date) => getDay(new Date(date)) !== 0)
 }

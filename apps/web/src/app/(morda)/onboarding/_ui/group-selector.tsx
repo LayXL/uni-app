@@ -38,7 +38,7 @@ export const GroupSelector = () => {
 			<input
 				type="text"
 				placeholder="Введите название группы"
-				className="p-2 rounded-2xl bg-secondary border border-border"
+				className="p-2 rounded-2xl bg-card border border-border"
 				value={groupName}
 				onChange={(e) => setGroupName(e.target.value)}
 				onKeyDown={(e) => {
@@ -54,7 +54,7 @@ export const GroupSelector = () => {
 				<button
 					key={group.id}
 					type="button"
-					className="p-2 rounded-2xl bg-secondary border border-border"
+					className="p-2 rounded-2xl bg-card border border-border"
 					onClick={handleGroupClick(group.id)}
 				>
 					{group.displayName}

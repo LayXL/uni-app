@@ -27,8 +27,8 @@ export const LessonCard = ({ lesson, group }: LessonCardProps) => {
 					{cutSubjectName(lesson.subject.name)}
 				</p>
 				<div className="flex gap-2 text-muted-foreground text-sm">
-					<p>{lesson.classroom} ауд.</p>
-					<p>
+					<p className="min-w-max">{lesson.classroom} ауд.</p>
+					<p className="min-w-max">
 						{lesson.groups
 							.filter((group) => group.type === "teacher")
 							.map((group) =>
@@ -36,16 +36,14 @@ export const LessonCard = ({ lesson, group }: LessonCardProps) => {
 							)
 							.join(", ")}
 					</p>
-					<p className="break-all line-clamp-1">
-						{otherGroups.length > 0 && (
-							<span>
-								+{" "}
-								{otherGroups.map((group) =>
-									transformFullNameToInitials(transformToGroupName(group)),
-								)}
-							</span>
-						)}
-					</p>
+					{otherGroups.length > 0 && (
+						<p className="break-all line-clamp-1">
+							+{" "}
+							{otherGroups
+								.map((group) => transformToGroupName(group))
+								.join(", ")}
+						</p>
+					)}
 				</div>
 			</div>
 		</div>
