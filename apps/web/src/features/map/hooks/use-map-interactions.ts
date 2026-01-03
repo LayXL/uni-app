@@ -10,7 +10,12 @@ type UseMapInteractionsParams = {
 	rotateAtCenter: (deltaRadians: number) => void
 	applyViewport: (next: ViewportState) => void
 	viewportRef: React.MutableRefObject<ViewportState>
+	screenToWorld: (point: fabric.Point, state: ViewportState) => fabric.Point
 	onRoomClick?: (roomId: number) => void
+	onPointerMove?: (coords: {
+		screen: { x: number; y: number }
+		world: { x: number; y: number }
+	}) => void
 }
 
 type GestureNativeEvent = TouchEvent & {
@@ -26,12 +31,42 @@ export const useMapInteractions = ({
 	rotateAtCenter,
 	applyViewport,
 	viewportRef,
+	screenToWorld,
 	onRoomClick,
+	onPointerMove,
 }: UseMapInteractionsParams) => {
 	const isDraggingRef = useRef(false)
 	const dragLastRef = useRef<{ x: number; y: number } | null>(null)
 	const didDragRef = useRef(false)
 	const gestureRef = useRef<{ scale: number; rotation: number } | null>(null)
+
+	const reportPointer = useCallback(
+		(event: MouseEvent | TouchEvent | fabric.TPointerEvent) => {
+			if (!onPointerMove) return
+
+			const canvas = fabricRef.current
+			if (!canvas) return
+
+			const clientCoords = getPointerCoords(event)
+			if (!clientCoords) return
+
+			const rect = canvas.getElement().getBoundingClientRect()
+			const screen = {
+				x: clientCoords.x - rect.left,
+				y: clientCoords.y - rect.top,
+			}
+			const worldPoint = screenToWorld(
+				new fabric.Point(screen.x, screen.y),
+				viewportRef.current,
+			)
+
+			onPointerMove({
+				screen,
+				world: { x: worldPoint.x, y: worldPoint.y },
+			})
+		},
+		[fabricRef, onPointerMove, screenToWorld, viewportRef],
+	)
 
 	const startDrag = useCallback((event: PointerInfo) => {
 		const coords = getPointerCoords(event.e)
@@ -65,8 +100,10 @@ export const useMapInteractions = ({
 		[applyViewport, viewportRef],
 	)
 
-	const continueDrag = useCallback(
+	const handleMouseMove = useCallback(
 		(event: PointerInfo) => {
+			reportPointer(event.e)
+
 			if (!isDraggingRef.current) return
 
 			const coords = getPointerCoords(event.e)
@@ -74,7 +111,7 @@ export const useMapInteractions = ({
 
 			applyDragDelta(coords)
 		},
-		[applyDragDelta],
+		[applyDragDelta, reportPointer],
 	)
 
 	const continueDragGlobal = useCallback(
@@ -85,8 +122,9 @@ export const useMapInteractions = ({
 			if (!coords) return
 
 			applyDragDelta(coords)
+			reportPointer(event)
 		},
-		[applyDragDelta],
+		[applyDragDelta, reportPointer],
 	)
 
 	const stopDrag = useCallback(() => {
@@ -200,7 +238,7 @@ export const useMapInteractions = ({
 
 		canvas.on("mouse:wheel", onWheel)
 		canvas.on("mouse:down", onMouseDown)
-		canvas.on("mouse:move", continueDrag)
+		canvas.on("mouse:move", handleMouseMove)
 		canvas.on("mouse:up", onMouseUp)
 		gestureCanvas.on("touch:gesture", onGesture)
 		gestureCanvas.on("touch:gesture:end", onGestureEnd)
@@ -208,13 +246,13 @@ export const useMapInteractions = ({
 		return () => {
 			canvas.off("mouse:wheel", onWheel)
 			canvas.off("mouse:down", onMouseDown)
-			canvas.off("mouse:move", continueDrag)
+			canvas.off("mouse:move", handleMouseMove)
 			canvas.off("mouse:up", onMouseUp)
 			gestureCanvas.off("touch:gesture", onGesture)
 			gestureCanvas.off("touch:gesture:end", onGestureEnd)
 		}
 	}, [
-		continueDrag,
+		handleMouseMove,
 		fabricRef,
 		onGesture,
 		onGestureEnd,

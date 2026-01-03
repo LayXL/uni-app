@@ -1,5 +1,5 @@
 import * as fabric from "fabric"
-import { type RefObject, useEffect } from "react"
+import { type RefObject, useEffect, useRef } from "react"
 
 import type { Floor } from "@repo/shared/building-scheme"
 
@@ -23,6 +23,15 @@ type UseFloorRenderParams = {
 	iconObjectsRef: RefObject<fabric.Object[]>
 	iconBaseScaleRef: RefObject<WeakMap<fabric.Object, number>>
 	isDebug: boolean
+	route?: RoutePoint[]
+}
+
+type RoutePoint = {
+	floor: number
+	x: number
+	y: number
+	type: "road" | "stairs"
+	toFloor?: number | null
 }
 
 export const useFloorRender = ({
@@ -36,7 +45,10 @@ export const useFloorRender = ({
 	iconObjectsRef,
 	iconBaseScaleRef,
 	isDebug,
+	route,
 }: UseFloorRenderParams) => {
+	const routeObjectsRef = useRef<fabric.Object[]>([])
+
 	useEffect(() => {
 		let disposed = false
 
@@ -46,6 +58,7 @@ export const useFloorRender = ({
 		const floor = data?.find((f) => f.id === activeFloor)
 		if (!floor) {
 			canvas.clear()
+			routeObjectsRef.current = []
 			return
 		}
 
@@ -53,6 +66,7 @@ export const useFloorRender = ({
 		textObjectsRef.current = []
 		iconObjectsRef.current = []
 		iconBaseScaleRef.current = new WeakMap()
+		routeObjectsRef.current = []
 
 		const colors = getMapColors()
 
@@ -273,4 +287,82 @@ export const useFloorRender = ({
 		iconBaseScaleRef,
 		isDebug,
 	])
+
+	useEffect(() => {
+		const canvas = fabricRef.current
+		if (!canvas) return
+
+		if (routeObjectsRef.current.length) {
+			routeObjectsRef.current.forEach((object) => {
+				canvas.remove(object)
+			})
+			routeObjectsRef.current = []
+		}
+
+		if (!route?.length) return
+
+		const floor = data?.find((f) => f.id === activeFloor)
+		if (!floor) return
+
+		const withOffset = (point: RoutePoint) =>
+			new fabric.Point(point.x + floor.position.x, point.y + floor.position.y)
+
+		let chain: fabric.Point[] = []
+
+		const flushChain = () => {
+			if (chain.length < 2) {
+				chain = []
+				return
+			}
+
+			const polyline = new fabric.Polyline(chain, {
+				stroke: "#22c55e",
+				strokeWidth: 6,
+				strokeLineCap: "round",
+				strokeLineJoin: "round",
+				strokeUniform: true,
+				fill: undefined,
+				opacity: 0.9,
+				hoverCursor: "default",
+				selectable: false,
+				evented: false,
+				objectCaching: false,
+			})
+
+			routeObjectsRef.current.push(polyline)
+			canvas.add(polyline)
+			chain = []
+		}
+
+		route.forEach((point, index) => {
+			if (point.floor !== activeFloor) {
+				flushChain()
+				return
+			}
+
+			const prevSameFloor = index > 0 && route[index - 1]?.floor === activeFloor
+			const nextSameFloor =
+				index + 1 < route.length && route[index + 1]?.floor === activeFloor
+
+			if (!prevSameFloor) {
+				chain = [withOffset(point)]
+			} else {
+				chain.push(withOffset(point))
+			}
+
+			if (!nextSameFloor) {
+				flushChain()
+			}
+		})
+
+		return () => {
+			if (!canvas) return
+			if (!routeObjectsRef.current.length) return
+
+			routeObjectsRef.current.forEach((object) => {
+				canvas.remove(object)
+			})
+			routeObjectsRef.current = []
+		}
+	}, [activeFloor, data, fabricRef, route])
 }

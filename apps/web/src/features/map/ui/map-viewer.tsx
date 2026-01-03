@@ -1,6 +1,6 @@
 "use client"
 
-import { useQuery } from "@tanstack/react-query"
+import { skipToken, useQuery } from "@tanstack/react-query"
 import * as fabric from "fabric"
 import { motion } from "motion/react"
 import { useCallback, useRef, useState } from "react"
@@ -16,11 +16,26 @@ import { useFloorRender } from "../hooks/use-floor-render"
 import { useMapCanvas } from "../hooks/use-map-canvas"
 import { useMapInteractions } from "../hooks/use-map-interactions"
 import { useMapViewport } from "../hooks/use-map-viewport"
+import { useRouteBuilder } from "../hooks/use-route-builder"
 import type { ViewportState } from "../types"
 import { RoomModal } from "./room-modal"
 
 export const MapViewer = () => {
-	const { data } = useQuery(orpc.map.getMap.queryOptions())
+	const { data: mapData } = useQuery(orpc.map.getMap.queryOptions())
+
+	const { start, end } = useRouteBuilder()
+
+	const { data: routeData } = useQuery(
+		orpc.map.buildRoute.queryOptions({
+			input:
+				start && end
+					? {
+							start,
+							end,
+						}
+					: skipToken,
+		}),
+	)
 
 	const [activeCampus, setActiveCampus] = useState<number>(0)
 	const [activeFloor, setActiveFloor] = useState<number>(0)
@@ -36,20 +51,29 @@ export const MapViewer = () => {
 	const iconObjectsRef = useRef<fabric.Object[]>([])
 	const iconBaseScaleRef = useRef(new WeakMap<fabric.Object, number>())
 	const [rotation, setRotation] = useState(0)
+	const [cursorCoords, setCursorCoords] = useState<{
+		screen: { x: number; y: number }
+		world: { x: number; y: number }
+	} | null>(null)
 
 	const handleViewportChange = useCallback((next: ViewportState) => {
 		setRotation(next.rotation)
 	}, [])
 
-	const { viewportRef, applyViewport, zoomAtPoint, rotateAtCenter } =
-		useMapViewport({
-			fabricRef,
-			textObjectsRef,
-			labelBaseSizeRef,
-			iconObjectsRef,
-			iconBaseScaleRef,
-			onViewportChange: handleViewportChange,
-		})
+	const {
+		viewportRef,
+		applyViewport,
+		screenToWorld,
+		zoomAtPoint,
+		rotateAtCenter,
+	} = useMapViewport({
+		fabricRef,
+		textObjectsRef,
+		labelBaseSizeRef,
+		iconObjectsRef,
+		iconBaseScaleRef,
+		onViewportChange: handleViewportChange,
+	})
 
 	const zoomByStep = useCallback(
 		(deltaZoom: number) => {
@@ -72,7 +96,7 @@ export const MapViewer = () => {
 		rotateAtCenter(-currentRotation)
 	}, [rotateAtCenter, viewportRef])
 
-	const filteredFloors = useFilteredFloors(data, activeCampus)
+	const filteredFloors = useFilteredFloors(mapData, activeCampus)
 
 	useMapInteractions({
 		fabricRef,
@@ -80,12 +104,14 @@ export const MapViewer = () => {
 		rotateAtCenter,
 		applyViewport,
 		viewportRef,
+		screenToWorld,
 		onRoomClick: (roomId) => setSelectedRoomId(roomId),
+		onPointerMove: isDebug ? setCursorCoords : undefined,
 	})
 
 	useFloorRender({
 		fabricRef,
-		data,
+		data: mapData,
 		activeFloor,
 		applyViewport,
 		viewportRef,
@@ -94,11 +120,26 @@ export const MapViewer = () => {
 		iconObjectsRef,
 		iconBaseScaleRef,
 		isDebug,
+		route: routeData?.route,
 	})
 
 	return (
 		<div className="relative h-full w-full overflow-hidden bg-[#1B2329]">
 			<canvas ref={canvasRef} className="size-full" />
+
+			{isDebug && cursorCoords && (
+				<div
+					className="pointer-events-none absolute rounded-md bg-neutral-900/80 px-2 py-1 text-xs text-white shadow"
+					style={{
+						left: cursorCoords.screen.x + 10,
+						top: cursorCoords.screen.y + 10,
+					}}
+				>
+					<div>
+						{cursorCoords.world.x.toFixed(0)}, {cursorCoords.world.y.toFixed(0)}
+					</div>
+				</div>
+			)}
 
 			<div className="absolute top-2 left-2 bg-card border-border flex flex-col gap-2 rounded-lg">
 				<button
@@ -158,7 +199,10 @@ export const MapViewer = () => {
 				isOpen={selectedRoomId !== null}
 				onClose={() => setSelectedRoomId(null)}
 			>
-				<RoomModal roomId={selectedRoomId} />
+				<RoomModal
+					roomId={selectedRoomId}
+					onClose={() => setSelectedRoomId(null)}
+				/>
 			</ModalRoot>
 		</div>
 	)
