@@ -1,3 +1,4 @@
+import { format, parseISO, subDays } from "date-fns"
 import z from "zod"
 
 import {
@@ -22,6 +23,33 @@ const addZeroToTime = (time: string) => {
 	return time.padStart(5, "0")
 }
 
+const getScheduleFromDb = async (dates: string[], group: number) => {
+	return db
+		.select({
+			...getTableColumns(classesTable),
+			subject: {
+				id: subjectsTable.id,
+				name: subjectsTable.name,
+			},
+			groups: sql<
+				{
+					id: number
+					displayName: string
+					type: "studentsGroup" | "teacher"
+				}[]
+			>`(SELECT json_agg(json_build_object('id', ${groupsTable.id}, 'displayName', ${groupsTable.displayName}, 'type', ${groupsTable.type})) FROM ${groupsTable} WHERE ${groupsTable.id} = ANY(${classesTable.groups}))`,
+		})
+		.from(classesTable)
+		.innerJoin(subjectsTable, eq(classesTable.subject, subjectsTable.id))
+		.where(
+			and(
+				inArray(classesTable.date, dates),
+				arrayContains(classesTable.groups, [group]),
+			),
+		)
+		.orderBy(asc(classesTable.date), asc(classesTable.order))
+}
+
 export const getSchedule = publicProcedure
 	.input(
 		z.object({
@@ -39,43 +67,25 @@ export const getSchedule = publicProcedure
 
 		const timetable = await getConfig("timetable")
 
-		const schedule = await db
-			.select({
-				...getTableColumns(classesTable),
-				subject: {
-					id: subjectsTable.id,
-					name: subjectsTable.name,
-				},
-				groups: sql<
-					{
-						id: number
-						displayName: string
-						type: "studentsGroup" | "teacher"
-					}[]
-				>`(SELECT json_agg(json_build_object('id', ${groupsTable.id}, 'displayName', ${groupsTable.displayName}, 'type', ${groupsTable.type})) FROM ${groupsTable} WHERE ${groupsTable.id} = ANY(${classesTable.groups}))`.mapWith(
-					(val) =>
-						val as {
-							id: number
-							displayName: string
-							type: "studentsGroup" | "teacher"
-						}[],
-				),
-			})
-			.from(classesTable)
-			.innerJoin(subjectsTable, eq(classesTable.subject, subjectsTable.id))
-			.where(
-				and(
-					inArray(classesTable.date, dates),
-					arrayContains(classesTable.groups, [group]),
-				),
-			)
-			.orderBy(asc(classesTable.date), asc(classesTable.order))
+		const schedule = await getScheduleFromDb(dates, group)
 
-		// const daysWithoutClasses = dates.filter(
-		// 	(date) => !schedule.some((lesson) => lesson.date === date),
-		// )
+		const daysWithoutClasses = dates.filter(
+			(date) => !schedule.some((lesson) => lesson.date === date),
+		)
 
-		// TODO: add days without classes
+		const predictedSchedules = await Promise.all(
+			daysWithoutClasses.map(async (date) => {
+				const parsedDate = parseISO(date)
+				const predictedSchedule = await getScheduleFromDb(
+					[format(subDays(parsedDate, 14), "yyyy-MM-dd")],
+					group,
+				)
+
+				return predictedSchedule.map((lesson) => ({ ...lesson, date }))
+			}),
+		)
+
+		schedule.push(...predictedSchedules.flat())
 
 		return schedule.map((lesson) => {
 			const weekday = new Date(lesson.date).getDay()
