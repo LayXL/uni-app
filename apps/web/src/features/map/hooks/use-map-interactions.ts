@@ -16,6 +16,10 @@ type UseMapInteractionsParams = {
 		screen: { x: number; y: number }
 		world: { x: number; y: number }
 	}) => void
+	onRightClick?: (coords: {
+		screen: { x: number; y: number }
+		world: { x: number; y: number }
+	}) => void
 }
 
 type GestureNativeEvent = TouchEvent & {
@@ -34,21 +38,20 @@ export const useMapInteractions = ({
 	screenToWorld,
 	onRoomClick,
 	onPointerMove,
+	onRightClick,
 }: UseMapInteractionsParams) => {
 	const isDraggingRef = useRef(false)
 	const dragLastRef = useRef<{ x: number; y: number } | null>(null)
 	const didDragRef = useRef(false)
 	const gestureRef = useRef<{ scale: number; rotation: number } | null>(null)
 
-	const reportPointer = useCallback(
+	const getPointerData = useCallback(
 		(event: MouseEvent | TouchEvent | fabric.TPointerEvent) => {
-			if (!onPointerMove) return
-
 			const canvas = fabricRef.current
-			if (!canvas) return
+			if (!canvas) return null
 
 			const clientCoords = getPointerCoords(event)
-			if (!clientCoords) return
+			if (!clientCoords) return null
 
 			const rect = canvas.getElement().getBoundingClientRect()
 			const screen = {
@@ -60,12 +63,24 @@ export const useMapInteractions = ({
 				viewportRef.current,
 			)
 
-			onPointerMove({
+			return {
 				screen,
 				world: { x: worldPoint.x, y: worldPoint.y },
-			})
+			}
 		},
-		[fabricRef, onPointerMove, screenToWorld, viewportRef],
+		[fabricRef, screenToWorld, viewportRef],
+	)
+
+	const reportPointer = useCallback(
+		(event: MouseEvent | TouchEvent | fabric.TPointerEvent) => {
+			if (!onPointerMove) return
+
+			const coords = getPointerData(event)
+			if (!coords) return
+
+			onPointerMove(coords)
+		},
+		[getPointerData, onPointerMove],
 	)
 
 	const startDrag = useCallback((event: PointerInfo) => {
@@ -156,13 +171,28 @@ export const useMapInteractions = ({
 			if (
 				"button" in event.e &&
 				typeof (event.e as MouseEvent).button === "number" &&
-				(((event.e as MouseEvent).button ?? 0) === 0 ||
-					(event.e as MouseEvent).button === 1)
+				(onRightClick || (event.e as MouseEvent).button === 0 || (event.e as MouseEvent).button === 1)
 			) {
-				startDrag(event)
+				const mouseEvent = event.e as MouseEvent
+
+				if (mouseEvent.button === 2) {
+					mouseEvent.preventDefault()
+					mouseEvent.stopPropagation()
+
+					if (onRightClick) {
+						const coords = getPointerData(event.e)
+						if (coords) onRightClick(coords)
+					}
+
+					return
+				}
+
+				if (mouseEvent.button === 0 || mouseEvent.button === 1) {
+					startDrag(event)
+				}
 			}
 		},
-		[startDrag],
+		[getPointerData, onRightClick, startDrag],
 	)
 
 	const onMouseUp = useCallback(

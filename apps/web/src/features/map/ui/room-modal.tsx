@@ -7,8 +7,6 @@ import { orpc } from "@repo/orpc/react"
 
 import { Button } from "@/shared/ui/button"
 
-import { useRouteBuilder } from "../hooks/use-route-builder"
-
 type RoomModalProps = {
 	roomId: number | null
 	onClose: () => void
@@ -17,7 +15,7 @@ type RoomModalProps = {
 export const RoomModal = ({ roomId, onClose }: RoomModalProps) => {
 	const { data } = useQuery(orpc.map.getMap.queryOptions())
 
-	const { setStart, setEnd } = useRouteBuilder()
+	// const { setStart, setEnd } = useRouteBuilder()
 
 	const room = useMemo(() => {
 		if (!roomId || !data) return null
@@ -44,17 +42,17 @@ export const RoomModal = ({ roomId, onClose }: RoomModalProps) => {
 				label="Проложить маршрут"
 				leftIcon="location-map-outline-24"
 				onClick={() => {
-					setStart({
-						x: 370,
-						y: 1500,
-						floor: 0,
-					})
+					// setStart({
+					// 	x: 370,
+					// 	y: 1500,
+					// 	floor: 0,
+					// })
 
-					setEnd({
-						x: 2454,
-						y: 588,
-						floor: 0,
-					})
+					// setEnd({
+					// 	x: 2454,
+					// 	y: 588,
+					// 	floor: 1,
+					// })
 
 					onClose()
 				}}

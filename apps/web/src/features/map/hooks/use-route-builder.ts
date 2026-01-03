@@ -14,7 +14,7 @@ type State = {
 		x: number
 		y: number
 		type: "road" | "stairs"
-		toFloor: number | null
+		toFloor?: number | null
 	}[]
 	setStart: (start: Point) => void
 	setEnd: (end: Point) => void
@@ -25,7 +25,7 @@ type State = {
 			x: number
 			y: number
 			type: "road" | "stairs"
-			toFloor: number | null
+			toFloor?: number | null
 		}[],
 	) => void
 }

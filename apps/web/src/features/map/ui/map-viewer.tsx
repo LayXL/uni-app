@@ -23,7 +23,7 @@ import { RoomModal } from "./room-modal"
 export const MapViewer = () => {
 	const { data: mapData } = useQuery(orpc.map.getMap.queryOptions())
 
-	const { start, end } = useRouteBuilder()
+	const { start, end, setStart, setEnd } = useRouteBuilder()
 
 	const { data: routeData } = useQuery(
 		orpc.map.buildRoute.queryOptions({
@@ -55,6 +55,27 @@ export const MapViewer = () => {
 		screen: { x: number; y: number }
 		world: { x: number; y: number }
 	} | null>(null)
+
+	const handleDebugRightClick = useCallback(
+		(coords: {
+			screen: { x: number; y: number }
+			world: { x: number; y: number }
+		}) => {
+			const point = {
+				x: Math.floor(coords.world.x),
+				y: Math.floor(coords.world.y),
+				floor: activeFloor,
+			}
+
+			if (!start) {
+				setStart(point)
+				return
+			}
+
+			setEnd(point)
+		},
+		[activeFloor, setEnd, setStart, start],
+	)
 
 	const handleViewportChange = useCallback((next: ViewportState) => {
 		setRotation(next.rotation)
@@ -107,6 +128,7 @@ export const MapViewer = () => {
 		screenToWorld,
 		onRoomClick: (roomId) => setSelectedRoomId(roomId),
 		onPointerMove: isDebug ? setCursorCoords : undefined,
+		onRightClick: isDebug ? handleDebugRightClick : undefined,
 	})
 
 	useFloorRender({
