@@ -10,6 +10,7 @@ type UseMapInteractionsParams = {
 	rotateAtCenter: (deltaRadians: number) => void
 	applyViewport: (next: ViewportState) => void
 	viewportRef: React.MutableRefObject<ViewportState>
+	onRoomClick?: (roomName: string) => void
 }
 
 type GestureNativeEvent = TouchEvent & {
@@ -25,9 +26,11 @@ export const useMapInteractions = ({
 	rotateAtCenter,
 	applyViewport,
 	viewportRef,
+	onRoomClick,
 }: UseMapInteractionsParams) => {
 	const isDraggingRef = useRef(false)
 	const dragLastRef = useRef<{ x: number; y: number } | null>(null)
+	const didDragRef = useRef(false)
 	const gestureRef = useRef<{ scale: number; rotation: number } | null>(null)
 
 	const startDrag = useCallback((event: PointerInfo) => {
@@ -36,6 +39,7 @@ export const useMapInteractions = ({
 
 		isDraggingRef.current = true
 		dragLastRef.current = coords
+		didDragRef.current = false
 	}, [])
 
 	const applyDragDelta = useCallback(
@@ -44,6 +48,10 @@ export const useMapInteractions = ({
 
 			const deltaX = coords.x - dragLastRef.current.x
 			const deltaY = coords.y - dragLastRef.current.y
+
+			if (Math.abs(deltaX) > 2 || Math.abs(deltaY) > 2) {
+				didDragRef.current = true
+			}
 
 			dragLastRef.current = coords
 
@@ -84,6 +92,7 @@ export const useMapInteractions = ({
 	const stopDrag = useCallback(() => {
 		isDraggingRef.current = false
 		dragLastRef.current = null
+		didDragRef.current = false
 	}, [])
 
 	const onWheel = useCallback(
@@ -116,6 +125,24 @@ export const useMapInteractions = ({
 			}
 		},
 		[startDrag],
+	)
+
+	const onMouseUp = useCallback(
+		(event: PointerInfo) => {
+			if (!didDragRef.current) {
+				const target = event.target as
+					| (fabric.Object & { data?: { roomName?: string } })
+					| undefined
+
+				const roomName = target?.data?.roomName
+				if (roomName && onRoomClick) {
+					onRoomClick(roomName)
+				}
+			}
+
+			stopDrag()
+		},
+		[onRoomClick, stopDrag],
 	)
 
 	const onGesture = useCallback(
@@ -174,7 +201,7 @@ export const useMapInteractions = ({
 		canvas.on("mouse:wheel", onWheel)
 		canvas.on("mouse:down", onMouseDown)
 		canvas.on("mouse:move", continueDrag)
-		canvas.on("mouse:up", stopDrag)
+		canvas.on("mouse:up", onMouseUp)
 		gestureCanvas.on("touch:gesture", onGesture)
 		gestureCanvas.on("touch:gesture:end", onGestureEnd)
 
@@ -182,7 +209,7 @@ export const useMapInteractions = ({
 			canvas.off("mouse:wheel", onWheel)
 			canvas.off("mouse:down", onMouseDown)
 			canvas.off("mouse:move", continueDrag)
-			canvas.off("mouse:up", stopDrag)
+			canvas.off("mouse:up", onMouseUp)
 			gestureCanvas.off("touch:gesture", onGesture)
 			gestureCanvas.off("touch:gesture:end", onGestureEnd)
 		}
@@ -192,8 +219,8 @@ export const useMapInteractions = ({
 		onGesture,
 		onGestureEnd,
 		onMouseDown,
+		onMouseUp,
 		onWheel,
-		stopDrag,
 	])
 
 	useEffect(() => {

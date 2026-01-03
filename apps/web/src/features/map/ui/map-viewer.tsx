@@ -8,6 +8,7 @@ import { useCallback, useRef, useState } from "react"
 import { orpc } from "@repo/orpc/react"
 
 import { Icon } from "@/shared/ui/icon"
+import { ModalRoot } from "@/shared/ui/modal-root"
 import { cn } from "@/shared/utils/cn"
 
 import { useFilteredFloors } from "../hooks/use-filtered-floors"
@@ -22,6 +23,7 @@ export const MapViewer = () => {
 
 	const [activeCampus, setActiveCampus] = useState<number>(0)
 	const [activeFloor, setActiveFloor] = useState<number>(0)
+	const [selectedRoomName, setSelectedRoomName] = useState<string | null>(null)
 
 	const canvasRef = useRef<HTMLCanvasElement | null>(null)
 
@@ -72,6 +74,7 @@ export const MapViewer = () => {
 		rotateAtCenter,
 		applyViewport,
 		viewportRef,
+		onRoomClick: (roomName) => setSelectedRoomName(roomName),
 	})
 
 	useFloorRender({
@@ -141,6 +144,15 @@ export const MapViewer = () => {
 					</button>
 				)}
 			</div>
+
+			<ModalRoot
+				isOpen={Boolean(selectedRoomName)}
+				onClose={() => setSelectedRoomName(null)}
+			>
+				<div className="flex flex-col gap-2">
+					<p className="text-lg font-semibold">{selectedRoomName}</p>
+				</div>
+			</ModalRoot>
 		</div>
 	)
 }

@@ -71,11 +71,17 @@ export const useFloorRender = ({
 					fill: room.clickable ? colors.roomFillClickable : colors.roomFill,
 					stroke: colors.roomStroke,
 					strokeWidth: 1,
-					hoverCursor: "default",
+					hoverCursor: "pointer",
 					objectCaching: false,
-					evented: false,
+					selectable: false,
+					evented: true,
 				},
 			)
+
+			;(roomPolygon as fabric.Object & { data?: { roomName?: string } }).data =
+				{
+					roomName: room.name,
+				}
 
 			canvas.add(roomPolygon)
 
