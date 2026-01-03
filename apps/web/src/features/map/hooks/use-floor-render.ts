@@ -1,5 +1,5 @@
 import * as fabric from "fabric"
-import { useEffect } from "react"
+import { type RefObject, useEffect } from "react"
 
 import type { Floor } from "@repo/shared/building-scheme"
 
@@ -13,13 +13,15 @@ import {
 import type { ViewportState } from "../types"
 
 type UseFloorRenderParams = {
-	fabricRef: React.MutableRefObject<fabric.Canvas | null>
+	fabricRef: RefObject<fabric.Canvas | null>
 	data: Floor[] | undefined
 	activeFloor: number
 	applyViewport: (next: ViewportState) => void
-	viewportRef: React.MutableRefObject<ViewportState>
-	textObjectsRef: React.MutableRefObject<fabric.Text[]>
-	labelBaseSizeRef: React.MutableRefObject<WeakMap<fabric.FabricText, number>>
+	viewportRef: RefObject<ViewportState>
+	textObjectsRef: RefObject<fabric.Text[]>
+	labelBaseSizeRef: RefObject<WeakMap<fabric.FabricText, number>>
+	iconObjectsRef: RefObject<fabric.Object[]>
+	iconBaseScaleRef: RefObject<WeakMap<fabric.Object, number>>
 	isDebug: boolean
 }
 
@@ -31,9 +33,13 @@ export const useFloorRender = ({
 	viewportRef,
 	textObjectsRef,
 	labelBaseSizeRef,
+	iconObjectsRef,
+	iconBaseScaleRef,
 	isDebug,
 }: UseFloorRenderParams) => {
 	useEffect(() => {
+		let disposed = false
+
 		const canvas = fabricRef.current
 		if (!canvas) return
 
@@ -45,6 +51,8 @@ export const useFloorRender = ({
 
 		canvas.clear()
 		textObjectsRef.current = []
+		iconObjectsRef.current = []
+		iconBaseScaleRef.current = new WeakMap()
 
 		const colors = getMapColors()
 
@@ -88,6 +96,71 @@ export const useFloorRender = ({
 			(typeof window !== "undefined" &&
 				getComputedStyle(document.body).fontFamily) ||
 			"Inter, sans-serif"
+
+		floor.stairs?.forEach((stair) => {
+			const x = floor.position.x + stair.position.x
+			const y = floor.position.y + stair.position.y
+
+			const imgEl = new Image()
+			imgEl.crossOrigin = "anonymous"
+			imgEl.src = "/icons/stairs.svg"
+			imgEl.onload = () => {
+				if (disposed || !fabricRef.current) return
+
+				const img = new fabric.FabricImage(imgEl, {
+					originX: "center",
+					originY: "center",
+					objectCaching: false,
+				})
+
+				if (fabric.filters?.BlendColor) {
+					img.filters = [
+						new fabric.filters.BlendColor({
+							color: colors.stairsIcon,
+							mode: "add",
+						}),
+					]
+					img.applyFilters()
+				}
+
+				const targetSize = 14
+				const scaleX = img.width && img.width > 0 ? targetSize / img.width : 1
+				const scaleY =
+					img.height && img.height > 0 ? targetSize / img.height : 1
+
+				img.set({
+					scaleX,
+					scaleY,
+				})
+
+				const marker = new fabric.Group(
+					[
+						new fabric.Circle({
+							radius: 10,
+							fill: colors.roomStroke,
+							originX: "center",
+							originY: "center",
+						}),
+						img,
+					],
+					{
+						left: x,
+						top: y,
+						originX: "center",
+						originY: "center",
+						hoverCursor: "default",
+						selectable: false,
+						evented: false,
+						objectCaching: false,
+					},
+				)
+
+				iconBaseScaleRef.current.set(marker, marker.scaleX ?? 1)
+				iconObjectsRef.current.push(marker)
+
+				fabricRef.current.add(marker)
+			}
+		})
 
 		const labels: fabric.FabricText[] = []
 
@@ -184,6 +257,10 @@ export const useFloorRender = ({
 			translateX: canvas.getWidth() / 2 - center.x * zoomFit,
 			translateY: canvas.getHeight() / 2 - center.y * zoomFit,
 		})
+
+		return () => {
+			disposed = true
+		}
 	}, [
 		activeFloor,
 		applyViewport,
@@ -192,6 +269,8 @@ export const useFloorRender = ({
 		labelBaseSizeRef,
 		textObjectsRef,
 		viewportRef,
+		iconObjectsRef,
+		iconBaseScaleRef,
 		isDebug,
 	])
 }

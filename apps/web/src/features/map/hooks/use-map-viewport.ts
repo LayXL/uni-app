@@ -8,6 +8,8 @@ type UseMapViewportParams = {
 	fabricRef: React.MutableRefObject<fabric.Canvas | null>
 	textObjectsRef: React.MutableRefObject<fabric.Text[]>
 	labelBaseSizeRef: React.MutableRefObject<WeakMap<fabric.FabricText, number>>
+	iconObjectsRef: React.MutableRefObject<fabric.Object[]>
+	iconBaseScaleRef: React.MutableRefObject<WeakMap<fabric.Object, number>>
 	onViewportChange?: (next: ViewportState) => void
 }
 
@@ -15,6 +17,8 @@ export const useMapViewport = ({
 	fabricRef,
 	textObjectsRef,
 	labelBaseSizeRef,
+	iconObjectsRef,
+	iconBaseScaleRef,
 	onViewportChange,
 }: UseMapViewportParams) => {
 	const viewportRef = useRef<ViewportState>({
@@ -45,10 +49,32 @@ export const useMapViewport = ({
 				text.set("dirty", true)
 			})
 
+			iconObjectsRef.current.forEach((icon) => {
+				const baseScale =
+					iconBaseScaleRef.current.get(icon) ??
+					(icon.scaleX !== undefined ? icon.scaleX : 1)
+				const baseScaleY =
+					iconBaseScaleRef.current.get(icon) ??
+					(icon.scaleY !== undefined ? icon.scaleY : 1)
+
+				icon.set({
+					scaleX: baseScale * fontScale,
+					scaleY: baseScaleY * fontScale,
+				})
+				icon.set("dirty", true)
+			})
+
 			canvas.requestRenderAll()
 			onViewportChange?.(next)
 		},
-		[fabricRef, labelBaseSizeRef, onViewportChange, textObjectsRef],
+		[
+			fabricRef,
+			iconBaseScaleRef,
+			iconObjectsRef,
+			labelBaseSizeRef,
+			onViewportChange,
+			textObjectsRef,
+		],
 	)
 
 	const screenToWorld = useCallback(

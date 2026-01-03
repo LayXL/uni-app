@@ -74,6 +74,7 @@
 		--map-room-fill-clickable: var(--card);
 		--map-room-stroke: var(--border);
 		--map-room-label: var(--foreground);
+		--map-stairs-icon: #ffffff;
 	}
 
 	.dark {
@@ -108,5 +109,6 @@
 		--map-room-fill-clickable: #4b636a;
 		--map-room-stroke: #444342;
 		--map-room-label: var(--foreground);
+		--map-stairs-icon: #ffffff;
 	}
 }

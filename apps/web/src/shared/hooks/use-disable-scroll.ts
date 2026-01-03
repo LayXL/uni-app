@@ -1,12 +1,6 @@
 import { useEffect } from "react"
 
-type UseDisableScrollParams = {
-	disabled?: boolean
-}
-
-export const useDisableScroll = ({
-	disabled = true,
-}: UseDisableScrollParams) => {
+export const useDisableScroll = (disabled = true) => {
 	useEffect(() => {
 		if (disabled) {
 			document.body.style.overflow = "hidden"

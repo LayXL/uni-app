@@ -33,6 +33,8 @@ export const MapViewer = () => {
 
 	const textObjectsRef = useRef<fabric.Text[]>([])
 	const labelBaseSizeRef = useRef(new WeakMap<fabric.FabricText, number>())
+	const iconObjectsRef = useRef<fabric.Object[]>([])
+	const iconBaseScaleRef = useRef(new WeakMap<fabric.Object, number>())
 	const [rotation, setRotation] = useState(0)
 
 	const handleViewportChange = useCallback((next: ViewportState) => {
@@ -44,6 +46,8 @@ export const MapViewer = () => {
 			fabricRef,
 			textObjectsRef,
 			labelBaseSizeRef,
+			iconObjectsRef,
+			iconBaseScaleRef,
 			onViewportChange: handleViewportChange,
 		})
 
@@ -87,6 +91,8 @@ export const MapViewer = () => {
 		viewportRef,
 		textObjectsRef,
 		labelBaseSizeRef,
+		iconObjectsRef,
+		iconBaseScaleRef,
 		isDebug,
 	})
 

@@ -21,7 +21,7 @@ type ModalRootProps = {
 export const ModalRoot = (props: ModalRootProps) => {
 	const { children, isOpen, className, onClose, close } = props
 
-	useDisableScroll({ disabled: isOpen })
+	useDisableScroll(isOpen)
 
 	return (
 		<AnimatePresence>
