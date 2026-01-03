@@ -20,6 +20,7 @@ type UseFloorRenderParams = {
 	viewportRef: React.MutableRefObject<ViewportState>
 	textObjectsRef: React.MutableRefObject<fabric.Text[]>
 	labelBaseSizeRef: React.MutableRefObject<WeakMap<fabric.FabricText, number>>
+	isDebug: boolean
 }
 
 export const useFloorRender = ({
@@ -30,6 +31,7 @@ export const useFloorRender = ({
 	viewportRef,
 	textObjectsRef,
 	labelBaseSizeRef,
+	isDebug,
 }: UseFloorRenderParams) => {
 	useEffect(() => {
 		const canvas = fabricRef.current
@@ -56,6 +58,31 @@ export const useFloorRender = ({
 		})
 
 		canvas.add(floorPolygon)
+
+		if (isDebug && floor.roads?.length) {
+			floor.roads.forEach((road) => {
+				const roadLine = new fabric.Line(
+					[
+						road.start.x + floor.position.x,
+						road.start.y + floor.position.y,
+						road.end.x + floor.position.x,
+						road.end.y + floor.position.y,
+					],
+					{
+						stroke: colors.roomStroke,
+						strokeDashArray: [8, 8],
+						strokeWidth: 2,
+						strokeLineCap: "round",
+						hoverCursor: "default",
+						objectCaching: false,
+						selectable: false,
+						evented: false,
+					},
+				)
+
+				canvas.add(roadLine)
+			})
+		}
 
 		const fontFamily =
 			(typeof window !== "undefined" &&
@@ -165,5 +192,6 @@ export const useFloorRender = ({
 		labelBaseSizeRef,
 		textObjectsRef,
 		viewportRef,
+		isDebug,
 	])
 }

@@ -25,6 +25,7 @@ export const MapViewer = () => {
 	const [activeCampus, setActiveCampus] = useState<number>(0)
 	const [activeFloor, setActiveFloor] = useState<number>(0)
 	const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null)
+	const [isDebug] = useState(true)
 
 	const canvasRef = useRef<HTMLCanvasElement | null>(null)
 
@@ -86,6 +87,7 @@ export const MapViewer = () => {
 		viewportRef,
 		textObjectsRef,
 		labelBaseSizeRef,
+		isDebug,
 	})
 
 	return (
