@@ -1,0 +1,58 @@
+import type {
+	BuildingScheme,
+	Coordinate,
+	Road,
+} from "@repo/shared/building-scheme"
+
+import { type ProjectionResult, projectPointToSegment } from "./geometry"
+
+export const DOOR_TO_ROAD_RADIUS = 120
+
+export function buildRoadsToRoomDoors(
+	buildingScheme: BuildingScheme,
+): BuildingScheme {
+	return buildingScheme.map((floor) => {
+		const baseRoads = floor.roads ?? []
+		if (!floor.rooms?.length || baseRoads.length === 0) return floor
+
+		const extraRoads: Road[] = []
+
+		floor.rooms.forEach((room) => {
+			room.doorsPosition?.forEach((door) => {
+				const doorGlobal: Coordinate = {
+					x: floor.position.x + room.position.x + door.x,
+					y: floor.position.y + room.position.y + door.y,
+				}
+
+				let closest: ProjectionResult | null = null
+
+				for (const road of baseRoads) {
+					const projected = projectPointToSegment(
+						doorGlobal,
+						road.start,
+						road.end,
+					)
+					if (!projected) continue
+
+					if (
+						projected.distance <= DOOR_TO_ROAD_RADIUS &&
+						(closest === null || projected.distance < closest.distance)
+					) {
+						closest = projected
+					}
+				}
+
+				if (closest === null || closest.distance < 1e-3) return
+
+				extraRoads.push({
+					start: closest.projection,
+					end: doorGlobal,
+				})
+			})
+		})
+
+		if (extraRoads.length === 0) return floor
+
+		return { ...floor, roads: [...baseRoads, ...extraRoads] }
+	})
+}
