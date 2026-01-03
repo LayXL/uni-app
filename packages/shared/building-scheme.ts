@@ -31,33 +31,37 @@ export type IconType =
 	| "projectAnalyticCenter"
 	| string
 
-export type Room = {
+export type MapEntity = {
 	name: string
-	description?: string
-	/** скрытое имя/служебные */
-	nameHidden?: boolean
 	/** приоритет для поиска/отображения */
 	priority?: number
-	/** можно ли кликать по комнате */
-	clickable?: boolean
-	/** скрывать из поиска */
-	hiddenInSearch?: boolean
 	/** алиасы для поиска */
 	aliases?: string[]
-	/** глобальная позиция “якоря” комнаты */
+	/** скрывать из поиска */
+	hiddenInSearch?: boolean
+	/** описание сущности */
+	description?: string
+	/** опциональный icon на плане */
+	icon?: IconType
+	/** глобальная позиция “якоря” */
 	position: Coordinate
+	/** id сущности (не у всех есть в json) */
+	id?: number
+}
+
+export type Room = MapEntity & {
+	/** скрытое имя/служебные */
+	nameHidden?: boolean
+	/** можно ли кликать по комнате */
+	clickable?: boolean
 	/** полигон стен в локальных координатах комнаты */
 	wallsPosition: WallsPolygon
 	/** локальные координаты дверей (относительно position) */
 	doorsPosition?: DoorPosition[]
-	/** id комнаты (не у всех есть в json) */
-	id?: number
 	/** индекс этажа, если присутствует */
 	floorIndex?: number
 	/** опциональная ссылка (например, vk) */
 	url?: string
-	/** опциональный icon на плане */
-	icon?: IconType
 }
 
 export type Stair = {
@@ -67,16 +71,8 @@ export type Stair = {
 	position: Coordinate
 }
 
-export type Place = {
-	name: string
-	/** приоритет точки интереса */
-	priority?: number
-	/** алиасы в поиске */
-	aliases?: string[]
+export type Place = MapEntity & {
 	type?: PlaceType
-	description?: string
-	icon?: IconType
-	position: Coordinate
 }
 
 export type PhotoPoint = {
@@ -109,5 +105,5 @@ export type Floor = {
 	photoPoints?: PhotoPoint[]
 }
 
-/** корневой объект файла paste.txt — список этажей */
+/** корневой объект файла список этажей */
 export type BuildingScheme = Floor[]

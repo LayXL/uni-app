@@ -10,7 +10,7 @@ type UseMapInteractionsParams = {
 	rotateAtCenter: (deltaRadians: number) => void
 	applyViewport: (next: ViewportState) => void
 	viewportRef: React.MutableRefObject<ViewportState>
-	onRoomClick?: (roomName: string) => void
+	onRoomClick?: (roomId: number) => void
 }
 
 type GestureNativeEvent = TouchEvent & {
@@ -131,12 +131,12 @@ export const useMapInteractions = ({
 		(event: PointerInfo) => {
 			if (!didDragRef.current) {
 				const target = event.target as
-					| (fabric.Object & { data?: { roomName?: string } })
+					| (fabric.Object & { data?: { roomId?: number } })
 					| undefined
 
-				const roomName = target?.data?.roomName
-				if (roomName && onRoomClick) {
-					onRoomClick(roomName)
+				const roomId = target?.data?.roomId
+				if (roomId !== undefined && onRoomClick) {
+					onRoomClick(roomId)
 				}
 			}
 

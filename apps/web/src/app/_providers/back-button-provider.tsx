@@ -3,7 +3,7 @@
 import { backButton, useSignal } from "@tma.js/sdk-react"
 import dynamic from "next/dynamic"
 import { usePathname, useRouter } from "next/navigation"
-import { type FC, type ReactNode, useEffect } from "react"
+import { type ReactNode, useEffect } from "react"
 
 type BackButtonProviderProps = {
 	children: ReactNode
@@ -33,7 +33,7 @@ const BackButtonProviderComponent = ({ children }: BackButtonProviderProps) => {
 	}, [router, isAvailable])
 
 	useEffect(() => {
-		const hasHistory = window.history.length > 0 && Boolean(pathname)
+		const hasHistory = window.history.length > 1 && Boolean(pathname)
 
 		if (hasHistory) {
 			backButton.show.ifAvailable()

@@ -78,10 +78,9 @@ export const useFloorRender = ({
 				},
 			)
 
-			;(roomPolygon as fabric.Object & { data?: { roomName?: string } }).data =
-				{
-					roomName: room.name,
-				}
+			;(roomPolygon as fabric.Object & { data?: { roomId?: number } }).data = {
+				roomId: room.id,
+			}
 
 			canvas.add(roomPolygon)
 

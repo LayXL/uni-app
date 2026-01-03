@@ -17,13 +17,14 @@ import { useMapCanvas } from "../hooks/use-map-canvas"
 import { useMapInteractions } from "../hooks/use-map-interactions"
 import { useMapViewport } from "../hooks/use-map-viewport"
 import type { ViewportState } from "../types"
+import { RoomModal } from "./room-modal"
 
 export const MapViewer = () => {
 	const { data } = useQuery(orpc.map.getMap.queryOptions())
 
 	const [activeCampus, setActiveCampus] = useState<number>(0)
 	const [activeFloor, setActiveFloor] = useState<number>(0)
-	const [selectedRoomName, setSelectedRoomName] = useState<string | null>(null)
+	const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null)
 
 	const canvasRef = useRef<HTMLCanvasElement | null>(null)
 
@@ -74,7 +75,7 @@ export const MapViewer = () => {
 		rotateAtCenter,
 		applyViewport,
 		viewportRef,
-		onRoomClick: (roomName) => setSelectedRoomName(roomName),
+		onRoomClick: (roomId) => setSelectedRoomId(roomId),
 	})
 
 	useFloorRender({
@@ -146,12 +147,10 @@ export const MapViewer = () => {
 			</div>
 
 			<ModalRoot
-				isOpen={Boolean(selectedRoomName)}
-				onClose={() => setSelectedRoomName(null)}
+				isOpen={selectedRoomId !== null}
+				onClose={() => setSelectedRoomId(null)}
 			>
-				<div className="flex flex-col gap-2">
-					<p className="text-lg font-semibold">{selectedRoomName}</p>
-				</div>
+				<RoomModal roomId={selectedRoomId} />
 			</ModalRoot>
 		</div>
 	)
