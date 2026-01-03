@@ -1,9 +1,11 @@
 import type { ClassValue } from "clsx"
 
+import type { IconName } from "@/types/icon-name"
+
 import { cn } from "../utils/cn"
 
 export type IconProps = {
-	name: string
+	name: IconName
 	size?: number
 	color?: string
 	className?: ClassValue

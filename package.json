@@ -10,7 +10,8 @@
     "db:generate": "cd packages/drizzle && bun run --env-file ../../.env generate",
     "db:migrate": "cd packages/drizzle && bun run --env-file ../../.env migrate",
     "db": "cd packages/drizzle && bun run --env-file ../../.env drizzle-kit",
-    "lint": "bunx biome check --write"
+    "lint": "bunx biome check --write",
+    "gen:icons": "turbo gen icons"
   },
   "workspaces": [
     "apps/*",

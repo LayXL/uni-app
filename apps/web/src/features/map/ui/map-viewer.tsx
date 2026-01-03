@@ -2,10 +2,12 @@
 
 import { useQuery } from "@tanstack/react-query"
 import * as fabric from "fabric"
+import { motion } from "motion/react"
 import { useCallback, useRef, useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
 
+import { Icon } from "@/shared/ui/icon"
 import { cn } from "@/shared/utils/cn"
 
 import { useFilteredFloors } from "../hooks/use-filtered-floors"
@@ -27,10 +29,10 @@ export const MapViewer = () => {
 
 	const textObjectsRef = useRef<fabric.Text[]>([])
 	const labelBaseSizeRef = useRef(new WeakMap<fabric.FabricText, number>())
-	const [hasRotation, setHasRotation] = useState(false)
+	const [rotation, setRotation] = useState(0)
 
 	const handleViewportChange = useCallback((next: ViewportState) => {
-		setHasRotation(Math.abs(next.rotation) > 0.001)
+		setRotation(next.rotation)
 	}, [])
 
 	const { viewportRef, applyViewport, zoomAtPoint, rotateAtCenter } =
@@ -115,22 +117,27 @@ export const MapViewer = () => {
 					className="size-8 text-lg grid place-items-center rounded-lg"
 					onClick={() => zoomByStep(1.2)}
 				>
-					+
+					<Icon name="add-16" />
 				</button>
 				<button
 					type="button"
 					className="size-8 text-lg grid place-items-center rounded-lg"
 					onClick={() => zoomByStep(1 / 1.2)}
 				>
-					-
+					<Icon name="minus-16" />
 				</button>
-				{hasRotation && (
+				{rotation !== 0 && (
 					<button
 						type="button"
 						className="size-8 text-lg grid place-items-center rounded-lg"
 						onClick={resetRotation}
 					>
-						*
+						<motion.span
+							initial={{ rotate: (rotation * 180 - 140) / Math.PI }}
+							animate={{ rotate: (rotation * 180 - 140) / Math.PI }}
+						>
+							<Icon name="compass-24" size={16} />
+						</motion.span>
 					</button>
 				)}
 			</div>
