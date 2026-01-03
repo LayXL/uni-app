@@ -5,7 +5,7 @@ import { Inter } from "next/font/google"
 
 import { cn } from "@/shared/utils/cn"
 
-import Providers from "./providers"
+import Providers from "./_providers"
 
 const inter = Inter({
 	subsets: ["latin", "latin-ext", "cyrillic", "cyrillic-ext"],

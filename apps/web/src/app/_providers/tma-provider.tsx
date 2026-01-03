@@ -8,6 +8,7 @@ export const TmaProvider = ({ children }: { children: ReactNode }) => {
 		try {
 			init()
 		} catch (error) {
+			// biome-ignore lint/suspicious/noConsole: tma sdk error
 			console.log("Failed to initialize TMA SDK", error)
 		}
 	}, [])

@@ -2,6 +2,7 @@ import { ThemeProvider } from "next-themes"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 import { nestProviders } from "react-nest-providers"
 
+import { BackButtonProvider } from "./back-button-provider"
 import { QueryClientProvider } from "./query-client-provider"
 import { TmaProvider } from "./tma-provider"
 
@@ -10,4 +11,5 @@ export default nestProviders()
 	.push(ThemeProvider, { attribute: "class" })
 	.push(QueryClientProvider)
 	.push(TmaProvider)
+	.push(BackButtonProvider)
 	.build()

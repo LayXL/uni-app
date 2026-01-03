@@ -19,14 +19,10 @@ export default function Page() {
 
 			if (hash.length > 0) {
 				cookie.set("session", `tma ${hash}`, { expires: 7 })
-				router.push("/")
+				router.replace("/")
 			}
 		}
 	}, [router])
 
-	return (
-		<div className="flex h-screen items-center justify-center">
-			<div className="text-2xl font-bold">Please wait...</div>
-		</div>
-	)
+	return null
 }
