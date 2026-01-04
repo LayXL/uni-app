@@ -3,6 +3,7 @@
 import { motion, useScroll, useTransform } from "motion/react"
 import type { ReactNode } from "react"
 
+import { useRouteBuilder } from "@/features/map/hooks/use-route-builder"
 import { useViewportDimensions } from "@/shared/hooks/use-viewport-dimensions"
 
 type MapViewerHomeProps = {
@@ -10,6 +11,8 @@ type MapViewerHomeProps = {
 }
 
 export const MapViewerHome = ({ children }: MapViewerHomeProps) => {
+	const hasPoints = useRouteBuilder((state) => state.hasPoints)
+
 	const { scrollY } = useScroll()
 
 	const { height } = useViewportDimensions()
@@ -24,7 +27,9 @@ export const MapViewerHome = ({ children }: MapViewerHomeProps) => {
 	return (
 		<motion.div
 			style={{ opacity, filter, pointerEvents }}
-			className="fixed w-full h-[calc(80vh+1rem)]"
+			initial={{ height: "80vh" }}
+			animate={{ height: hasPoints ? "100vh" : "80vh" }}
+			className="fixed w-full"
 		>
 			{children}
 		</motion.div>

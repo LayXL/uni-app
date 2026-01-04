@@ -11,12 +11,14 @@ import { Icon } from "@/shared/ui/icon"
 import { ModalRoot } from "@/shared/ui/modal-root"
 import { cn } from "@/shared/utils/cn"
 
+import { useActiveFloor } from "../hooks/use-active-floor"
 import { useFilteredFloors } from "../hooks/use-filtered-floors"
 import { useFloorRender } from "../hooks/use-floor-render"
 import { useMapCanvas } from "../hooks/use-map-canvas"
 import { useMapInteractions } from "../hooks/use-map-interactions"
 import { useMapViewport } from "../hooks/use-map-viewport"
 import { useRouteBuilder } from "../hooks/use-route-builder"
+import { createViewportMatrix } from "../lib/geometry"
 import type { ViewportState } from "../types"
 import { RoomModal } from "./room-modal"
 
@@ -27,24 +29,17 @@ export const MapViewer = () => {
 
 	const { data: routeData } = useQuery(
 		orpc.map.buildRoute.queryOptions({
-			input:
-				start && end
-					? {
-							start,
-							end,
-						}
-					: skipToken,
+			input: start && end ? { start, end } : skipToken,
 		}),
 	)
 
 	const [activeCampus, setActiveCampus] = useState<number>(0)
-	const [activeFloor, setActiveFloor] = useState<number>(0)
+	const { activeFloor, setActiveFloor } = useActiveFloor()
 	const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null)
 	const [isDebug] = useState(true)
 
 	const canvasRef = useRef<HTMLCanvasElement | null>(null)
-
-	const { fabricRef } = useMapCanvas({ canvasRef })
+	const fabricRef = useRef<fabric.Canvas | null>(null)
 
 	const textObjectsRef = useRef<fabric.Text[]>([])
 	const labelBaseSizeRef = useRef(new WeakMap<fabric.FabricText, number>())
@@ -96,6 +91,36 @@ export const MapViewer = () => {
 		onViewportChange: handleViewportChange,
 	})
 
+	const handleResize = useCallback(
+		(
+			width: number,
+			height: number,
+			prevWidth: number | undefined,
+			prevHeight: number | undefined,
+		) => {
+			if (!prevWidth || !prevHeight) return
+
+			const state = viewportRef.current
+			const prevCenter = new fabric.Point(prevWidth / 2, prevHeight / 2)
+			const worldCenter = screenToWorld(prevCenter, state)
+			const matrix = createViewportMatrix({
+				...state,
+				translateX: 0,
+				translateY: 0,
+			})
+			const screenWithZero = fabric.util.transformPoint(worldCenter, matrix)
+
+			applyViewport({
+				...state,
+				translateX: width / 2 - screenWithZero.x,
+				translateY: height / 2 - screenWithZero.y,
+			})
+		},
+		[applyViewport, screenToWorld, viewportRef],
+	)
+
+	useMapCanvas({ canvasRef, fabricRef, onResize: handleResize })
+
 	const zoomByStep = useCallback(
 		(deltaZoom: number) => {
 			const canvas = fabricRef.current
@@ -107,7 +132,7 @@ export const MapViewer = () => {
 			)
 			zoomAtPoint(center, deltaZoom)
 		},
-		[fabricRef, zoomAtPoint],
+		[zoomAtPoint],
 	)
 
 	const resetRotation = useCallback(() => {

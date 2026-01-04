@@ -9,30 +9,19 @@ type Point = {
 type State = {
 	start?: Point
 	end?: Point
-	route?: {
-		floor: number
-		x: number
-		y: number
-		type: "road" | "stairs"
-		toFloor?: number | null
-	}[]
+	hasPoints: boolean
 	setStart: (start: Point) => void
 	setEnd: (end: Point) => void
 	resetRoute: () => void
-	setRoute: (
-		route: {
-			floor: number
-			x: number
-			y: number
-			type: "road" | "stairs"
-			toFloor?: number | null
-		}[],
-	) => void
 }
 
 export const useRouteBuilder = create<State>((set) => ({
-	setStart: (start) => set({ start }),
-	setEnd: (end) => set({ end }),
-	setRoute: (route) => set({ route }),
-	resetRoute: () => set({ start: undefined, end: undefined, route: undefined }),
+	start: undefined,
+	end: undefined,
+	hasPoints: false,
+	setStart: (start) =>
+		set((state) => ({ start, hasPoints: state.end !== undefined })),
+	setEnd: (end) =>
+		set((state) => ({ end, hasPoints: state.start !== undefined })),
+	resetRoute: () => set({ start: undefined, end: undefined, hasPoints: false }),
 }))

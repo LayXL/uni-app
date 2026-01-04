@@ -2720,6 +2720,7 @@ export type IconName =
   | "squareshape-5-vertical-left-outline-24"
   | "squareshape-5-vertical-left-split-outline-24"
   | "squareshape-9-grid-outline-20"
+  | "stairs"
   | "star-12"
   | "star-alt-16"
   | "star-circle-12"

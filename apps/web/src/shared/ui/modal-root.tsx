@@ -38,7 +38,7 @@ export const ModalRoot = (props: ModalRootProps) => {
 						/>
 						<motion.div
 							animate={{ opacity: 1, y: 0 }}
-							className="absolute bottom-1 left-1 right-1 justify-end bg-background border border-border rounded-3xl p-4"
+							className="absolute bottom-1 left-1 right-1 bg-background border border-border rounded-3xl p-4"
 							exit={{ opacity: 0, y: "100%" }}
 							initial={{ opacity: 0, y: "100%" }}
 							transition={TRANSITION}

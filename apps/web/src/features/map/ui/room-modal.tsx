@@ -15,8 +15,6 @@ type RoomModalProps = {
 export const RoomModal = ({ roomId, onClose }: RoomModalProps) => {
 	const { data } = useQuery(orpc.map.getMap.queryOptions())
 
-	// const { setStart, setEnd } = useRouteBuilder()
-
 	const room = useMemo(() => {
 		if (!roomId || !data) return null
 

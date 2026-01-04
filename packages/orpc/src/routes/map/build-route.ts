@@ -73,6 +73,16 @@ const segmentIntersection = (
 	return null
 }
 
+export const routeSchema = z.array(
+	z.object({
+		floor: z.number(),
+		x: z.number(),
+		y: z.number(),
+		type: z.enum(["road", "stairs"]).default("road"),
+		toFloor: z.number().optional(),
+	}),
+)
+
 export const buildRoute = publicProcedure
 	.input(
 		z.object({
@@ -88,19 +98,7 @@ export const buildRoute = publicProcedure
 			}),
 		}),
 	)
-	.output(
-		z.object({
-			route: z.array(
-				z.object({
-					floor: z.number(),
-					x: z.number(),
-					y: z.number(),
-					type: z.enum(["road", "stairs"]).default("road"),
-					toFloor: z.number().optional(),
-				}),
-			),
-		}),
-	)
+	.output(z.object({ route: routeSchema }))
 	.handler(async ({ input }) => {
 		const buildingScheme = buildRoadsToRoomDoors(
 			await getConfig("buildingScheme"),
