@@ -2261,7 +2261,7 @@ UPDATE config SET json = $$
           "y": 489
         }
       ],
-      "id": 0,
+      "id": 1,
       "floorId": 0
     },
     {
@@ -2294,7 +2294,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 1,
+      "id": 2,
       "floorId": 0
     },
     {
@@ -2327,7 +2327,7 @@ UPDATE config SET json = $$
           "y": 50
         }
       ],
-      "id": 2,
+      "id": 3,
       "floorId": 0
     },
     {
@@ -2360,7 +2360,7 @@ UPDATE config SET json = $$
           "y": 70
         }
       ],
-      "id": 3,
+      "id": 4,
       "floorId": 0
     },
     {
@@ -2401,7 +2401,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 4,
+      "id": 5,
       "floorId": 0
     },
     {
@@ -2435,7 +2435,7 @@ UPDATE config SET json = $$
           "y": 435
         }
       ],
-      "id": 5,
+      "id": 6,
       "floorId": 0
     },
     {
@@ -2470,7 +2470,7 @@ UPDATE config SET json = $$
           "y": 90
         }
       ],
-      "id": 6,
+      "id": 7,
       "floorId": 0
     },
     {
@@ -2503,7 +2503,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 7,
+      "id": 8,
       "floorId": 0
     },
     {
@@ -2537,7 +2537,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 8,
+      "id": 9,
       "floorId": 0
     },
     {
@@ -2571,7 +2571,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 9,
+      "id": 10,
       "floorId": 0
     },
     {
@@ -2604,7 +2604,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 10,
+      "id": 11,
       "floorId": 0
     },
     {
@@ -2649,7 +2649,7 @@ UPDATE config SET json = $$
           "y": 239
         }
       ],
-      "id": 11,
+      "id": 12,
       "floorId": 0
     },
     {
@@ -2686,7 +2686,7 @@ UPDATE config SET json = $$
           "y": 250
         }
       ],
-      "id": 12,
+      "id": 13,
       "floorId": 0
     },
     {
@@ -2720,7 +2720,7 @@ UPDATE config SET json = $$
           "y": 250
         }
       ],
-      "id": 13,
+      "id": 14,
       "floorId": 0
     },
     {
@@ -2754,7 +2754,7 @@ UPDATE config SET json = $$
           "y": 62
         }
       ],
-      "id": 14,
+      "id": 15,
       "floorId": 0
     },
     {
@@ -2788,7 +2788,7 @@ UPDATE config SET json = $$
           "y": 62
         }
       ],
-      "id": 15,
+      "id": 16,
       "floorId": 0
     },
     {
@@ -2822,7 +2822,7 @@ UPDATE config SET json = $$
           "y": 62
         }
       ],
-      "id": 16,
+      "id": 17,
       "floorId": 0
     },
     {
@@ -2864,7 +2864,7 @@ UPDATE config SET json = $$
           "y": 62
         }
       ],
-      "id": 32,
+      "id": 33,
       "floorId": 0
     },
     {
@@ -2897,7 +2897,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 18,
+      "id": 19,
       "floorId": 0
     },
     {
@@ -2930,7 +2930,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 19,
+      "id": 20,
       "floorId": 0
     },
     {
@@ -2963,7 +2963,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 20,
+      "id": 21,
       "floorId": 0
     },
     {
@@ -2997,7 +2997,7 @@ UPDATE config SET json = $$
           "y": 380
         }
       ],
-      "id": 21,
+      "id": 22,
       "floorId": 0
     },
     {
@@ -3034,7 +3034,7 @@ UPDATE config SET json = $$
           "y": 380
         }
       ],
-      "id": 22,
+      "id": 23,
       "floorId": 0
     },
     {
@@ -3068,7 +3068,7 @@ UPDATE config SET json = $$
           "y": 260
         }
       ],
-      "id": 23,
+      "id": 24,
       "floorId": 0
     },
     {
@@ -3102,7 +3102,7 @@ UPDATE config SET json = $$
           "y": 180
         }
       ],
-      "id": 24,
+      "id": 25,
       "floorId": 0
     },
     {
@@ -3136,7 +3136,7 @@ UPDATE config SET json = $$
           "y": 50
         }
       ],
-      "id": 25,
+      "id": 26,
       "floorId": 0
     },
     {
@@ -3170,7 +3170,7 @@ UPDATE config SET json = $$
           "y": 50
         }
       ],
-      "id": 26,
+      "id": 27,
       "floorId": 0
     },
     {
@@ -3208,7 +3208,7 @@ UPDATE config SET json = $$
           "y": 380
         }
       ],
-      "id": 27,
+      "id": 28,
       "floorId": 0
     },
     {
@@ -3242,7 +3242,7 @@ UPDATE config SET json = $$
           "y": 180
         }
       ],
-      "id": 28,
+      "id": 29,
       "floorId": 0
     },
     {
@@ -3276,7 +3276,7 @@ UPDATE config SET json = $$
           "y": 166
         }
       ],
-      "id": 29,
+      "id": 30,
       "floorId": 0
     },
     {
@@ -3310,7 +3310,7 @@ UPDATE config SET json = $$
           "y": 50
         }
       ],
-      "id": 30,
+      "id": 31,
       "floorId": 0
     },
     {
@@ -3344,7 +3344,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 31,
+      "id": 32,
       "floorId": 0
     },
     {
@@ -3378,7 +3378,7 @@ UPDATE config SET json = $$
           "y": 370
         }
       ],
-      "id": 33,
+      "id": 34,
       "floorId": 1
     },
     {
@@ -3412,7 +3412,7 @@ UPDATE config SET json = $$
           "y": 370
         }
       ],
-      "id": 34,
+      "id": 35,
       "floorId": 1
     },
     {
@@ -3446,7 +3446,7 @@ UPDATE config SET json = $$
           "y": 370
         }
       ],
-      "id": 35,
+      "id": 36,
       "floorId": 1
     },
     {
@@ -3479,7 +3479,7 @@ UPDATE config SET json = $$
           "y": 370
         }
       ],
-      "id": 36,
+      "id": 37,
       "floorId": 1
     },
     {
@@ -3512,7 +3512,7 @@ UPDATE config SET json = $$
           "y": 370
         }
       ],
-      "id": 37,
+      "id": 38,
       "floorId": 1
     },
     {
@@ -3549,7 +3549,7 @@ UPDATE config SET json = $$
           "y": 370
         }
       ],
-      "id": 38,
+      "id": 39,
       "floorId": 1
     },
     {
@@ -3583,7 +3583,7 @@ UPDATE config SET json = $$
           "y": 250
         }
       ],
-      "id": 39,
+      "id": 40,
       "floorId": 1
     },
     {
@@ -3616,7 +3616,7 @@ UPDATE config SET json = $$
           "y": 100
         }
       ],
-      "id": 40,
+      "id": 41,
       "floorId": 1
     },
     {
@@ -3649,7 +3649,7 @@ UPDATE config SET json = $$
           "y": 100
         }
       ],
-      "id": 41,
+      "id": 42,
       "floorId": 1
     },
     {
@@ -3683,7 +3683,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 42,
+      "id": 43,
       "floorId": 1
     },
     {
@@ -3717,7 +3717,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 43,
+      "id": 44,
       "floorId": 1
     },
     {
@@ -3751,7 +3751,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 44,
+      "id": 45,
       "floorId": 1
     },
     {
@@ -3785,7 +3785,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 45,
+      "id": 46,
       "floorId": 1
     },
     {
@@ -3819,7 +3819,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 46,
+      "id": 47,
       "floorId": 1
     },
     {
@@ -3853,7 +3853,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 47,
+      "id": 48,
       "floorId": 1
     },
     {
@@ -3894,7 +3894,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 48,
+      "id": 49,
       "floorId": 1
     },
     {
@@ -3932,7 +3932,7 @@ UPDATE config SET json = $$
           "y": 410
         }
       ],
-      "id": 49,
+      "id": 50,
       "floorId": 1
     },
     {
@@ -3966,7 +3966,7 @@ UPDATE config SET json = $$
           "y": 130
         }
       ],
-      "id": 50,
+      "id": 51,
       "floorId": 1
     },
     {
@@ -4000,7 +4000,7 @@ UPDATE config SET json = $$
           "y": 190
         }
       ],
-      "id": 51,
+      "id": 52,
       "floorId": 1
     },
     {
@@ -4032,39 +4032,6 @@ UPDATE config SET json = $$
         {
           "x": 250,
           "y": 190
-        }
-      ],
-      "id": 52,
-      "floorId": 1
-    },
-    {
-      "name": "251",
-      "position": {
-        "x": 0,
-        "y": 1609
-      },
-      "wallsPosition": [
-        {
-          "x": 0,
-          "y": 0
-        },
-        {
-          "x": 171,
-          "y": 0
-        },
-        {
-          "x": 171,
-          "y": 232
-        },
-        {
-          "x": 0,
-          "y": 232
-        }
-      ],
-      "doorsPosition": [
-        {
-          "x": 140,
-          "y": 0
         }
       ],
       "id": 53,
@@ -4104,6 +4071,39 @@ UPDATE config SET json = $$
       "floorId": 1
     },
     {
+      "name": "251",
+      "position": {
+        "x": 0,
+        "y": 1609
+      },
+      "wallsPosition": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 171,
+          "y": 0
+        },
+        {
+          "x": 171,
+          "y": 232
+        },
+        {
+          "x": 0,
+          "y": 232
+        }
+      ],
+      "doorsPosition": [
+        {
+          "x": 140,
+          "y": 0
+        }
+      ],
+      "id": 55,
+      "floorId": 1
+    },
+    {
       "name": "250",
       "description": "Отдел технического обеспечения и сопровождения информационных технологий",
       "position": {
@@ -4134,7 +4134,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 55,
+      "id": 56,
       "floorId": 1
     },
     {
@@ -4167,7 +4167,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 56,
+      "id": 57,
       "floorId": 1
     },
     {
@@ -4203,7 +4203,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 57,
+      "id": 58,
       "floorId": 1
     },
     {
@@ -4237,7 +4237,7 @@ UPDATE config SET json = $$
           "y": 130
         }
       ],
-      "id": 58,
+      "id": 59,
       "floorId": 1
     },
     {
@@ -4279,7 +4279,7 @@ UPDATE config SET json = $$
           "y": 344
         }
       ],
-      "id": 59,
+      "id": 60,
       "floorId": 1
     },
     {
@@ -4312,7 +4312,7 @@ UPDATE config SET json = $$
           "y": 70
         }
       ],
-      "id": 60,
+      "id": 61,
       "floorId": 1
     },
     {
@@ -4346,7 +4346,7 @@ UPDATE config SET json = $$
           "y": 50
         }
       ],
-      "id": 61,
+      "id": 62,
       "floorId": 1
     },
     {
@@ -4380,7 +4380,7 @@ UPDATE config SET json = $$
           "y": 50
         }
       ],
-      "id": 62,
+      "id": 63,
       "floorId": 1
     },
     {
@@ -4425,7 +4425,7 @@ UPDATE config SET json = $$
           "y": 250
         }
       ],
-      "id": 63,
+      "id": 64,
       "floorId": 1
     },
     {
@@ -4459,7 +4459,7 @@ UPDATE config SET json = $$
           "y": 50
         }
       ],
-      "id": 64,
+      "id": 65,
       "floorId": 1
     },
     {
@@ -4495,7 +4495,7 @@ UPDATE config SET json = $$
           "y": 50
         }
       ],
-      "id": 65,
+      "id": 66,
       "floorId": 1
     },
     {
@@ -4532,7 +4532,7 @@ UPDATE config SET json = $$
           "y": 232
         }
       ],
-      "id": 66,
+      "id": 67,
       "floorId": 1
     },
     {
@@ -4566,7 +4566,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 67,
+      "id": 68,
       "floorId": 1
     },
     {
@@ -4608,7 +4608,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 68,
+      "id": 69,
       "floorId": 1
     },
     {
@@ -4642,7 +4642,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 69,
+      "id": 70,
       "floorId": 1
     },
     {
@@ -4676,7 +4676,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 70,
+      "id": 71,
       "floorId": 1
     },
     {
@@ -4709,7 +4709,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 71,
+      "id": 72,
       "floorId": 1
     },
     {
@@ -4743,7 +4743,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 72,
+      "id": 73,
       "floorId": 1
     },
     {
@@ -4777,7 +4777,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 73,
+      "id": 74,
       "floorId": 1
     },
     {
@@ -4811,7 +4811,7 @@ UPDATE config SET json = $$
           "y": 60
         }
       ],
-      "id": 74,
+      "id": 75,
       "floorId": 1
     },
     {
@@ -4845,7 +4845,7 @@ UPDATE config SET json = $$
           "y": 60
         }
       ],
-      "id": 75,
+      "id": 76,
       "floorId": 1
     },
     {
@@ -4878,7 +4878,7 @@ UPDATE config SET json = $$
           "y": 185
         }
       ],
-      "id": 76,
+      "id": 77,
       "floorId": 1
     },
     {
@@ -4911,7 +4911,7 @@ UPDATE config SET json = $$
           "y": 185
         }
       ],
-      "id": 77,
+      "id": 78,
       "floorId": 1
     },
     {
@@ -4948,7 +4948,7 @@ UPDATE config SET json = $$
           "y": 436
         }
       ],
-      "id": 78,
+      "id": 79,
       "floorId": 1
     },
     {
@@ -4989,7 +4989,7 @@ UPDATE config SET json = $$
           "y": 160
         }
       ],
-      "id": 79,
+      "id": 80,
       "floorId": 1
     },
     {
@@ -5022,7 +5022,7 @@ UPDATE config SET json = $$
           "y": 53
         }
       ],
-      "id": 80,
+      "id": 81,
       "floorId": 1
     },
     {
@@ -5055,7 +5055,7 @@ UPDATE config SET json = $$
           "y": 53
         }
       ],
-      "id": 81,
+      "id": 82,
       "floorId": 1
     },
     {
@@ -5088,7 +5088,7 @@ UPDATE config SET json = $$
           "y": 180
         }
       ],
-      "id": 82,
+      "id": 83,
       "floorId": 1
     },
     {
@@ -5121,7 +5121,7 @@ UPDATE config SET json = $$
           "y": 40
         }
       ],
-      "id": 83,
+      "id": 84,
       "floorId": 1
     },
     {
@@ -5154,7 +5154,7 @@ UPDATE config SET json = $$
           "y": 180
         }
       ],
-      "id": 84,
+      "id": 85,
       "floorId": 1
     },
     {
@@ -5188,7 +5188,7 @@ UPDATE config SET json = $$
           "y": 65
         }
       ],
-      "id": 85,
+      "id": 86,
       "floorId": 1
     },
     {
@@ -5226,7 +5226,7 @@ UPDATE config SET json = $$
           "y": 232
         }
       ],
-      "id": 86,
+      "id": 87,
       "floorId": 1
     },
     {
@@ -5263,7 +5263,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 87,
+      "id": 88,
       "floorId": 3
     },
     {
@@ -5297,7 +5297,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 88,
+      "id": 89,
       "floorId": 3
     },
     {
@@ -5331,7 +5331,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 89,
+      "id": 90,
       "floorId": 3
     },
     {
@@ -5365,7 +5365,7 @@ UPDATE config SET json = $$
           "y": 105
         }
       ],
-      "id": 90,
+      "id": 91,
       "floorId": 3
     },
     {
@@ -5398,7 +5398,7 @@ UPDATE config SET json = $$
           "y": 50
         }
       ],
-      "id": 91,
+      "id": 92,
       "floorId": 3
     },
     {
@@ -5431,7 +5431,7 @@ UPDATE config SET json = $$
           "y": 345
         }
       ],
-      "id": 92,
+      "id": 93,
       "floorId": 3
     },
     {
@@ -5465,7 +5465,7 @@ UPDATE config SET json = $$
           "y": 345
         }
       ],
-      "id": 93,
+      "id": 94,
       "floorId": 3
     },
     {
@@ -5499,7 +5499,7 @@ UPDATE config SET json = $$
           "y": 80
         }
       ],
-      "id": 94,
+      "id": 95,
       "floorId": 3
     },
     {
@@ -5533,7 +5533,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 95,
+      "id": 96,
       "floorId": 3
     },
     {
@@ -5567,7 +5567,7 @@ UPDATE config SET json = $$
           "y": 80
         }
       ],
-      "id": 96,
+      "id": 97,
       "floorId": 3
     },
     {
@@ -5601,7 +5601,7 @@ UPDATE config SET json = $$
           "y": 258
         }
       ],
-      "id": 97,
+      "id": 98,
       "floorId": 3
     },
     {
@@ -5634,7 +5634,7 @@ UPDATE config SET json = $$
           "y": 310
         }
       ],
-      "id": 98,
+      "id": 99,
       "floorId": 2
     },
     {
@@ -5667,7 +5667,7 @@ UPDATE config SET json = $$
           "y": 370
         }
       ],
-      "id": 99,
+      "id": 100,
       "floorId": 2
     },
     {
@@ -5701,7 +5701,7 @@ UPDATE config SET json = $$
           "y": 370
         }
       ],
-      "id": 100,
+      "id": 101,
       "floorId": 2
     },
     {
@@ -5735,7 +5735,7 @@ UPDATE config SET json = $$
           "y": 370
         }
       ],
-      "id": 101,
+      "id": 102,
       "floorId": 2
     },
     {
@@ -5772,7 +5772,7 @@ UPDATE config SET json = $$
           "y": 370
         }
       ],
-      "id": 102,
+      "id": 103,
       "floorId": 2
     },
     {
@@ -5802,7 +5802,7 @@ UPDATE config SET json = $$
           "y": 220
         }
       ],
-      "id": 103,
+      "id": 104,
       "floorId": 2
     },
     {
@@ -5836,7 +5836,7 @@ UPDATE config SET json = $$
           "y": 110
         }
       ],
-      "id": 104,
+      "id": 105,
       "floorId": 2
     },
     {
@@ -5870,7 +5870,7 @@ UPDATE config SET json = $$
           "y": 110
         }
       ],
-      "id": 105,
+      "id": 106,
       "floorId": 2
     },
     {
@@ -5904,7 +5904,7 @@ UPDATE config SET json = $$
           "y": 110
         }
       ],
-      "id": 106,
+      "id": 107,
       "floorId": 2
     },
     {
@@ -5934,7 +5934,7 @@ UPDATE config SET json = $$
           "y": 249
         }
       ],
-      "id": 107,
+      "id": 108,
       "floorId": 2
     },
     {
@@ -5968,7 +5968,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 108,
+      "id": 109,
       "floorId": 2
     },
     {
@@ -5995,7 +5995,7 @@ UPDATE config SET json = $$
           "y": 249
         }
       ],
-      "id": 109,
+      "id": 110,
       "floorId": 2
     },
     {
@@ -6029,7 +6029,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 110,
+      "id": 111,
       "floorId": 2
     },
     {
@@ -6063,7 +6063,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 111,
+      "id": 112,
       "floorId": 2
     },
     {
@@ -6105,7 +6105,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 112,
+      "id": 113,
       "floorId": 2
     },
     {
@@ -6138,7 +6138,7 @@ UPDATE config SET json = $$
           "y": 98
         }
       ],
-      "id": 113,
+      "id": 114,
       "floorId": 2
     },
     {
@@ -6171,7 +6171,7 @@ UPDATE config SET json = $$
           "y": 210
         }
       ],
-      "id": 114,
+      "id": 115,
       "floorId": 2
     },
     {
@@ -6205,7 +6205,7 @@ UPDATE config SET json = $$
           "y": 160
         }
       ],
-      "id": 115,
+      "id": 116,
       "floorId": 2
     },
     {
@@ -6239,7 +6239,7 @@ UPDATE config SET json = $$
           "y": 40
         }
       ],
-      "id": 116,
+      "id": 117,
       "floorId": 2
     },
     {
@@ -6269,7 +6269,7 @@ UPDATE config SET json = $$
           "y": 221
         }
       ],
-      "id": 117,
+      "id": 118,
       "floorId": 2
     },
     {
@@ -6303,7 +6303,7 @@ UPDATE config SET json = $$
           "y": 221
         }
       ],
-      "id": 118,
+      "id": 119,
       "floorId": 2
     },
     {
@@ -6337,7 +6337,7 @@ UPDATE config SET json = $$
           "y": 221
         }
       ],
-      "id": 119,
+      "id": 120,
       "floorId": 2
     },
     {
@@ -6370,7 +6370,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 120,
+      "id": 121,
       "floorId": 2
     },
     {
@@ -6404,7 +6404,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 121,
+      "id": 122,
       "floorId": 2
     },
     {
@@ -6438,7 +6438,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 122,
+      "id": 123,
       "floorId": 2
     },
     {
@@ -6472,7 +6472,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 123,
+      "id": 124,
       "floorId": 2
     },
     {
@@ -6506,7 +6506,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 124,
+      "id": 125,
       "floorId": 2
     },
     {
@@ -6543,7 +6543,7 @@ UPDATE config SET json = $$
           "y": 221
         }
       ],
-      "id": 125,
+      "id": 126,
       "floorId": 2
     },
     {
@@ -6576,7 +6576,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 126,
+      "id": 127,
       "floorId": 2
     },
     {
@@ -6610,7 +6610,7 @@ UPDATE config SET json = $$
           "y": 52
         }
       ],
-      "id": 127,
+      "id": 128,
       "floorId": 2
     },
     {
@@ -6643,7 +6643,7 @@ UPDATE config SET json = $$
           "y": 320
         }
       ],
-      "id": 128,
+      "id": 129,
       "floorId": 2
     },
     {
@@ -6677,7 +6677,7 @@ UPDATE config SET json = $$
           "y": 58
         }
       ],
-      "id": 129,
+      "id": 130,
       "floorId": 2
     },
     {
@@ -6718,7 +6718,7 @@ UPDATE config SET json = $$
           "y": 81
         }
       ],
-      "id": 130,
+      "id": 131,
       "floorId": 2
     },
     {
@@ -6752,7 +6752,7 @@ UPDATE config SET json = $$
           "y": 201
         }
       ],
-      "id": 131,
+      "id": 132,
       "floorId": 2
     },
     {
@@ -6782,7 +6782,7 @@ UPDATE config SET json = $$
           "y": 129
         }
       ],
-      "id": 132,
+      "id": 133,
       "floorId": 2
     },
     {
@@ -6815,7 +6815,7 @@ UPDATE config SET json = $$
           "y": 140
         }
       ],
-      "id": 133,
+      "id": 134,
       "floorId": 2
     },
     {
@@ -6848,7 +6848,7 @@ UPDATE config SET json = $$
           "y": 40
         }
       ],
-      "id": 134,
+      "id": 135,
       "floorId": 2
     },
     {
@@ -6881,7 +6881,7 @@ UPDATE config SET json = $$
           "y": 180
         }
       ],
-      "id": 135,
+      "id": 136,
       "floorId": 2
     },
     {
@@ -6914,7 +6914,7 @@ UPDATE config SET json = $$
           "y": 180
         }
       ],
-      "id": 136,
+      "id": 137,
       "floorId": 2
     },
     {
@@ -6947,7 +6947,7 @@ UPDATE config SET json = $$
           "y": 180
         }
       ],
-      "id": 137,
+      "id": 138,
       "floorId": 2
     },
     {
@@ -6980,7 +6980,7 @@ UPDATE config SET json = $$
           "y": 180
         }
       ],
-      "id": 138,
+      "id": 139,
       "floorId": 2
     },
     {
@@ -7013,7 +7013,7 @@ UPDATE config SET json = $$
           "y": 30
         }
       ],
-      "id": 139,
+      "id": 140,
       "floorId": 2
     },
     {
@@ -7046,7 +7046,7 @@ UPDATE config SET json = $$
           "y": 50
         }
       ],
-      "id": 140,
+      "id": 141,
       "floorId": 2
     },
     {
@@ -7079,7 +7079,7 @@ UPDATE config SET json = $$
           "y": 180
         }
       ],
-      "id": 141,
+      "id": 142,
       "floorId": 2
     },
     {
@@ -7112,7 +7112,7 @@ UPDATE config SET json = $$
           "y": 40
         }
       ],
-      "id": 142,
+      "id": 143,
       "floorId": 2
     },
     {
@@ -7146,7 +7146,7 @@ UPDATE config SET json = $$
           "y": 320
         }
       ],
-      "id": 143,
+      "id": 144,
       "floorId": 4
     },
     {
@@ -7179,7 +7179,7 @@ UPDATE config SET json = $$
           "y": 190
         }
       ],
-      "id": 144,
+      "id": 145,
       "floorId": 4
     },
     {
@@ -7213,7 +7213,7 @@ UPDATE config SET json = $$
           "y": 140
         }
       ],
-      "id": 145,
+      "id": 146,
       "floorId": 4
     },
     {
@@ -7250,7 +7250,7 @@ UPDATE config SET json = $$
           "y": 740
         }
       ],
-      "id": 146,
+      "id": 147,
       "floorId": 4
     },
     {
@@ -7280,7 +7280,7 @@ UPDATE config SET json = $$
           "y": 200
         }
       ],
-      "id": 147,
+      "id": 148,
       "floorId": 4
     },
     {
@@ -7314,7 +7314,7 @@ UPDATE config SET json = $$
           "y": 40
         }
       ],
-      "id": 148,
+      "id": 149,
       "floorId": 4
     },
     {
@@ -7347,7 +7347,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 149,
+      "id": 150,
       "floorId": 4
     },
     {
@@ -7380,7 +7380,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 150,
+      "id": 151,
       "floorId": 4
     },
     {
@@ -7410,7 +7410,7 @@ UPDATE config SET json = $$
           "y": 300
         }
       ],
-      "id": 151,
+      "id": 152,
       "floorId": 4
     },
     {
@@ -7443,7 +7443,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 152,
+      "id": 153,
       "floorId": 4
     },
     {
@@ -7476,7 +7476,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 153,
+      "id": 154,
       "floorId": 4
     },
     {
@@ -7509,7 +7509,7 @@ UPDATE config SET json = $$
           "y": 80
         }
       ],
-      "id": 154,
+      "id": 155,
       "floorId": 4
     },
     {
@@ -7542,7 +7542,7 @@ UPDATE config SET json = $$
           "y": 70
         }
       ],
-      "id": 155,
+      "id": 156,
       "floorId": 4
     },
     {
@@ -7575,7 +7575,7 @@ UPDATE config SET json = $$
           "y": 340
         }
       ],
-      "id": 156,
+      "id": 157,
       "floorId": 6
     },
     {
@@ -7618,7 +7618,7 @@ UPDATE config SET json = $$
           "y": 700
         }
       ],
-      "id": 157,
+      "id": 158,
       "floorId": 6
     },
     {
@@ -7651,7 +7651,7 @@ UPDATE config SET json = $$
           "y": 0
         }
       ],
-      "id": 158,
+      "id": 159,
       "floorId": 6
     },
     {
@@ -7684,7 +7684,7 @@ UPDATE config SET json = $$
           "y": 170
         }
       ],
-      "id": 159,
+      "id": 160,
       "floorId": 6
     },
     {
@@ -7721,7 +7721,7 @@ UPDATE config SET json = $$
           "y": 160
         }
       ],
-      "id": 160,
+      "id": 161,
       "floorId": 6
     },
     {
@@ -7754,7 +7754,7 @@ UPDATE config SET json = $$
           "y": 390
         }
       ],
-      "id": 161,
+      "id": 162,
       "floorId": 7
     },
     {
@@ -7787,7 +7787,7 @@ UPDATE config SET json = $$
           "y": 290
         }
       ],
-      "id": 162,
+      "id": 163,
       "floorId": 7
     },
     {
@@ -7820,7 +7820,7 @@ UPDATE config SET json = $$
           "y": 60
         }
       ],
-      "id": 163,
+      "id": 164,
       "floorId": 7
     },
     {
@@ -7850,7 +7850,7 @@ UPDATE config SET json = $$
           "y": 350
         }
       ],
-      "id": 164,
+      "id": 165,
       "floorId": 7
     }
   ]

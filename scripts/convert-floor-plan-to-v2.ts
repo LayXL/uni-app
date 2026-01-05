@@ -134,7 +134,7 @@ function convertToV2(oldScheme: OldBuildingScheme): NewBuildingScheme {
 
 			const newRoom: NewRoom = {
 				...roomWithoutFloorIndex,
-				id: roomId,
+				id: roomId + 1,
 				floorId: oldFloor.id,
 			}
 
