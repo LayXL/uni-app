@@ -38,14 +38,16 @@ export const getRoomPolygon = (
 export const getFloorPolygon = (floor: Floor): fabric.Point[] =>
 	floor.wallsPosition.map((p) => toCanvasPoint(p, floor.position))
 
-export const collectBounds = (floor: Floor) => {
+export const collectBounds = (floor: Floor, rooms: Room[]) => {
 	const points: Coordinate[] = []
 
 	getFloorPolygon(floor).forEach((p) => {
 		points.push({ x: p.x, y: p.y })
 	})
 
-	floor.rooms?.forEach((room) => {
+	const floorRooms = rooms.filter((r) => r.floorId === floor.id)
+
+	floorRooms.forEach((room) => {
 		getRoomPolygon(room, floor.position).forEach((p) => {
 			points.push({ x: p.x, y: p.y })
 		})

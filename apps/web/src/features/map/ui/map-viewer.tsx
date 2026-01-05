@@ -132,10 +132,10 @@ export const MapViewer = () => {
 			const canvas = fabricRef.current
 			if (!canvas || !mapData) return
 
-			const floor = mapData.find((f) => f.id === floorId)
+			const floor = mapData.floors.find((f) => f.id === floorId)
 			if (!floor) return
 
-			const bounds = collectBounds(floor)
+			const bounds = collectBounds(floor, mapData.rooms)
 			const padding = 192
 			const worldWidth = bounds.maxX - bounds.minX + padding * 2
 			const worldHeight = bounds.maxY - bounds.minY + padding * 2

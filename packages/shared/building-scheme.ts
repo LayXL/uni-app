@@ -43,13 +43,15 @@ export type MapEntity = {
 	description?: string
 	/** опциональный icon на плане */
 	icon?: IconType
-	/** глобальная позиция “якоря” */
+	/** глобальная позиция "якоря" */
 	position: Coordinate
-	/** id сущности (не у всех есть в json) */
-	id?: number
 }
 
 export type Room = MapEntity & {
+	/** уникальный id комнаты */
+	id: number
+	/** id этажа, к которому принадлежит комната */
+	floorId: number
 	/** скрытое имя/служебные */
 	nameHidden?: boolean
 	/** можно ли кликать по комнате */
@@ -58,8 +60,6 @@ export type Room = MapEntity & {
 	wallsPosition: WallsPolygon
 	/** локальные координаты дверей (относительно position) */
 	doorsPosition?: DoorPosition[]
-	/** индекс этажа, если присутствует */
-	floorIndex?: number
 	/** опциональная ссылка (например, vk) */
 	url?: string
 }
@@ -89,14 +89,12 @@ export type Floor = {
 	id: number
 	/** сдвиг всего этажа на глобальном плане */
 	position: Coordinate
-	/** краткое обозначение (“1”, “4” и т.п.) */
+	/** краткое обозначение ("1", "4" и т.п.) */
 	acronym?: string
 	/** внешний полигон стен этажа */
 	wallsPosition: WallsPolygon
 	/** коридоры/маршруты */
 	roads?: Road[]
-	/** комнаты на этаже */
-	rooms?: Room[]
 	/** лестницы на этаже */
 	stairs?: Stair[]
 	/** точки интереса */
@@ -105,5 +103,8 @@ export type Floor = {
 	photoPoints?: PhotoPoint[]
 }
 
-/** корневой объект файла список этажей */
-export type BuildingScheme = Floor[]
+/** корневой объект файла */
+export type BuildingScheme = {
+	floors: Floor[]
+	rooms: Room[]
+}

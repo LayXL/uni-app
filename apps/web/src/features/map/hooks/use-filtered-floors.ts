@@ -1,14 +1,14 @@
 import { useMemo } from "react"
 
-import type { Floor } from "@repo/shared/building-scheme"
+import type { BuildingScheme } from "@repo/shared/building-scheme"
 
 export const useFilteredFloors = (
-	data: Floor[] | undefined,
+	data: BuildingScheme | undefined,
 	activeCampus: number,
 ) =>
 	useMemo(
 		() =>
-			data?.filter(
+			data?.floors.filter(
 				(floor) => floor.name.includes("школы") === (activeCampus === 1),
 			),
 		[data, activeCampus],

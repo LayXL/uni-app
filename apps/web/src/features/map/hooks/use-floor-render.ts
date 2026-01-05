@@ -1,7 +1,7 @@
 import * as fabric from "fabric"
 import { type RefObject, useEffect, useRef } from "react"
 
-import type { Floor } from "@repo/shared/building-scheme"
+import type { BuildingScheme } from "@repo/shared/building-scheme"
 
 import { getMapColors } from "../lib/colors"
 import { clamp, getFloorPolygon, getRoomPolygon } from "../lib/geometry"
@@ -9,7 +9,7 @@ import type { ViewportState } from "../types"
 
 type UseFloorRenderParams = {
 	fabricRef: RefObject<fabric.Canvas | null>
-	data: Floor[] | undefined
+	data: BuildingScheme | undefined
 	activeFloor: number
 	applyViewport?: (next: ViewportState) => void
 	viewportRef: RefObject<ViewportState>
@@ -53,12 +53,15 @@ export const useFloorRender = ({
 		const canvas = fabricRef.current
 		if (!canvas) return
 
-		const floor = data?.find((f) => f.id === activeFloor)
+		const floor = data?.floors.find((f) => f.id === activeFloor)
 		if (!floor) {
 			canvas.clear()
 			routeObjectsRef.current = []
 			return
 		}
+
+		const floorRooms =
+			data?.rooms.filter((r) => r.floorId === activeFloor) ?? []
 
 		canvas.clear()
 		textObjectsRef.current = []
@@ -186,7 +189,7 @@ export const useFloorRender = ({
 
 		const labels: fabric.FabricText[] = []
 
-		floor.rooms?.forEach((room) => {
+		floorRooms.forEach((room) => {
 			const roomPolygon = new fabric.Polygon(
 				getRoomPolygon(room, floor.position),
 				{
@@ -299,7 +302,7 @@ export const useFloorRender = ({
 
 		if (!route?.length) return
 
-		const floor = data?.find((f) => f.id === activeFloor)
+		const floor = data?.floors.find((f) => f.id === activeFloor)
 		if (!floor) return
 
 		const withOffset = (point: RoutePoint) =>

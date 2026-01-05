@@ -18,15 +18,7 @@ export const RoomModal = ({ roomId, onClose }: RoomModalProps) => {
 	const room = useMemo(() => {
 		if (!roomId || !data) return null
 
-		for (const floor of data) {
-			for (const room of floor.rooms ?? []) {
-				if (room.id === roomId) {
-					return room
-				}
-			}
-		}
-
-		return null
+		return data.rooms.find((r) => r.id === roomId) ?? null
 	}, [data, roomId])
 
 	return (

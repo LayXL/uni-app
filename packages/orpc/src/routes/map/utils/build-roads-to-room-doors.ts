@@ -11,13 +11,17 @@ export const DOOR_TO_ROAD_RADIUS = 120
 export function buildRoadsToRoomDoors(
 	buildingScheme: BuildingScheme,
 ): BuildingScheme {
-	return buildingScheme.map((floor) => {
+	const floorsWithExtraRoads = buildingScheme.floors.map((floor) => {
 		const baseRoads = floor.roads ?? []
-		if (!floor.rooms?.length || baseRoads.length === 0) return floor
+		const floorRooms = buildingScheme.rooms.filter(
+			(r) => r.floorId === floor.id,
+		)
+
+		if (!floorRooms.length || baseRoads.length === 0) return floor
 
 		const extraRoads: Road[] = []
 
-		floor.rooms.forEach((room) => {
+		floorRooms.forEach((room) => {
 			room.doorsPosition?.forEach((door) => {
 				const doorGlobal: Coordinate = {
 					x: floor.position.x + room.position.x + door.x,
@@ -55,4 +59,9 @@ export function buildRoadsToRoomDoors(
 
 		return { ...floor, roads: [...baseRoads, ...extraRoads] }
 	})
+
+	return {
+		floors: floorsWithExtraRoads,
+		rooms: buildingScheme.rooms,
+	}
 }

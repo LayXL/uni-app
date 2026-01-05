@@ -135,7 +135,7 @@ export const buildRoute = publicProcedure
 		let startNode: GraphNode | null = null
 		let endNode: GraphNode | null = null
 
-		for (const floor of buildingScheme) {
+		for (const floor of buildingScheme.floors) {
 			const floorRoads = floor.roads || []
 			const pointsOnRoads: Map<number, Coordinate[]> = new Map()
 
