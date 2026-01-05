@@ -2,12 +2,10 @@
 
 import { skipToken, useQuery } from "@tanstack/react-query"
 import * as fabric from "fabric"
-import { motion } from "motion/react"
 import { useCallback, useEffect, useRef, useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
 
-import { Icon } from "@/shared/ui/icon"
 import { ModalRoot } from "@/shared/ui/modal-root"
 import { cn } from "@/shared/utils/cn"
 
@@ -20,6 +18,7 @@ import { useMapViewport } from "../hooks/use-map-viewport"
 import { useRouteBuilder } from "../hooks/use-route-builder"
 import { clamp, collectBounds, createViewportMatrix } from "../lib/geometry"
 import type { ViewportState } from "../types"
+import { MapControls } from "./map-controls"
 import { RoomModal } from "./room-modal"
 
 export const MapViewer = () => {
@@ -262,45 +261,22 @@ export const MapViewer = () => {
 				))}
 			</div>
 
-			<div className="absolute top-2 right-2 bg-card border-border flex flex-col gap-2 rounded-lg">
-				<button
-					type="button"
-					className="size-8 text-lg grid place-items-center rounded-lg"
-					onClick={() => zoomByStep(1.2)}
-				>
-					<Icon name="add-16" />
-				</button>
-				<button
-					type="button"
-					className="size-8 text-lg grid place-items-center rounded-lg"
-					onClick={() => zoomByStep(1 / 1.2)}
-				>
-					<Icon name="minus-16" />
-				</button>
-				{rotation !== 0 && (
-					<button
-						type="button"
-						className="size-8 text-lg grid place-items-center rounded-lg"
-						onClick={resetRotation}
-					>
-						<motion.span
-							initial={{ rotate: (rotation * 180 - 140) / Math.PI }}
-							animate={{ rotate: (rotation * 180 - 140) / Math.PI }}
-						>
-							<Icon name="compass-24" size={16} />
-						</motion.span>
-					</button>
-				)}
-			</div>
+			<MapControls
+				zoomByStep={zoomByStep}
+				rotation={rotation}
+				resetRotation={resetRotation}
+			/>
 
 			<ModalRoot
 				isOpen={selectedRoomId !== null}
 				onClose={() => setSelectedRoomId(null)}
 			>
-				<RoomModal
-					roomId={selectedRoomId}
-					onClose={() => setSelectedRoomId(null)}
-				/>
+				{selectedRoomId && (
+					<RoomModal
+						roomId={selectedRoomId}
+						onClose={() => setSelectedRoomId(null)}
+					/>
+				)}
 			</ModalRoot>
 		</div>
 	)
