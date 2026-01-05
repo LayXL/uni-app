@@ -15,6 +15,7 @@ type RoomModalProps = {
 }
 
 export const RoomModal = ({ roomId, onClose }: RoomModalProps) => {
+	const openModal = useRouteBuilder((state) => state.openModal)
 	const setEndRoomId = useRouteBuilder((state) => state.setEndRoomId)
 	const { data } = useQuery(orpc.map.getMap.queryOptions())
 
@@ -36,6 +37,7 @@ export const RoomModal = ({ roomId, onClose }: RoomModalProps) => {
 				leftIcon="location-map-outline-24"
 				onClick={() => {
 					setEndRoomId(roomId)
+					openModal()
 					onClose()
 				}}
 			/>

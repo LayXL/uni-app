@@ -20,11 +20,12 @@ import { clamp, collectBounds, createViewportMatrix } from "../lib/geometry"
 import type { ViewportState } from "../types"
 import { MapControls } from "./map-controls"
 import { RoomModal } from "./room-modal"
+import { RouteBuilderModal } from "./route-builder-modal"
 
 export const MapViewer = () => {
 	const { data: mapData } = useQuery(orpc.map.getMap.queryOptions())
 
-	const { start, end, setStart, setEnd } = useRouteBuilder()
+	const { start, end } = useRouteBuilder()
 
 	const { data: routeData } = useQuery(
 		orpc.map.buildRoute.queryOptions({
@@ -51,26 +52,26 @@ export const MapViewer = () => {
 		world: { x: number; y: number }
 	} | null>(null)
 
-	const handleDebugRightClick = useCallback(
-		(coords: {
-			screen: { x: number; y: number }
-			world: { x: number; y: number }
-		}) => {
-			const point = {
-				x: Math.floor(coords.world.x),
-				y: Math.floor(coords.world.y),
-				floor: activeFloor,
-			}
+	// const handleDebugRightClick = useCallback(
+	// 	(coords: {
+	// 		screen: { x: number; y: number }
+	// 		world: { x: number; y: number }
+	// 	}) => {
+	// 		const point = {
+	// 			x: Math.floor(coords.world.x),
+	// 			y: Math.floor(coords.world.y),
+	// 			floor: activeFloor,
+	// 		}
 
-			if (!start) {
-				setStart(point)
-				return
-			}
+	// 		if (!start) {
+	// 			setStart(point)
+	// 			return
+	// 		}
 
-			setEnd(point)
-		},
-		[activeFloor, setEnd, setStart, start],
-	)
+	// 		setEnd(point)
+	// 	},
+	// 	[activeFloor, setEnd, setStart, start],
+	// )
 
 	const handleViewportChange = useCallback((next: ViewportState) => {
 		setRotation(next.rotation)
@@ -199,7 +200,7 @@ export const MapViewer = () => {
 		screenToWorld,
 		onRoomClick: (roomId) => setSelectedRoomId(roomId),
 		onPointerMove: isDebug ? setCursorCoords : undefined,
-		onRightClick: isDebug ? handleDebugRightClick : undefined,
+		// onRightClick: isDebug ? handleDebugRightClick : undefined,
 	})
 
 	useFloorRender({
@@ -278,6 +279,8 @@ export const MapViewer = () => {
 					/>
 				)}
 			</ModalRoot>
+
+			<RouteBuilderModal />
 		</div>
 	)
 }
