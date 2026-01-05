@@ -12,21 +12,28 @@ type UseMapCanvasParams = {
 		prevWidth: number | undefined,
 		prevHeight: number | undefined,
 	) => void
+	onInit?: () => void
 }
 
 export const useMapCanvas = ({
 	canvasRef,
 	fabricRef: externalFabricRef,
 	onResize,
+	onInit,
 }: UseMapCanvasParams) => {
 	const internalFabricRef = useRef<fabric.Canvas | null>(null)
 	const fabricRef = externalFabricRef || internalFabricRef
 	const lastSizeRef = useRef<{ width: number; height: number } | null>(null)
 	const onResizeRef = useRef(onResize)
+	const onInitRef = useRef(onInit)
 
 	useEffect(() => {
 		onResizeRef.current = onResize
 	}, [onResize])
+
+	useEffect(() => {
+		onInitRef.current = onInit
+	}, [onInit])
 
 	useEffect(() => {
 		if (!canvasRef.current) return
@@ -84,6 +91,9 @@ export const useMapCanvas = ({
 		}
 
 		fabricRef.current = canvas
+		if (onInitRef.current) {
+			onInitRef.current()
+		}
 
 		return () => {
 			resizeObserver.disconnect()

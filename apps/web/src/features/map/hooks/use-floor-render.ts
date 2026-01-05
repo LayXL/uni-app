@@ -4,19 +4,14 @@ import { type RefObject, useEffect, useRef } from "react"
 import type { Floor } from "@repo/shared/building-scheme"
 
 import { getMapColors } from "../lib/colors"
-import {
-	clamp,
-	collectBounds,
-	getFloorPolygon,
-	getRoomPolygon,
-} from "../lib/geometry"
+import { getFloorPolygon, getRoomPolygon } from "../lib/geometry"
 import type { ViewportState } from "../types"
 
 type UseFloorRenderParams = {
 	fabricRef: RefObject<fabric.Canvas | null>
 	data: Floor[] | undefined
 	activeFloor: number
-	applyViewport: (next: ViewportState) => void
+	applyViewport?: (next: ViewportState) => void
 	viewportRef: RefObject<ViewportState>
 	textObjectsRef: RefObject<fabric.Text[]>
 	labelBaseSizeRef: RefObject<WeakMap<fabric.FabricText, number>>
@@ -24,6 +19,7 @@ type UseFloorRenderParams = {
 	iconBaseScaleRef: RefObject<WeakMap<fabric.Object, number>>
 	isDebug: boolean
 	route?: RoutePoint[]
+	enabled?: boolean
 }
 
 type RoutePoint = {
@@ -38,7 +34,6 @@ export const useFloorRender = ({
 	fabricRef,
 	data,
 	activeFloor,
-	applyViewport,
 	viewportRef,
 	textObjectsRef,
 	labelBaseSizeRef,
@@ -46,10 +41,13 @@ export const useFloorRender = ({
 	iconBaseScaleRef,
 	isDebug,
 	route,
+	enabled = true,
 }: UseFloorRenderParams) => {
 	const routeObjectsRef = useRef<fabric.Object[]>([])
 
 	useEffect(() => {
+		if (!enabled) return
+
 		let disposed = false
 
 		const canvas = fabricRef.current
@@ -250,34 +248,11 @@ export const useFloorRender = ({
 			canvas.add(label)
 		})
 
-		const bounds = collectBounds(floor)
-		const padding = 192
-		const worldWidth = bounds.maxX - bounds.minX + padding * 2
-		const worldHeight = bounds.maxY - bounds.minY + padding * 2
-
-		const zoomFit = Math.min(
-			canvas.getWidth() / worldWidth,
-			canvas.getHeight() / worldHeight,
-		)
-
-		const center = {
-			x: (bounds.maxX + bounds.minX) / 2,
-			y: (bounds.maxY + bounds.minY) / 2,
-		}
-
-		applyViewport({
-			zoom: clamp(zoomFit, 0.05, 8),
-			rotation: 0,
-			translateX: canvas.getWidth() / 2 - center.x * zoomFit,
-			translateY: canvas.getHeight() / 2 - center.y * zoomFit,
-		})
-
 		return () => {
 			disposed = true
 		}
 	}, [
 		activeFloor,
-		applyViewport,
 		fabricRef,
 		data,
 		labelBaseSizeRef,
@@ -286,6 +261,7 @@ export const useFloorRender = ({
 		iconObjectsRef,
 		iconBaseScaleRef,
 		isDebug,
+		enabled,
 	])
 
 	useEffect(() => {

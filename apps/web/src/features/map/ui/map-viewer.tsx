@@ -3,7 +3,7 @@
 import { skipToken, useQuery } from "@tanstack/react-query"
 import * as fabric from "fabric"
 import { motion } from "motion/react"
-import { useCallback, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
 
@@ -18,7 +18,7 @@ import { useMapCanvas } from "../hooks/use-map-canvas"
 import { useMapInteractions } from "../hooks/use-map-interactions"
 import { useMapViewport } from "../hooks/use-map-viewport"
 import { useRouteBuilder } from "../hooks/use-route-builder"
-import { createViewportMatrix } from "../lib/geometry"
+import { clamp, collectBounds, createViewportMatrix } from "../lib/geometry"
 import type { ViewportState } from "../types"
 import { RoomModal } from "./room-modal"
 
@@ -46,6 +46,7 @@ export const MapViewer = () => {
 	const iconObjectsRef = useRef<fabric.Object[]>([])
 	const iconBaseScaleRef = useRef(new WeakMap<fabric.Object, number>())
 	const [rotation, setRotation] = useState(0)
+	const [isCanvasReady, setIsCanvasReady] = useState(false)
 	const [cursorCoords, setCursorCoords] = useState<{
 		screen: { x: number; y: number }
 		world: { x: number; y: number }
@@ -119,7 +120,53 @@ export const MapViewer = () => {
 		[applyViewport, screenToWorld, viewportRef],
 	)
 
-	useMapCanvas({ canvasRef, fabricRef, onResize: handleResize })
+	useMapCanvas({
+		canvasRef,
+		fabricRef,
+		onResize: handleResize,
+		onInit: () => setIsCanvasReady(true),
+	})
+
+	const centerOnFloor = useCallback(
+		(floorId: number) => {
+			const canvas = fabricRef.current
+			if (!canvas || !mapData) return
+
+			const floor = mapData.find((f) => f.id === floorId)
+			if (!floor) return
+
+			const bounds = collectBounds(floor)
+			const padding = 192
+			const worldWidth = bounds.maxX - bounds.minX + padding * 2
+			const worldHeight = bounds.maxY - bounds.minY + padding * 2
+
+			const zoomFit = Math.min(
+				canvas.getWidth() / worldWidth,
+				canvas.getHeight() / worldHeight,
+			)
+
+			const center = {
+				x: (bounds.maxX + bounds.minX) / 2,
+				y: (bounds.maxY + bounds.minY) / 2,
+			}
+
+			applyViewport({
+				zoom: clamp(zoomFit, 0.05, 8),
+				rotation: 0,
+				translateX: canvas.getWidth() / 2 - center.x * zoomFit,
+				translateY: canvas.getHeight() / 2 - center.y * zoomFit,
+			})
+		},
+		[applyViewport, mapData],
+	)
+
+	const hasCenteredRef = useRef(false)
+	useEffect(() => {
+		if (isCanvasReady && mapData && !hasCenteredRef.current) {
+			centerOnFloor(activeFloor)
+			hasCenteredRef.current = true
+		}
+	}, [isCanvasReady, mapData, activeFloor, centerOnFloor])
 
 	const zoomByStep = useCallback(
 		(deltaZoom: number) => {
@@ -168,6 +215,7 @@ export const MapViewer = () => {
 		iconBaseScaleRef,
 		isDebug,
 		route: routeData?.route,
+		enabled: isCanvasReady,
 	})
 
 	return (
@@ -204,7 +252,10 @@ export const MapViewer = () => {
 							"size-8 text-xs grid place-items-center rounded-lg",
 							activeFloor === floor.id && "bg-accent text-accent-foreground",
 						)}
-						onClick={() => setActiveFloor(floor.id)}
+						onClick={() => {
+							setActiveFloor(floor.id)
+							centerOnFloor(floor.id)
+						}}
 					>
 						{floor.acronym ?? floor.name}
 					</button>
