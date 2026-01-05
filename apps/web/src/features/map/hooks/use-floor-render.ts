@@ -4,7 +4,7 @@ import { type RefObject, useEffect, useRef } from "react"
 import type { Floor } from "@repo/shared/building-scheme"
 
 import { getMapColors } from "../lib/colors"
-import { getFloorPolygon, getRoomPolygon } from "../lib/geometry"
+import { clamp, getFloorPolygon, getRoomPolygon } from "../lib/geometry"
 import type { ViewportState } from "../types"
 
 type UseFloorRenderParams = {
@@ -167,10 +167,20 @@ export const useFloorRender = ({
 					},
 				)
 
-				iconBaseScaleRef.current.set(marker, marker.scaleX ?? 1)
+				const baseScale = marker.scaleX ?? 1
+				iconBaseScaleRef.current.set(marker, baseScale)
 				iconObjectsRef.current.push(marker)
 
+				// Apply current zoom-based scaling immediately after creation
+				const currentZoom = viewportRef.current.zoom
+				const iconFontScale = clamp(1 / currentZoom ** 0.7, 0.75, 4)
+				marker.set({
+					scaleX: baseScale * iconFontScale,
+					scaleY: baseScale * iconFontScale,
+				})
+
 				fabricRef.current.add(marker)
+				fabricRef.current.requestRenderAll()
 			}
 		})
 
@@ -247,6 +257,18 @@ export const useFloorRender = ({
 			textObjectsRef.current.push(label)
 			canvas.add(label)
 		})
+
+		// Apply current zoom-based scaling to labels immediately after creation
+		const currentZoom = viewportRef.current.zoom
+		const fontScale = clamp(1 / currentZoom ** 0.7, 0.75, 4)
+
+		labels.forEach((label) => {
+			const baseFontSize = labelBaseSizeRef.current.get(label) ?? 14
+			label.set("fontSize", baseFontSize * fontScale)
+			label.set("dirty", true)
+		})
+
+		canvas.requestRenderAll()
 
 		return () => {
 			disposed = true
