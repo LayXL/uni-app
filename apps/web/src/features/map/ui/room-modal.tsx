@@ -17,6 +17,7 @@ type RoomModalProps = {
 export const RoomModal = ({ roomId, onClose }: RoomModalProps) => {
 	const openModal = useRouteBuilder((state) => state.openModal)
 	const setEndRoomId = useRouteBuilder((state) => state.setEndRoomId)
+	const setEnd = useRouteBuilder((state) => state.setEnd)
 	const { data } = useQuery(orpc.map.getMap.queryOptions())
 
 	const room = useMemo(() => {
@@ -36,7 +37,16 @@ export const RoomModal = ({ roomId, onClose }: RoomModalProps) => {
 				label="Проложить маршрут"
 				leftIcon="location-map-outline-24"
 				onClick={() => {
+					if (!room) return
+
+					const door = room.doorsPosition?.[0]
+
 					setEndRoomId(roomId)
+					setEnd({
+						floor: room.floorId,
+						x: door ? room.position.x + door.x : room.position.x,
+						y: door ? room.position.y + door.y : room.position.y,
+					})
 					openModal()
 					onClose()
 				}}
