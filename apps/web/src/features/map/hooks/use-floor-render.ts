@@ -312,33 +312,118 @@ export const useFloorRender = ({
 					centroid.y /= walls.length
 				}
 
-				const label = new fabric.FabricText(room.name, {
-					fontSize: 14,
-					fontFamily,
-					fill: colors.roomLabel,
-					originX: "center",
-					originY: "center",
-					angle: (-viewportRef.current.rotation * 180) / Math.PI,
-					objectCaching: false,
-					evented: false,
-				})
+				const centerX = floor.position.x + room.position.x + centroid.x
+				const centerY = floor.position.y + room.position.y + centroid.y
 
-				label.setPositionByOrigin(
-					new fabric.Point(
-						floor.position.x + room.position.x + centroid.x,
-						floor.position.y + room.position.y + centroid.y,
-					),
-					"center",
-					"center",
-				)
+				// If room has an icon, render icon with text below
+				if (room.icon) {
+					const imgEl = new Image()
+					imgEl.crossOrigin = "anonymous"
+					imgEl.src = `/icons/${room.icon}.svg`
+					imgEl.onload = () => {
+						if (disposed || !fabricRef.current) return
 
-				label.set({
-					left: Math.round(label.left ?? 0),
-					top: Math.round(label.top ?? 0),
-				})
+						const img = new fabric.FabricImage(imgEl, {
+							originX: "center",
+							originY: "center",
+							objectCaching: false,
+						})
 
-				labels.push(label)
-				labelBaseSizeRef.current.set(label, 14)
+						if (fabric.filters?.BlendColor) {
+							img.filters = [
+								new fabric.filters.BlendColor({
+									color: colors.stairsIcon,
+									mode: "add",
+								}),
+							]
+							img.applyFilters()
+						}
+
+						const targetSize = 14
+						const scaleX =
+							img.width && img.width > 0 ? targetSize / img.width : 1
+						const scaleY =
+							img.height && img.height > 0 ? targetSize / img.height : 1
+
+						img.set({
+							scaleX,
+							scaleY,
+						})
+
+						const iconCircle = new fabric.Circle({
+							radius: 10,
+							fill: colors.roomStroke,
+							originX: "center",
+							originY: "center",
+							top: 0,
+						})
+
+						img.set({ top: 0 })
+
+						const label = new fabric.FabricText(room.name, {
+							fontSize: 14,
+							fontFamily,
+							fill: colors.roomLabel,
+							originX: "center",
+							originY: "top",
+							top: 14,
+							objectCaching: false,
+						})
+
+						const marker = new fabric.Group([iconCircle, img, label], {
+							left: centerX,
+							top: centerY,
+							originX: "center",
+							originY: "center",
+							angle: (-viewportRef.current.rotation * 180) / Math.PI,
+							hoverCursor: "default",
+							selectable: false,
+							evented: false,
+							objectCaching: false,
+						})
+
+						const baseScale = marker.scaleX ?? 1
+						iconBaseScaleRef.current.set(marker, baseScale)
+						iconObjectsRef.current.push(marker)
+
+						// Apply current zoom-based scaling immediately after creation
+						const currentZoom = viewportRef.current.zoom
+						const iconFontScale = clamp(1 / currentZoom ** 0.7, 0.75, 4)
+						marker.set({
+							scaleX: baseScale * iconFontScale,
+							scaleY: baseScale * iconFontScale,
+						})
+
+						fabricRef.current.add(marker)
+						fabricRef.current.requestRenderAll()
+					}
+				} else {
+					// No icon, just render text as before
+					const label = new fabric.FabricText(room.name, {
+						fontSize: 14,
+						fontFamily,
+						fill: colors.roomLabel,
+						originX: "center",
+						originY: "center",
+						angle: (-viewportRef.current.rotation * 180) / Math.PI,
+						objectCaching: false,
+						evented: false,
+					})
+
+					label.setPositionByOrigin(
+						new fabric.Point(centerX, centerY),
+						"center",
+						"center",
+					)
+
+					label.set({
+						left: Math.round(label.left ?? 0),
+						top: Math.round(label.top ?? 0),
+					})
+
+					labels.push(label)
+					labelBaseSizeRef.current.set(label, 14)
+				}
 			}
 		})
 
