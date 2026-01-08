@@ -1,7 +1,4 @@
-FROM oven/bun:alpine
-
-RUN apk update
-RUN apk upgrade
+FROM oven/bun:1.3.3-alpine
 
 WORKDIR /app
 
