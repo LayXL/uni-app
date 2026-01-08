@@ -86,7 +86,7 @@ export const RouteBuilderModal = () => {
 				<div className="bg-popover border border-border rounded-xl relative">
 					<div className="relative">
 						<div className="absolute size-12 grid place-items-center pointer-events-none z-10">
-							<Icon name="location-16" size={16} />
+							<Icon name="iconify:material-symbols:near-me-rounded" size={24} />
 						</div>
 						<SearchInput
 							items={roomItems}
@@ -102,7 +102,7 @@ export const RouteBuilderModal = () => {
 					<div className="h-px w-full bg-border" />
 					<div className="relative">
 						<div className="absolute size-12 grid place-items-center pointer-events-none z-10">
-							<Icon name="location-map-outline-20" size={16} />
+							<Icon name="iconify:material-symbols:flag-rounded" size={24} />
 						</div>
 						<SearchInput
 							items={roomItems}

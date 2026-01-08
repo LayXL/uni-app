@@ -1,6 +1,8 @@
 import { Icon } from "@/shared/ui/icon"
 import type { IconName } from "@/types/icon-name"
 
+import { useRouteBuilder } from "../hooks/use-route-builder"
+
 type MapBottomBarButtonProps = {
 	icon: IconName
 	onClick?: () => void
@@ -19,6 +21,8 @@ const MapBottomBarButton = ({ icon, onClick }: MapBottomBarButtonProps) => {
 }
 
 export const MapBottomBar = () => {
+	const openRouteBuilderModal = useRouteBuilder((state) => state.openModal)
+
 	return (
 		<div className="fixed bottom-4 left-0 right-0 px-3 py-2">
 			<div className="flex gap-1">
@@ -26,7 +30,10 @@ export const MapBottomBar = () => {
 					icon="iconify:material-symbols:search-rounded"
 					onClick={() => {}}
 				/>
-				<MapBottomBarButton icon="route" onClick={() => {}} />
+				<MapBottomBarButton
+					icon="iconify:material-symbols:route"
+					onClick={openRouteBuilderModal}
+				/>
 			</div>
 		</div>
 	)
