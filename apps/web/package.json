@@ -5,7 +5,7 @@
 	"scripts": {
 		"dev": "next dev -H 127.0.0.1 --turbopack",
 		"build": "next build",
-		"start": "cd ../packages/drizzle && bunx drizzle-kit migrate && cd ../../apps/web && next start",
+		"start": "cd ../../packages/drizzle && bunx drizzle-kit migrate && cd ../../apps/web && next start",
 		"lint": "next lint"
 	},
 	"dependencies": {
