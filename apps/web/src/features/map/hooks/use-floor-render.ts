@@ -1,7 +1,8 @@
 import * as fabric from "fabric"
 import { type RefObject, useEffect, useRef } from "react"
 
-import type { BuildingScheme } from "@repo/shared/building-scheme"
+import type { BuildingScheme, Room } from "@repo/shared/building-scheme"
+import { isRoom } from "@repo/shared/building-scheme"
 
 import { getMapColors } from "../lib/colors"
 import { clamp, getFloorPolygon, getRoomPolygon } from "../lib/geometry"
@@ -61,7 +62,9 @@ export const useFloorRender = ({
 		}
 
 		const floorRooms =
-			data?.rooms.filter((r) => r.floorId === activeFloor) ?? []
+			data?.entities.filter(
+				(e): e is Room => isRoom(e) && e.floorId === activeFloor,
+			) ?? []
 
 		canvas.clear()
 		textObjectsRef.current = []

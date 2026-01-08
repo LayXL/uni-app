@@ -1,8 +1,7 @@
-import { useQuery } from "@tanstack/react-query"
 import { useMemo } from "react"
 
-import { orpc } from "@repo/orpc/react"
-import type { Room } from "@repo/shared/building-scheme"
+import type { MapEntity } from "@repo/shared/building-scheme"
+import { isRoom } from "@repo/shared/building-scheme"
 
 import { Button } from "@/shared/ui/button"
 import { Icon } from "@/shared/ui/icon"
@@ -15,25 +14,33 @@ import { RouteBuilderSuggestions } from "./route-builder-suggestions"
 
 type Point = { floor: number; x: number; y: number }
 
-export type CreateRoomSelectHandler = (
-	rooms: Room[] | undefined,
-	setRoomId: (id: number) => void,
+export type CreateEntitySelectHandler = (
+	entities: MapEntity[] | undefined,
+	setEntityId: (id: number) => void,
 	setPosition: (point: Point) => void,
-) => (roomId: number) => void
+) => (entityId: number) => void
 
-const createRoomSelectHandler: CreateRoomSelectHandler =
-	(rooms, setRoomId, setPosition) => (roomId) => {
-		const room = rooms?.find((r) => r.id === roomId)
-		if (!room) return
+const createEntitySelectHandler: CreateEntitySelectHandler =
+	(entities, setEntityId, setPosition) => (entityId) => {
+		const entity = entities?.find((e) => e.id === entityId)
+		if (!entity) return
 
-		const door = room.doorsPosition?.[0]
+		setEntityId(entityId)
 
-		setRoomId(roomId)
-		setPosition({
-			floor: room.floorId,
-			x: door ? room.position.x + door.x : room.position.x,
-			y: door ? room.position.y + door.y : room.position.y,
-		})
+		if (isRoom(entity)) {
+			const door = entity.doorsPosition?.[0]
+			setPosition({
+				floor: entity.floorId,
+				x: door ? entity.position.x + door.x : entity.position.x,
+				y: door ? entity.position.y + door.y : entity.position.y,
+			})
+		} else {
+			setPosition({
+				floor: entity.floorId,
+				x: entity.position.x,
+				y: entity.position.y,
+			})
+		}
 	}
 
 export const RouteBuilderModal = () => {
@@ -51,33 +58,36 @@ export const RouteBuilderModal = () => {
 		setIsActive,
 	} = useRouteBuilder()
 
-	const roomItems = useMemo<SearchInputItem<number>[]>(() => {
-		if (!mapData?.rooms) return []
+	const entities = useMemo<MapEntity[]>(() => {
+		if (!mapData?.entities) return []
+		return mapData.entities
+	}, [mapData?.entities])
 
-		return mapData.rooms
-			.filter((room) => !room.hiddenInSearch && room.name)
+	const entityItems = useMemo<SearchInputItem<number>[]>(() => {
+		return entities
+			.filter((entity) => !entity.hiddenInSearch && entity.name)
 			.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
-			.map((room) => ({ key: room.name, value: room.id }))
-	}, [mapData?.rooms])
+			.map((entity) => ({ key: entity.name, value: entity.id }))
+	}, [entities])
 
-	const filterRoom = (item: SearchInputItem<number>, query: string) => {
-		const room = mapData?.rooms.find((r) => r.id === item.value)
+	const filterEntity = (item: SearchInputItem<number>, query: string) => {
+		const entity = entities.find((e) => e.id === item.value)
 		const q = query.toLowerCase()
 
 		return (
 			item.key.toLowerCase().includes(q) ||
-			room?.aliases?.some((alias) => alias.toLowerCase().includes(q)) ||
+			entity?.aliases?.some((alias) => alias.toLowerCase().includes(q)) ||
 			false
 		)
 	}
 
-	const handleStartSelect = createRoomSelectHandler(
-		mapData?.rooms,
+	const handleStartSelect = createEntitySelectHandler(
+		entities,
 		setStartRoomId,
 		setStart,
 	)
-	const handleEndSelect = createRoomSelectHandler(
-		mapData?.rooms,
+	const handleEndSelect = createEntitySelectHandler(
+		entities,
 		setEndRoomId,
 		setEnd,
 	)
@@ -92,13 +102,13 @@ export const RouteBuilderModal = () => {
 							<Icon name="iconify:material-symbols:near-me-rounded" size={24} />
 						</div>
 						<SearchInput
-							items={roomItems}
+							items={entityItems}
 							value={startRoomId ?? undefined}
 							onChange={handleStartSelect}
-							filterFn={filterRoom}
+							filterFn={filterEntity}
 							placeholder="Откуда"
 							maxSuggestions={8}
-							emptyMessage="Комната не найдена"
+							emptyMessage="Место не найдено"
 							className="bg-transparent border-none rounded-xl pl-12 h-12"
 						/>
 					</div>
@@ -108,13 +118,13 @@ export const RouteBuilderModal = () => {
 							<Icon name="iconify:material-symbols:flag-rounded" size={24} />
 						</div>
 						<SearchInput
-							items={roomItems}
+							items={entityItems}
 							value={endRoomId ?? undefined}
 							onChange={handleEndSelect}
-							filterFn={filterRoom}
+							filterFn={filterEntity}
 							placeholder="Куда"
 							maxSuggestions={8}
-							emptyMessage="Комната не найдена"
+							emptyMessage="Место не найдено"
 							className="bg-transparent border-none rounded-xl pl-12 h-12"
 						/>
 					</div>

@@ -31,7 +31,11 @@ export type IconType =
 	| "projectAnalyticCenter"
 	| string
 
-export type MapEntity = {
+export type BaseEntity = {
+	/** уникальный id сущности */
+	id: number
+	/** id этажа, к которому принадлежит сущность */
+	floorId: number
 	name: string
 	/** приоритет для поиска/отображения */
 	priority?: number
@@ -47,11 +51,8 @@ export type MapEntity = {
 	position: Coordinate
 }
 
-export type Room = MapEntity & {
-	/** уникальный id комнаты */
-	id: number
-	/** id этажа, к которому принадлежит комната */
-	floorId: number
+export type Room = BaseEntity & {
+	type: "room"
 	/** скрытое имя/служебные */
 	nameHidden?: boolean
 	/** можно ли кликать по комнате */
@@ -64,15 +65,19 @@ export type Room = MapEntity & {
 	url?: string
 }
 
+export type Place = BaseEntity & {
+	type: "place"
+	/** тип точки интереса */
+	placeType?: PlaceType
+}
+
+export type MapEntity = Room | Place
+
 export type Stair = {
 	id: number
 	/** список id этажей, которые соединяет лестница */
 	floors: number[]
 	position: Coordinate
-}
-
-export type Place = MapEntity & {
-	type?: PlaceType
 }
 
 export type PhotoPoint = {
@@ -97,8 +102,6 @@ export type Floor = {
 	roads?: Road[]
 	/** лестницы на этаже */
 	stairs?: Stair[]
-	/** точки интереса */
-	places?: Place[]
 	/** фотовьюшки на этаже */
 	photoPoints?: PhotoPoint[]
 }
@@ -106,5 +109,13 @@ export type Floor = {
 /** корневой объект файла */
 export type BuildingScheme = {
 	floors: Floor[]
-	rooms: Room[]
+	entities: MapEntity[]
 }
+
+/** хелпер для проверки типа сущности */
+export const isRoom = (entity: MapEntity): entity is Room =>
+	entity.type === "room"
+
+/** хелпер для проверки типа сущности */
+export const isPlace = (entity: MapEntity): entity is Place =>
+	entity.type === "place"

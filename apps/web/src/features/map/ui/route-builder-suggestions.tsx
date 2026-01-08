@@ -3,17 +3,18 @@ import { formatISO } from "date-fns"
 import { Fragment, useMemo } from "react"
 
 import { orpc } from "@repo/orpc/react"
+import type { MapEntity } from "@repo/shared/building-scheme"
 
 import { useUser } from "@/entities/user/hooks/useUser"
 import { Icon } from "@/shared/ui/icon"
 import { Touchable } from "@/shared/ui/touchable"
 
 import { useMapData } from "../hooks/use-map-data"
-import type { CreateRoomSelectHandler } from "./route-builder-modal"
+import type { CreateEntitySelectHandler } from "./route-builder-modal"
 
 type RouteBuilderSuggestionsProps = {
-	handleStartSelect: ReturnType<CreateRoomSelectHandler>
-	handleEndSelect: ReturnType<CreateRoomSelectHandler>
+	handleStartSelect: ReturnType<CreateEntitySelectHandler>
+	handleEndSelect: ReturnType<CreateEntitySelectHandler>
 	setIsActive: (isActive: boolean) => void
 	closeModal: () => void
 }
@@ -24,8 +25,13 @@ export const RouteBuilderSuggestions = ({
 	setIsActive,
 	closeModal,
 }: RouteBuilderSuggestionsProps) => {
-	const { rooms } = useMapData()
+	const mapData = useMapData()
 	const user = useUser()
+
+	const entities = useMemo<MapEntity[]>(() => {
+		if (!mapData?.entities) return []
+		return mapData.entities
+	}, [mapData?.entities])
 
 	const { data: todaySchedule } = useQuery(
 		orpc.schedule.getSchedule.queryOptions({
@@ -40,12 +46,12 @@ export const RouteBuilderSuggestions = ({
 
 	const suggestions = todaySchedule?.reduce(
 		(acc, lesson, index) => {
-			const roomId = rooms.find((room) => room.name === lesson.classroom)?.id
+			const entityId = entities.find((e) => e.name === lesson.classroom)?.id
 
-			if (roomId) {
+			if (entityId) {
 				acc.push({
-					from: acc[index - 1]?.to ?? -1,
-					to: roomId,
+					from: acc[index - 1]?.to ?? 166,
+					to: entityId,
 				})
 			}
 			return acc
@@ -53,9 +59,9 @@ export const RouteBuilderSuggestions = ({
 		[] as { from: number; to: number }[],
 	)
 
-	const roomItems = useMemo(
-		() => new Map((rooms ?? []).map((room) => [room.id, room])),
-		[rooms],
+	const entityItems = useMemo(
+		() => new Map(entities.map((entity) => [entity.id, entity])),
+		[entities],
 	)
 
 	return (
@@ -77,17 +83,13 @@ export const RouteBuilderSuggestions = ({
 								<Icon name="iconify:material-symbols:auto-awesome" size={20} />
 							</div>
 							<div className="flex items-center gap-2">
-								<span>
-									{suggestion.from === -1
-										? "Главный вход"
-										: roomItems.get(suggestion.from)?.name}
-								</span>
+								<span>{entityItems.get(suggestion.from)?.name}</span>
 								<Icon
 									name="iconify:material-symbols:arrow-forward-rounded"
 									size={20}
 									className="bg-muted-foreground"
 								/>
-								<span>{roomItems.get(suggestion.to)?.name}</span>
+								<span>{entityItems.get(suggestion.to)?.name}</span>
 							</div>
 						</button>
 					</Touchable>

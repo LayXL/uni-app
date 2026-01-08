@@ -2,7 +2,9 @@ import type {
 	BuildingScheme,
 	Coordinate,
 	Road,
+	Room,
 } from "@repo/shared/building-scheme"
+import { isRoom } from "@repo/shared/building-scheme"
 
 import { type ProjectionResult, projectPointToSegment } from "./geometry"
 
@@ -13,8 +15,8 @@ export function buildRoadsToRoomDoors(
 ): BuildingScheme {
 	const floorsWithExtraRoads = buildingScheme.floors.map((floor) => {
 		const baseRoads = floor.roads ?? []
-		const floorRooms = buildingScheme.rooms.filter(
-			(r) => r.floorId === floor.id,
+		const floorRooms = buildingScheme.entities.filter(
+			(e): e is Room => isRoom(e) && e.floorId === floor.id,
 		)
 
 		if (!floorRooms.length || baseRoads.length === 0) return floor
@@ -62,6 +64,6 @@ export function buildRoadsToRoomDoors(
 
 	return {
 		floors: floorsWithExtraRoads,
-		rooms: buildingScheme.rooms,
+		entities: buildingScheme.entities,
 	}
 }

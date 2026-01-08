@@ -1,6 +1,12 @@
 import * as fabric from "fabric"
 
-import type { Coordinate, Floor, Room } from "@repo/shared/building-scheme"
+import type {
+	Coordinate,
+	Floor,
+	MapEntity,
+	Room,
+} from "@repo/shared/building-scheme"
+import { isRoom } from "@repo/shared/building-scheme"
 
 import type { FabricMatrix, ViewportState } from "../types"
 
@@ -38,14 +44,16 @@ export const getRoomPolygon = (
 export const getFloorPolygon = (floor: Floor): fabric.Point[] =>
 	floor.wallsPosition.map((p) => toCanvasPoint(p, floor.position))
 
-export const collectBounds = (floor: Floor, rooms: Room[]) => {
+export const collectBounds = (floor: Floor, entities: MapEntity[]) => {
 	const points: Coordinate[] = []
 
 	getFloorPolygon(floor).forEach((p) => {
 		points.push({ x: p.x, y: p.y })
 	})
 
-	const floorRooms = rooms.filter((r) => r.floorId === floor.id)
+	const floorRooms = entities.filter(
+		(e): e is Room => isRoom(e) && e.floorId === floor.id,
+	)
 
 	floorRooms.forEach((room) => {
 		getRoomPolygon(room, floor.position).forEach((p) => {

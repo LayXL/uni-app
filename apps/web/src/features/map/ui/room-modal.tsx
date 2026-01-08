@@ -3,6 +3,8 @@
 import { useMemo } from "react"
 import { useShallow } from "zustand/react/shallow"
 
+import { isRoom } from "@repo/shared/building-scheme"
+
 import { Button } from "@/shared/ui/button"
 
 import { useMapData } from "../hooks/use-map-data"
@@ -26,7 +28,10 @@ export const RoomModal = ({ roomId, onClose }: RoomModalProps) => {
 	const room = useMemo(() => {
 		if (!roomId || !data) return null
 
-		return data.rooms.find((r) => r.id === roomId) ?? null
+		const entity = data.entities.find((e) => e.id === roomId)
+		if (!entity || !isRoom(entity)) return null
+
+		return entity
 	}, [data, roomId])
 
 	return (

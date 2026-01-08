@@ -1,2 +1,21 @@
 {
+  "pgsql.connections": [
+		{
+			"id": "A3DFBBD5-0B50-4B2B-980A-890BEDD63557",
+			"groupId": "3A3DB652-07B1-4F7F-9939-AE1E4326D068",
+			"authenticationType": "None",
+			"connectTimeout": 15,
+			"applicationName": "vscode-pgsql",
+			"clientEncoding": "utf8",
+			"sslmode": "prefer",
+			"server": "localhost",
+			"expiresOn": 0,
+			"emptyPasswordInput": true,
+			"user": "layxl",
+			"password": "",
+			"sshPassword": "",
+			"profileName": "schedule",
+      "database": "schedule"
+		}
+	],
 }

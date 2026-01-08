@@ -115,7 +115,7 @@ export const MapViewer = () => {
 			const floor = mapData.floors.find((f) => f.id === floorId)
 			if (!floor) return
 
-			const bounds = collectBounds(floor, mapData.rooms)
+			const bounds = collectBounds(floor, mapData.entities)
 			const padding = 192
 			const worldWidth = bounds.maxX - bounds.minX + padding * 2
 			const worldHeight = bounds.maxY - bounds.minY + padding * 2
