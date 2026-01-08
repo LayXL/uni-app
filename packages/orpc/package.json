@@ -17,6 +17,7 @@
 		"@orpc/client": "^1.10.0",
 		"@orpc/server": "^1.10.0",
 		"@orpc/tanstack-query": "^1.10.0",
+		"@repo/shared": "workspace:*",
 		"@repo/drizzle": "workspace:*",
 		"@repo/env": "workspace:*",
 		"@tma.js/init-data-node": "^2.0.4",
