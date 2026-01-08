@@ -1,7 +1,6 @@
 import { skipToken, useQuery } from "@tanstack/react-query"
 import { formatISO } from "date-fns"
 import { Fragment, useMemo } from "react"
-import { useShallow } from "zustand/react/shallow"
 
 import { orpc } from "@repo/orpc/react"
 
@@ -9,20 +8,23 @@ import { useUser } from "@/entities/user/hooks/useUser"
 import { Icon } from "@/shared/ui/icon"
 import { Touchable } from "@/shared/ui/touchable"
 
-import { useRouteBuilder } from "../hooks/use-route-builder"
+import { useMapData } from "../hooks/use-map-data"
+import type { CreateRoomSelectHandler } from "./route-builder-modal"
 
-export const RouteBuilderSuggestions = () => {
-	const { setStartRoomId, setStart, setEndRoomId, setEnd } = useRouteBuilder(
-		useShallow((state) => ({
-			setStartRoomId: state.setStartRoomId,
-			setStart: state.setStart,
-			setEndRoomId: state.setEndRoomId,
-			setEnd: state.setEnd,
-		})),
-	)
+type RouteBuilderSuggestionsProps = {
+	handleStartSelect: ReturnType<CreateRoomSelectHandler>
+	handleEndSelect: ReturnType<CreateRoomSelectHandler>
+	setIsActive: (isActive: boolean) => void
+	closeModal: () => void
+}
 
-	const { data: mapData } = useQuery(orpc.map.getMap.queryOptions())
-
+export const RouteBuilderSuggestions = ({
+	handleStartSelect,
+	handleEndSelect,
+	setIsActive,
+	closeModal,
+}: RouteBuilderSuggestionsProps) => {
+	const { rooms } = useMapData()
 	const user = useUser()
 
 	const { data: todaySchedule } = useQuery(
@@ -38,9 +40,7 @@ export const RouteBuilderSuggestions = () => {
 
 	const suggestions = todaySchedule?.reduce(
 		(acc, lesson, index) => {
-			const roomId = mapData?.rooms.find(
-				(room) => room.name === lesson.classroom,
-			)?.id
+			const roomId = rooms.find((room) => room.name === lesson.classroom)?.id
 
 			if (roomId) {
 				acc.push({
@@ -54,8 +54,8 @@ export const RouteBuilderSuggestions = () => {
 	)
 
 	const roomItems = useMemo(
-		() => new Map((mapData?.rooms ?? []).map((room) => [room.id, room])),
-		[mapData?.rooms],
+		() => new Map((rooms ?? []).map((room) => [room.id, room])),
+		[rooms],
 	)
 
 	return (
@@ -67,7 +67,10 @@ export const RouteBuilderSuggestions = () => {
 							type="button"
 							className="flex items-center gap-4 px-4 py-3"
 							onClick={() => {
-								//
+								handleStartSelect(suggestion.from)
+								handleEndSelect(suggestion.to)
+								setIsActive(true)
+								closeModal()
 							}}
 						>
 							<div>

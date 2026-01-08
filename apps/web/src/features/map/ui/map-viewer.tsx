@@ -13,18 +13,18 @@ import { useActiveFloor } from "../hooks/use-active-floor"
 import { useFilteredFloors } from "../hooks/use-filtered-floors"
 import { useFloorRender } from "../hooks/use-floor-render"
 import { useMapCanvas } from "../hooks/use-map-canvas"
+import { useMapData } from "../hooks/use-map-data"
 import { useMapInteractions } from "../hooks/use-map-interactions"
 import { useMapViewport } from "../hooks/use-map-viewport"
 import { useRouteBuilder } from "../hooks/use-route-builder"
 import { clamp, collectBounds, createViewportMatrix } from "../lib/geometry"
 import type { ViewportState } from "../types"
-import { MapBottomBar } from "./map-bottom-bar"
 import { MapControls } from "./map-controls"
 import { RoomModal } from "./room-modal"
 import { RouteBuilderModal } from "./route-builder-modal"
 
 export const MapViewer = () => {
-	const { data: mapData } = useQuery(orpc.map.getMap.queryOptions())
+	const mapData = useMapData()
 
 	const { start, end } = useRouteBuilder()
 
@@ -52,27 +52,6 @@ export const MapViewer = () => {
 		screen: { x: number; y: number }
 		world: { x: number; y: number }
 	} | null>(null)
-
-	// const handleDebugRightClick = useCallback(
-	// 	(coords: {
-	// 		screen: { x: number; y: number }
-	// 		world: { x: number; y: number }
-	// 	}) => {
-	// 		const point = {
-	// 			x: Math.floor(coords.world.x),
-	// 			y: Math.floor(coords.world.y),
-	// 			floor: activeFloor,
-	// 		}
-
-	// 		if (!start) {
-	// 			setStart(point)
-	// 			return
-	// 		}
-
-	// 		setEnd(point)
-	// 	},
-	// 	[activeFloor, setEnd, setStart, start],
-	// )
 
 	const handleViewportChange = useCallback((next: ViewportState) => {
 		setRotation(next.rotation)

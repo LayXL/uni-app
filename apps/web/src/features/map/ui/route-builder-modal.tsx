@@ -9,18 +9,20 @@ import { Icon } from "@/shared/ui/icon"
 import { ModalRoot } from "@/shared/ui/modal-root"
 import { SearchInput, type SearchInputItem } from "@/shared/ui/search-input"
 
+import { useMapData } from "../hooks/use-map-data"
 import { useRouteBuilder } from "../hooks/use-route-builder"
 import { RouteBuilderSuggestions } from "./route-builder-suggestions"
 
 type Point = { floor: number; x: number; y: number }
 
-const createRoomSelectHandler =
-	(
-		rooms: Room[] | undefined,
-		setRoomId: (id: number) => void,
-		setPosition: (point: Point) => void,
-	) =>
-	(roomId: number) => {
+export type CreateRoomSelectHandler = (
+	rooms: Room[] | undefined,
+	setRoomId: (id: number) => void,
+	setPosition: (point: Point) => void,
+) => (roomId: number) => void
+
+const createRoomSelectHandler: CreateRoomSelectHandler =
+	(rooms, setRoomId, setPosition) => (roomId) => {
 		const room = rooms?.find((r) => r.id === roomId)
 		if (!room) return
 
@@ -35,7 +37,7 @@ const createRoomSelectHandler =
 	}
 
 export const RouteBuilderModal = () => {
-	const { data: mapData } = useQuery(orpc.map.getMap.queryOptions())
+	const mapData = useMapData()
 
 	const {
 		isModalOpen,
@@ -117,7 +119,12 @@ export const RouteBuilderModal = () => {
 						/>
 					</div>
 				</div>
-				<RouteBuilderSuggestions />
+				<RouteBuilderSuggestions
+					handleStartSelect={handleStartSelect}
+					handleEndSelect={handleEndSelect}
+					setIsActive={setIsActive}
+					closeModal={closeModal}
+				/>
 				<Button
 					onClick={() => {
 						setIsActive(true)

@@ -1,13 +1,11 @@
 "use client"
 
-import { useQuery } from "@tanstack/react-query"
 import { useMemo } from "react"
 import { useShallow } from "zustand/react/shallow"
 
-import { orpc } from "@repo/orpc/react"
-
 import { Button } from "@/shared/ui/button"
 
+import { useMapData } from "../hooks/use-map-data"
 import { useRouteBuilder } from "../hooks/use-route-builder"
 
 type RoomModalProps = {
@@ -23,7 +21,7 @@ export const RoomModal = ({ roomId, onClose }: RoomModalProps) => {
 			setEnd: state.setEnd,
 		})),
 	)
-	const { data } = useQuery(orpc.map.getMap.queryOptions())
+	const data = useMapData()
 
 	const room = useMemo(() => {
 		if (!roomId || !data) return null
