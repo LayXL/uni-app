@@ -29,6 +29,9 @@
     "apps/schedule-updater": {
       "name": "@repo/schedule-updater",
       "dependencies": {
+        "@repo/bitrix": "workspace:*",
+        "@repo/drizzle": "workspace:*",
+        "@repo/env": "workspace:*",
         "@repo/shared": "workspace:*",
         "croner": "^9.0.0",
       },

@@ -4,6 +4,7 @@
 	"module": "index.ts",
 	"type": "module",
 	"scripts": {
+		"start": "bun run .",
 		"dev": "bun --env-file ../../.env --watch ."
 	},
 	"devDependencies": {
@@ -15,6 +16,9 @@
 	},
 	"dependencies": {
 		"croner": "^9.0.0",
-		"@repo/shared": "workspace:*"
+		"@repo/shared": "workspace:*",
+		"@repo/bitrix": "workspace:*",
+		"@repo/drizzle": "workspace:*",
+		"@repo/env": "workspace:*"
 	}
 }
