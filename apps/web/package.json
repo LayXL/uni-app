@@ -9,6 +9,7 @@
 		"lint": "next lint"
 	},
 	"dependencies": {
+		"zod": "^4.1.13",
 		"@orpc/server": "^1.7.1",
 		"@repo/orpc": "workspace:*",
 		"@repo/shared": "workspace:*",
