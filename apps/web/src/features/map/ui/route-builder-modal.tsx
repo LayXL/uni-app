@@ -45,6 +45,7 @@ export const RouteBuilderModal = () => {
 		setStart,
 		setEnd,
 		closeModal,
+		setIsActive,
 	} = useRouteBuilder()
 
 	const roomItems = useMemo<SearchInputItem<number>[]>(() => {
@@ -117,7 +118,10 @@ export const RouteBuilderModal = () => {
 				</div>
 				<div className="h-32" />
 				<Button
-					onClick={closeModal}
+					onClick={() => {
+						setIsActive(true)
+						closeModal()
+					}}
 					disabled={!startRoomId || !endRoomId}
 					label="Построить маршрут"
 				/>

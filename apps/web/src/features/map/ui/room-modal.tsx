@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query"
 import { useMemo } from "react"
+import { useShallow } from "zustand/react/shallow"
 
 import { orpc } from "@repo/orpc/react"
 
@@ -15,9 +16,13 @@ type RoomModalProps = {
 }
 
 export const RoomModal = ({ roomId, onClose }: RoomModalProps) => {
-	const openModal = useRouteBuilder((state) => state.openModal)
-	const setEndRoomId = useRouteBuilder((state) => state.setEndRoomId)
-	const setEnd = useRouteBuilder((state) => state.setEnd)
+	const { openModal, setEndRoomId, setEnd } = useRouteBuilder(
+		useShallow((state) => ({
+			openModal: state.openModal,
+			setEndRoomId: state.setEndRoomId,
+			setEnd: state.setEnd,
+		})),
+	)
 	const { data } = useQuery(orpc.map.getMap.queryOptions())
 
 	const room = useMemo(() => {

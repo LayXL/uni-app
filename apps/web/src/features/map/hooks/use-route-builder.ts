@@ -7,6 +7,7 @@ type Point = {
 }
 
 type State = {
+	isActive: boolean
 	isModalOpen: boolean
 	startRoomId?: number
 	endRoomId?: number
@@ -20,9 +21,11 @@ type State = {
 	setStart: (start: Point) => void
 	setEnd: (end: Point) => void
 	resetRoute: () => void
+	setIsActive: (isActive: boolean) => void
 }
 
 export const useRouteBuilder = create<State>((set) => ({
+	isActive: false,
 	isModalOpen: false,
 	startRoomId: undefined,
 	endRoomId: undefined,
@@ -44,5 +47,7 @@ export const useRouteBuilder = create<State>((set) => ({
 			hasPoints: false,
 			startRoomId: undefined,
 			endRoomId: undefined,
+			isActive: false,
 		}),
+	setIsActive: (isActive: boolean) => set({ isActive }),
 }))

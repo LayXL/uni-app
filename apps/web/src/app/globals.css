@@ -74,7 +74,7 @@
 		--map-room-fill-clickable: var(--card);
 		--map-room-stroke: var(--border);
 		--map-room-label: var(--foreground);
-		--map-stairs-icon: #ffffff;
+		--map-stairs-icon: #000;
 	}
 
 	.dark {

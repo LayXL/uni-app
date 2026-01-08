@@ -102,7 +102,7 @@ const buildSteps = (route: z.infer<typeof routeSchema>) => {
 }
 
 export const RouteNavigation = () => {
-	const { start, end, hasPoints, resetRoute } = useRouteBuilder()
+	const { start, end, hasPoints, isActive, resetRoute } = useRouteBuilder()
 
 	const setActiveFloor = useActiveFloor((state) => state.setActiveFloor)
 	const moveTo = useMapState((state) => state.moveTo)
@@ -111,7 +111,7 @@ export const RouteNavigation = () => {
 
 	const { data } = useQuery(
 		orpc.map.buildRoute.queryOptions({
-			input: start && end ? { start, end } : skipToken,
+			input: start && end && isActive ? { start, end } : skipToken,
 		}),
 	)
 
