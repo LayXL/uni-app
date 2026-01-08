@@ -146,7 +146,6 @@
         "heic-convert": "^2.1.0",
         "ky": "^1.12.0",
         "langchain": "^1.0.1",
-        "sharp": "^0.34.4",
         "zod": "^4.1.13",
       },
       "devDependencies": {
