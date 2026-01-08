@@ -6768,7 +6768,7 @@ UPDATE config SET json = $$
         "Проектно-аналитический офис"
       ],
       "description": "Офис проектного аналитического центра",
-      "icon": "projectAnalyticCenter",
+      "icon": "project-analytic-center",
       "doorsPosition": [
         {
           "x": 304,
@@ -7983,7 +7983,7 @@ UPDATE config SET json = $$
         "x": 1290,
         "y": 1602
       },
-      "icon": "waterSource"
+      "icon": "water-source"
     },
     {
       "type": "place",

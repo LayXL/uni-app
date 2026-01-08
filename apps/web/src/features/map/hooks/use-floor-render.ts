@@ -1,8 +1,8 @@
 import * as fabric from "fabric"
 import { type RefObject, useEffect, useRef } from "react"
 
-import type { BuildingScheme, Room } from "@repo/shared/building-scheme"
-import { isRoom } from "@repo/shared/building-scheme"
+import type { BuildingScheme, Place, Room } from "@repo/shared/building-scheme"
+import { isPlace, isRoom } from "@repo/shared/building-scheme"
 
 import { getMapColors } from "../lib/colors"
 import { clamp, getFloorPolygon, getRoomPolygon } from "../lib/geometry"
@@ -66,6 +66,11 @@ export const useFloorRender = ({
 				(e): e is Room => isRoom(e) && e.floorId === activeFloor,
 			) ?? []
 
+		const floorPlaces =
+			data?.entities.filter(
+				(e): e is Place => isPlace(e) && e.floorId === activeFloor,
+			) ?? []
+
 		canvas.clear()
 		textObjectsRef.current = []
 		iconObjectsRef.current = []
@@ -122,6 +127,84 @@ export const useFloorRender = ({
 			const imgEl = new Image()
 			imgEl.crossOrigin = "anonymous"
 			imgEl.src = "/icons/stairs.svg"
+			imgEl.onload = () => {
+				if (disposed || !fabricRef.current) return
+
+				const img = new fabric.FabricImage(imgEl, {
+					originX: "center",
+					originY: "center",
+					objectCaching: false,
+				})
+
+				if (fabric.filters?.BlendColor) {
+					img.filters = [
+						new fabric.filters.BlendColor({
+							color: colors.stairsIcon,
+							mode: "add",
+						}),
+					]
+					img.applyFilters()
+				}
+
+				const targetSize = 14
+				const scaleX = img.width && img.width > 0 ? targetSize / img.width : 1
+				const scaleY =
+					img.height && img.height > 0 ? targetSize / img.height : 1
+
+				img.set({
+					scaleX,
+					scaleY,
+				})
+
+				const marker = new fabric.Group(
+					[
+						new fabric.Circle({
+							radius: 10,
+							fill: colors.roomStroke,
+							originX: "center",
+							originY: "center",
+						}),
+						img,
+					],
+					{
+						left: x,
+						top: y,
+						originX: "center",
+						originY: "center",
+						hoverCursor: "default",
+						selectable: false,
+						evented: false,
+						objectCaching: false,
+					},
+				)
+
+				const baseScale = marker.scaleX ?? 1
+				iconBaseScaleRef.current.set(marker, baseScale)
+				iconObjectsRef.current.push(marker)
+
+				// Apply current zoom-based scaling immediately after creation
+				const currentZoom = viewportRef.current.zoom
+				const iconFontScale = clamp(1 / currentZoom ** 0.7, 0.75, 4)
+				marker.set({
+					scaleX: baseScale * iconFontScale,
+					scaleY: baseScale * iconFontScale,
+				})
+
+				fabricRef.current.add(marker)
+				fabricRef.current.requestRenderAll()
+			}
+		})
+
+		// Render places (points of interest)
+		floorPlaces.forEach((place) => {
+			const x = floor.position.x + place.position.x
+			const y = floor.position.y + place.position.y
+
+			const iconName = place.icon || place.placeType || "place"
+
+			const imgEl = new Image()
+			imgEl.crossOrigin = "anonymous"
+			imgEl.src = `/icons/${iconName}.svg`
 			imgEl.onload = () => {
 				if (disposed || !fabricRef.current) return
 
