@@ -4,6 +4,7 @@ import { orpc } from "@repo/orpc/react"
 import { getNextTwoWeeksDates } from "@repo/shared/lessons/get-next-two-weeks-dates"
 
 import { MapViewerHome } from "@/app/(morda)/_ui/map-viewer-home"
+import { MapBottomBar } from "@/features/map/ui/map-bottom-bar"
 import { MapViewer } from "@/features/map/ui/map-viewer"
 import { ScheduleHeader } from "@/features/schedule/ui/schedule-header"
 import { ScheduleViewer } from "@/features/schedule/ui/schedule-viewer"
@@ -33,7 +34,10 @@ export default async function () {
 					<MapViewer />
 				</MapViewerHome>
 				<ScheduleViewerHome>
-					<div className="-mt-4 flex flex-col bg-background rounded-t-2xl">
+					<div className="-mt-4 flex flex-col bg-background rounded-t-2xl relative">
+						<div className="absolute bottom-full left-3 right-3 py-2">
+							<MapBottomBar />
+						</div>
 						<ScheduleHeader />
 						<ScheduleViewer />
 					</div>

@@ -10,6 +10,7 @@ import { ModalRoot } from "@/shared/ui/modal-root"
 import { SearchInput, type SearchInputItem } from "@/shared/ui/search-input"
 
 import { useRouteBuilder } from "../hooks/use-route-builder"
+import { RouteBuilderSuggestions } from "./route-builder-suggestions"
 
 type Point = { floor: number; x: number; y: number }
 
@@ -99,7 +100,7 @@ export const RouteBuilderModal = () => {
 							className="bg-transparent border-none rounded-xl pl-12 h-12"
 						/>
 					</div>
-					<div className="h-px w-full bg-border" />
+					<div className="h-px ml-13 bg-border" />
 					<div className="relative">
 						<div className="absolute size-12 grid place-items-center pointer-events-none z-10">
 							<Icon name="iconify:material-symbols:flag-rounded" size={24} />
@@ -116,7 +117,7 @@ export const RouteBuilderModal = () => {
 						/>
 					</div>
 				</div>
-				<div className="h-32" />
+				<RouteBuilderSuggestions />
 				<Button
 					onClick={() => {
 						setIsActive(true)

@@ -11,6 +11,7 @@ import type { IconName } from "@/types/icon-name"
 
 import { cn } from "../utils/cn"
 import { Icon } from "./icon"
+import { Touchable } from "./touchable"
 
 type ButtonProps = {
 	variant?: "primary" | "secondary" | "accent"
@@ -89,5 +90,9 @@ export const Button = (props: ButtonProps) => {
 		})
 	}
 
-	return <button disabled={props.disabled} type="button" {...childProps} />
+	return (
+		<Touchable>
+			<button disabled={props.disabled} type="button" {...childProps} />
+		</Touchable>
+	)
 }

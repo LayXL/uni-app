@@ -282,8 +282,6 @@ export const MapViewer = () => {
 			</ModalRoot>
 
 			<RouteBuilderModal />
-
-			<MapBottomBar />
 		</div>
 	)
 }

@@ -4,6 +4,7 @@ import type { ReactNode } from "react"
 import { useDisableScroll } from "../hooks/use-disable-scroll"
 import { Icon } from "./icon"
 import { Portal } from "./portal"
+import { Touchable } from "./touchable"
 
 export const TRANSITION = {
 	ease: [0.25, 0.1, 0.25, 1],
@@ -43,13 +44,17 @@ export const ModalRoot = (props: ModalRootProps) => {
 							initial={{ opacity: 0, y: "100%" }}
 							transition={TRANSITION}
 						>
-							<button
-								type="button"
-								className="cursor-pointer absolute top-2 right-2 bg-card border border-border rounded-full p-1"
-								onClick={onClose ?? close}
-							>
-								<Icon name="cancel-24" className="icon-secondary" />
-							</button>
+							<div className="absolute top-2 right-2">
+								<Touchable>
+									<button
+										type="button"
+										className="cursor-pointer bg-card border border-border rounded-full p-1"
+										onClick={onClose ?? close}
+									>
+										<Icon name="cancel-24" className="icon-secondary" />
+									</button>
+								</Touchable>
+							</div>
 							<div className={className}>{children}</div>
 						</motion.div>
 					</div>
