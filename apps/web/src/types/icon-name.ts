@@ -2446,6 +2446,7 @@ export type IconName =
   | "rouble-circle-fill-blue-28"
   | "rouble-outline-16"
   | "rouble-outline-20"
+  | "route"
   | "rss-circle-fill-black-20"
   | "rss-circle-fill-black-28"
   | "rss-circle-fill-yellow-20"
@@ -3310,3 +3311,4 @@ export type IconName =
   | "zodiac-scorpio-outline-20"
   | "zodiac-taurus-outline-20"
   | "zodiac-virgo-outline-20"
+  | `iconify:${string}:${string}`

@@ -14,6 +14,15 @@ export type IconProps = {
 export const Icon = (props: IconProps) => {
 	const size = props.size ?? Number(props.name.slice(-2))
 
+	const isIconify = props.name.startsWith("iconify:")
+	const [_, namespace, icon] = isIconify
+		? props.name.split(":")
+		: [null, props.name]
+
+	const url = isIconify
+		? `https://api.iconify.design/${namespace}/${icon}.svg`
+		: `/icons/${props.name}.svg`
+
 	return (
 		<span
 			className={cn(
@@ -22,8 +31,8 @@ export const Icon = (props: IconProps) => {
 			)}
 			style={{
 				"--size": `${size}px`,
-				WebkitMaskImage: `url(/icons/${props.name}.svg)`,
-				maskImage: `url(/icons/${props.name}.svg)`,
+				WebkitMaskImage: `url(${url})`,
+				maskImage: `url(${url})`,
 				WebkitMaskSize: "var(--size)",
 				maskSize: "var(--size)",
 				color: props.color ?? "currentcolor",

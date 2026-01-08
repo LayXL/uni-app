@@ -18,6 +18,7 @@ import { useMapViewport } from "../hooks/use-map-viewport"
 import { useRouteBuilder } from "../hooks/use-route-builder"
 import { clamp, collectBounds, createViewportMatrix } from "../lib/geometry"
 import type { ViewportState } from "../types"
+import { MapBottomBar } from "./map-bottom-bar"
 import { MapControls } from "./map-controls"
 import { RoomModal } from "./room-modal"
 import { RouteBuilderModal } from "./route-builder-modal"
@@ -281,6 +282,8 @@ export const MapViewer = () => {
 			</ModalRoot>
 
 			<RouteBuilderModal />
+
+			<MapBottomBar />
 		</div>
 	)
 }

@@ -16,6 +16,8 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
 					return [
 						"export type IconName =",
 						...files.map((file) => `  | "${file.replace(".svg", "")}"`),
+						// biome-ignore lint/suspicious/noTemplateCurlyInString: iconify icons are not supported by the icon component
+						"  | `iconify:${string}:${string}`",
 						"",
 					].join("\n")
 				},
