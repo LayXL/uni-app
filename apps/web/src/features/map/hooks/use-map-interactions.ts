@@ -47,10 +47,7 @@ const getTouchAngle = (t1: Touch, t2: Touch): number => {
 	return Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX)
 }
 
-const getTouchCenter = (
-	t1: Touch,
-	t2: Touch,
-): { x: number; y: number } => {
+const getTouchCenter = (t1: Touch, t2: Touch): { x: number; y: number } => {
 	return {
 		x: (t1.clientX + t2.clientX) / 2,
 		y: (t1.clientY + t2.clientY) / 2,
@@ -316,7 +313,11 @@ export const useMapInteractions = ({
 			const canvas = fabricRef.current
 			if (!canvas) return
 
-			if (event.touches.length === 1 && touchStateRef.current && !multiTouchRef.current) {
+			if (
+				event.touches.length === 1 &&
+				touchStateRef.current &&
+				!multiTouchRef.current
+			) {
 				// Single finger pan
 				const t = event.touches[0]
 				const state = touchStateRef.current
@@ -405,9 +406,8 @@ export const useMapInteractions = ({
 					state.startPos.y - rect.top,
 				)
 
-				// Use fabric's findTarget to properly handle viewport transforms
-				// We need to simulate a pointer event for fabric to find the target
-				const pointer = canvas.restorePointerVpt(screenPos)
+				// Convert screen coordinates to world coordinates
+				const worldPos = screenToWorld(screenPos, viewportRef.current)
 
 				// Find the topmost interactive object at this position
 				const objects = canvas.getObjects()
@@ -418,7 +418,7 @@ export const useMapInteractions = ({
 					if (
 						obj.data?.roomId !== undefined &&
 						obj.evented &&
-						obj.containsPoint(pointer)
+						obj.containsPoint(worldPos)
 					) {
 						onRoomClick?.(obj.data.roomId)
 						break
@@ -444,7 +444,7 @@ export const useMapInteractions = ({
 				activeTouchCountRef.current = 1
 			}
 		},
-		[fabricRef, onRoomClick],
+		[fabricRef, onRoomClick, screenToWorld, viewportRef],
 	)
 
 	// Fabric.js canvas events (mouse only)
@@ -484,7 +484,9 @@ export const useMapInteractions = ({
 		const canvasEl = canvas.getElement()
 
 		// Use passive: false to allow preventDefault
-		canvasEl.addEventListener("touchstart", handleTouchStart, { passive: false })
+		canvasEl.addEventListener("touchstart", handleTouchStart, {
+			passive: false,
+		})
 		canvasEl.addEventListener("touchmove", handleTouchMove, { passive: false })
 		canvasEl.addEventListener("touchend", handleTouchEnd, { passive: false })
 		canvasEl.addEventListener("touchcancel", handleTouchEnd, { passive: false })

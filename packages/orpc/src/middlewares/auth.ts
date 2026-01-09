@@ -44,9 +44,13 @@ export const authMiddleware = base.middleware(async ({ context, next }) => {
 		const searchParams = authTokenStringToSearchParams(authToken)
 
 		if (process.env.NODE_ENV === "production") {
-			validate(searchParams, env.botToken, {
-				expiresIn: 60 * 60 * 24,
-			})
+			try {
+				validate(searchParams, env.botToken, {
+					expiresIn: 60 * 60 * 24,
+				})
+			} catch {
+				throw new ORPCError("UNAUTHORIZED")
+			}
 		}
 
 		const initData = parse(searchParams)
