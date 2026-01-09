@@ -38,6 +38,7 @@ export const MapViewer = () => {
 	const { activeFloor, setActiveFloor } = useActiveFloor()
 	const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null)
 	const [isDebug] = useState(process.env.NODE_ENV === "development")
+	const [isFloorChanging, setIsFloorChanging] = useState(false)
 
 	const canvasRef = useRef<HTMLCanvasElement | null>(null)
 	const fabricRef = useRef<fabric.Canvas | null>(null)
@@ -46,6 +47,7 @@ export const MapViewer = () => {
 	const labelBaseSizeRef = useRef(new WeakMap<fabric.FabricText, number>())
 	const iconObjectsRef = useRef<fabric.Object[]>([])
 	const iconBaseScaleRef = useRef(new WeakMap<fabric.Object, number>())
+	const floorChangeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const [rotation, setRotation] = useState(0)
 	const [isCanvasReady, setIsCanvasReady] = useState(false)
 	const [cursorCoords, setCursorCoords] = useState<{
@@ -140,6 +142,26 @@ export const MapViewer = () => {
 		[applyViewport, mapData],
 	)
 
+	const handleFloorChange = useCallback(
+		(floorId: number) => {
+			// Cancel any pending floor change
+			if (floorChangeTimeoutRef.current) {
+				clearTimeout(floorChangeTimeoutRef.current)
+			}
+
+			// Immediately update UI to show selected floor
+			setActiveFloor(floorId)
+			setIsFloorChanging(true)
+
+			// Debounce the centering and rendering
+			floorChangeTimeoutRef.current = setTimeout(() => {
+				centerOnFloor(floorId)
+				setIsFloorChanging(false)
+			}, 150)
+		},
+		[setActiveFloor, centerOnFloor],
+	)
+
 	const hasCenteredRef = useRef(false)
 	useEffect(() => {
 		if (isCanvasReady && mapData && !hasCenteredRef.current) {
@@ -147,6 +169,15 @@ export const MapViewer = () => {
 			hasCenteredRef.current = true
 		}
 	}, [isCanvasReady, mapData, activeFloor, centerOnFloor])
+
+	// Cleanup floor change timeout on unmount
+	useEffect(() => {
+		return () => {
+			if (floorChangeTimeoutRef.current) {
+				clearTimeout(floorChangeTimeoutRef.current)
+			}
+		}
+	}, [])
 
 	const zoomByStep = useCallback(
 		(deltaZoom: number) => {
@@ -221,6 +252,7 @@ export const MapViewer = () => {
 					type="button"
 					className="size-8 text-xs grid place-items-center"
 					onClick={() => setActiveCampus(activeCampus === 0 ? 1 : 0)}
+					disabled={isFloorChanging}
 				>
 					{activeCampus === 0 ? "МИДИС" : "Школа"}
 				</button>
@@ -229,13 +261,12 @@ export const MapViewer = () => {
 						key={floor.id}
 						type="button"
 						className={cn(
-							"size-8 text-xs grid place-items-center rounded-lg",
+							"size-8 text-xs grid place-items-center rounded-lg transition-colors",
 							activeFloor === floor.id && "bg-accent text-accent-foreground",
+							isFloorChanging && "opacity-50 cursor-not-allowed",
 						)}
-						onClick={() => {
-							setActiveFloor(floor.id)
-							centerOnFloor(floor.id)
-						}}
+						onClick={() => handleFloorChange(floor.id)}
+						disabled={isFloorChanging}
 					>
 						{floor.acronym ?? floor.name}
 					</button>
