@@ -71,12 +71,11 @@ export default function Page() {
 	const router = useRouter()
 
 	useEffect(() => {
-		let hash = retrieveRawInitData()
-
-		if (!hash && process.env.NODE_ENV === "development") {
+		if (process.env.NODE_ENV === "development") {
 			mockTelegramEnv({ launchParams, onEvent })
-			hash = retrieveRawInitData()
 		}
+
+		const hash = retrieveRawInitData()
 
 		if (hash && hash.length > 0) {
 			cookie.set("session", `tma ${hash}`, { expires: 7 })

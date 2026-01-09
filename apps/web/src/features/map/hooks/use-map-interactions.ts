@@ -22,40 +22,12 @@ type UseMapInteractionsParams = {
 	}) => void
 }
 
-type TouchState = {
-	startTime: number
-	startPos: { x: number; y: number }
-	lastPos: { x: number; y: number }
-	moved: boolean
+type GestureNativeEvent = TouchEvent & {
+	scale?: number
+	rotation?: number
+	clientX?: number
+	clientY?: number
 }
-
-type MultiTouchState = {
-	initialDistance: number
-	initialAngle: number
-	initialCenter: { x: number; y: number }
-	lastDistance: number
-	lastAngle: number
-}
-
-const getTouchDistance = (t1: Touch, t2: Touch): number => {
-	const dx = t2.clientX - t1.clientX
-	const dy = t2.clientY - t1.clientY
-	return Math.sqrt(dx * dx + dy * dy)
-}
-
-const getTouchAngle = (t1: Touch, t2: Touch): number => {
-	return Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX)
-}
-
-const getTouchCenter = (t1: Touch, t2: Touch): { x: number; y: number } => {
-	return {
-		x: (t1.clientX + t2.clientX) / 2,
-		y: (t1.clientY + t2.clientY) / 2,
-	}
-}
-
-const TAP_THRESHOLD_PX = 10
-const TAP_THRESHOLD_MS = 300
 
 export const useMapInteractions = ({
 	fabricRef,
@@ -71,11 +43,8 @@ export const useMapInteractions = ({
 	const isDraggingRef = useRef(false)
 	const dragLastRef = useRef<{ x: number; y: number } | null>(null)
 	const didDragRef = useRef(false)
-
-	// Touch-specific state
-	const touchStateRef = useRef<TouchState | null>(null)
-	const multiTouchRef = useRef<MultiTouchState | null>(null)
-	const activeTouchCountRef = useRef(0)
+	const hadGestureRef = useRef(false)
+	const gestureRef = useRef<{ scale: number; rotation: number } | null>(null)
 
 	const getPointerData = useCallback(
 		(event: MouseEvent | TouchEvent | fabric.TPointerEvent) => {
@@ -115,7 +84,10 @@ export const useMapInteractions = ({
 		[getPointerData, onPointerMove],
 	)
 
-	const startDrag = useCallback((coords: { x: number; y: number }) => {
+	const startDrag = useCallback((event: PointerInfo) => {
+		const coords = getPointerCoords(event.e)
+		if (!coords) return
+
 		isDraggingRef.current = true
 		dragLastRef.current = coords
 		didDragRef.current = false
@@ -159,8 +131,12 @@ export const useMapInteractions = ({
 	)
 
 	const continueDragGlobal = useCallback(
-		(event: MouseEvent) => {
+		(event: MouseEvent | TouchEvent) => {
 			if (!isDraggingRef.current) return
+
+			if (event instanceof TouchEvent) {
+				event.preventDefault()
+			}
 
 			const coords = getPointerCoords(event)
 			if (!coords) return
@@ -197,26 +173,34 @@ export const useMapInteractions = ({
 
 	const onMouseDown = useCallback(
 		(event: PointerInfo) => {
-			// Only handle actual mouse events, not touch
-			if (!("button" in event.e)) return
-
-			const mouseEvent = event.e as MouseEvent
-
-			if (mouseEvent.button === 2) {
-				mouseEvent.preventDefault()
-				mouseEvent.stopPropagation()
-
-				if (onRightClick) {
-					const coords = getPointerData(event.e)
-					if (coords) onRightClick(coords)
-				}
-
+			// Touch events do not have button; start drag immediately.
+			if (event.e instanceof TouchEvent) {
+				event.e.preventDefault()
+				startDrag(event)
 				return
 			}
 
-			if (mouseEvent.button === 0 || mouseEvent.button === 1) {
-				const coords = getPointerCoords(event.e)
-				if (coords) startDrag(coords)
+			if (
+				"button" in event.e &&
+				typeof (event.e as MouseEvent).button === "number"
+			) {
+				const mouseEvent = event.e as MouseEvent
+
+				if (mouseEvent.button === 2) {
+					mouseEvent.preventDefault()
+					mouseEvent.stopPropagation()
+
+					if (onRightClick) {
+						const coords = getPointerData(event.e)
+						if (coords) onRightClick(coords)
+					}
+
+					return
+				}
+
+				if (mouseEvent.button === 0 || mouseEvent.button === 1) {
+					startDrag(event)
+				}
 			}
 		},
 		[getPointerData, onRightClick, startDrag],
@@ -224,8 +208,11 @@ export const useMapInteractions = ({
 
 	const onMouseUp = useCallback(
 		(event: PointerInfo) => {
-			// Only handle mouse clicks, not touch (touch has its own handler)
-			if (!("button" in event.e)) return
+			if (hadGestureRef.current) {
+				hadGestureRef.current = false
+				stopDrag()
+				return
+			}
 
 			if (!didDragRef.current) {
 				const target = event.target as
@@ -243,259 +230,116 @@ export const useMapInteractions = ({
 		[onRoomClick, stopDrag],
 	)
 
-	// Touch handlers
-	const handleTouchStart = useCallback(
-		(event: TouchEvent) => {
-			const canvas = fabricRef.current
-			if (!canvas) return
+	const onGesture = useCallback(
+		(event: fabric.TEvent<TouchEvent>) => {
+			const nativeEvent = event.e as GestureNativeEvent
+			const scale = nativeEvent?.scale ?? 1
+			const rotation = nativeEvent?.rotation ?? 0
 
-			const canvasEl = canvas.getElement()
-			const rect = canvasEl.getBoundingClientRect()
-
-			// Check if touch is on canvas
-			const touch = event.touches[0]
-			if (!touch) return
-
-			const isOnCanvas =
-				touch.clientX >= rect.left &&
-				touch.clientX <= rect.right &&
-				touch.clientY >= rect.top &&
-				touch.clientY <= rect.bottom
-
-			if (!isOnCanvas) return
-
-			event.preventDefault()
-
-			activeTouchCountRef.current = event.touches.length
-
-			if (event.touches.length === 1) {
-				// Single touch - start potential drag or tap
-				const t = event.touches[0]
-				touchStateRef.current = {
-					startTime: Date.now(),
-					startPos: { x: t.clientX, y: t.clientY },
-					lastPos: { x: t.clientX, y: t.clientY },
-					moved: false,
-				}
-				multiTouchRef.current = null
-			} else if (event.touches.length === 2) {
-				// Two-finger gesture - pinch/rotate
-				const t1 = event.touches[0]
-				const t2 = event.touches[1]
-
-				const distance = getTouchDistance(t1, t2)
-				const angle = getTouchAngle(t1, t2)
-				const center = getTouchCenter(t1, t2)
-
-				multiTouchRef.current = {
-					initialDistance: distance,
-					initialAngle: angle,
-					initialCenter: center,
-					lastDistance: distance,
-					lastAngle: angle,
-				}
-
-				// Mark as moved to prevent tap detection
-				if (touchStateRef.current) {
-					touchStateRef.current.moved = true
-				}
+			if (!gestureRef.current) {
+				didDragRef.current = true
+				hadGestureRef.current = true
+				gestureRef.current = { scale, rotation }
+				return
 			}
-		},
-		[fabricRef],
-	)
 
-	const handleTouchMove = useCallback(
-		(event: TouchEvent) => {
-			if (activeTouchCountRef.current === 0) return
-
-			event.preventDefault()
-
+			didDragRef.current = true
+			hadGestureRef.current = true
+			const scaleDelta = scale / (gestureRef.current.scale || 1)
 			const canvas = fabricRef.current
-			if (!canvas) return
+			const touchPoint = nativeEvent.touches?.[0]
 
-			if (
-				event.touches.length === 1 &&
-				touchStateRef.current &&
-				!multiTouchRef.current
-			) {
-				// Single finger pan
-				const t = event.touches[0]
-				const state = touchStateRef.current
-
-				const deltaX = t.clientX - state.lastPos.x
-				const deltaY = t.clientY - state.lastPos.y
-
-				// Check if moved enough to be considered a drag
-				const totalDeltaX = t.clientX - state.startPos.x
-				const totalDeltaY = t.clientY - state.startPos.y
-				if (
-					Math.abs(totalDeltaX) > TAP_THRESHOLD_PX ||
-					Math.abs(totalDeltaY) > TAP_THRESHOLD_PX
-				) {
-					state.moved = true
-				}
-
-				state.lastPos = { x: t.clientX, y: t.clientY }
-
-				// Apply panning
-				const current = viewportRef.current
-				applyViewport({
-					...current,
-					translateX: current.translateX + deltaX,
-					translateY: current.translateY + deltaY,
-				})
-			} else if (event.touches.length === 2 && multiTouchRef.current) {
-				// Two-finger pinch and rotate
-				const t1 = event.touches[0]
-				const t2 = event.touches[1]
-
-				const distance = getTouchDistance(t1, t2)
-				const angle = getTouchAngle(t1, t2)
-				const center = getTouchCenter(t1, t2)
-
-				const state = multiTouchRef.current
-
-				// Calculate deltas
-				const scaleDelta = distance / state.lastDistance
-				const angleDelta = angle - state.lastAngle
-
-				// Get canvas rect for proper coordinate conversion
+			const screenPoint = (() => {
+				if (!canvas || !touchPoint) return new fabric.Point(0, 0)
 				const rect = canvas.getElement().getBoundingClientRect()
-				const screenCenter = new fabric.Point(
-					center.x - rect.left,
-					center.y - rect.top,
+				return new fabric.Point(
+					touchPoint.clientX - rect.left,
+					touchPoint.clientY - rect.top,
 				)
+			})()
 
-				// Apply zoom at pinch center
-				if (Math.abs(scaleDelta - 1) > 0.001) {
-					zoomAtPoint(screenCenter, scaleDelta)
-				}
+			zoomAtPoint(screenPoint, scaleDelta)
 
-				// Apply rotation
-				if (Math.abs(angleDelta) > 0.001) {
-					rotateAtCenter(angleDelta)
-				}
+			const rotationDelta =
+				((rotation ?? 0) - (gestureRef.current.rotation ?? 0)) * (Math.PI / 180)
+			rotateAtCenter(rotationDelta)
 
-				// Update state
-				state.lastDistance = distance
-				state.lastAngle = angle
-			}
+			gestureRef.current = { scale, rotation }
 		},
-		[applyViewport, fabricRef, rotateAtCenter, viewportRef, zoomAtPoint],
+		[fabricRef, rotateAtCenter, zoomAtPoint],
 	)
 
-	const handleTouchEnd = useCallback(
-		(event: TouchEvent) => {
-			const canvas = fabricRef.current
-			if (!canvas) return
+	const onGestureEnd = useCallback(() => {
+		didDragRef.current = true
+		gestureRef.current = null
+	}, [])
 
-			const state = touchStateRef.current
-
-			// Handle tap (single finger, not moved, quick touch)
-			if (
-				event.touches.length === 0 &&
-				state &&
-				!state.moved &&
-				activeTouchCountRef.current === 1 &&
-				Date.now() - state.startTime < TAP_THRESHOLD_MS
-			) {
-				// This was a tap - find the object under the tap position
-				const rect = canvas.getElement().getBoundingClientRect()
-				const screenPos = new fabric.Point(
-					state.startPos.x - rect.left,
-					state.startPos.y - rect.top,
-				)
-
-				// Convert screen coordinates to world coordinates
-				const worldPos = screenToWorld(screenPos, viewportRef.current)
-
-				// Find the topmost interactive object at this position
-				const objects = canvas.getObjects()
-				for (let i = objects.length - 1; i >= 0; i--) {
-					const obj = objects[i] as fabric.Object & {
-						data?: { roomId?: number }
-					}
-					if (
-						obj.data?.roomId !== undefined &&
-						obj.evented &&
-						obj.containsPoint(worldPos)
-					) {
-						onRoomClick?.(obj.data.roomId)
-						break
-					}
-				}
-			}
-
-			// Reset state
-			if (event.touches.length === 0) {
-				touchStateRef.current = null
-				multiTouchRef.current = null
-				activeTouchCountRef.current = 0
-			} else if (event.touches.length === 1) {
-				// Went from 2 to 1 finger - reset to single touch state
-				multiTouchRef.current = null
-				const t = event.touches[0]
-				touchStateRef.current = {
-					startTime: Date.now(),
-					startPos: { x: t.clientX, y: t.clientY },
-					lastPos: { x: t.clientX, y: t.clientY },
-					moved: true, // Mark as moved to prevent tap on release
-				}
-				activeTouchCountRef.current = 1
-			}
-		},
-		[fabricRef, onRoomClick, screenToWorld, viewportRef],
-	)
-
-	// Fabric.js canvas events (mouse only)
 	useEffect(() => {
 		const canvas = fabricRef.current
 		if (!canvas) return
+
+		type CanvasWithGesture = fabric.Canvas & {
+			on(
+				eventName: "touch:gesture" | "touch:gesture:end",
+				handler: (event: fabric.TEvent<TouchEvent>) => void,
+			): void
+			off(
+				eventName: "touch:gesture" | "touch:gesture:end",
+				handler: (event: fabric.TEvent<TouchEvent>) => void,
+			): void
+		}
+
+		const gestureCanvas = canvas as CanvasWithGesture
 
 		canvas.on("mouse:wheel", onWheel)
 		canvas.on("mouse:down", onMouseDown)
 		canvas.on("mouse:move", handleMouseMove)
 		canvas.on("mouse:up", onMouseUp)
+		gestureCanvas.on("touch:gesture", onGesture)
+		gestureCanvas.on("touch:gesture:end", onGestureEnd)
+
+		if (canvas.upperCanvasEl) {
+			canvas.upperCanvasEl.style.touchAction = "none"
+		}
 
 		return () => {
 			canvas.off("mouse:wheel", onWheel)
 			canvas.off("mouse:down", onMouseDown)
 			canvas.off("mouse:move", handleMouseMove)
 			canvas.off("mouse:up", onMouseUp)
+			gestureCanvas.off("touch:gesture", onGesture)
+			gestureCanvas.off("touch:gesture:end", onGestureEnd)
+			if (canvas.upperCanvasEl) {
+				canvas.upperCanvasEl.style.touchAction = ""
+			}
 		}
-	}, [handleMouseMove, fabricRef, onMouseDown, onMouseUp, onWheel])
+	}, [
+		handleMouseMove,
+		fabricRef,
+		onGesture,
+		onGestureEnd,
+		onMouseDown,
+		onMouseUp,
+		onWheel,
+	])
 
-	// Global mouse events for drag outside canvas
 	useEffect(() => {
-		window.addEventListener("mousemove", continueDragGlobal)
+		const handleMove = (event: MouseEvent | TouchEvent) => {
+			continueDragGlobal(event)
+		}
+
+		window.addEventListener("mousemove", handleMove)
+		window.addEventListener("touchmove", handleMove, { passive: false })
 		window.addEventListener("mouseup", stopDrag)
+		window.addEventListener("touchend", stopDrag)
+		window.addEventListener("touchcancel", stopDrag)
 
 		return () => {
-			window.removeEventListener("mousemove", continueDragGlobal)
+			window.removeEventListener("mousemove", handleMove)
+			window.removeEventListener("touchmove", handleMove)
 			window.removeEventListener("mouseup", stopDrag)
+			window.removeEventListener("touchend", stopDrag)
+			window.removeEventListener("touchcancel", stopDrag)
 		}
 	}, [continueDragGlobal, stopDrag])
-
-	// Touch events on canvas element directly
-	useEffect(() => {
-		const canvas = fabricRef.current
-		if (!canvas) return
-
-		const canvasEl = canvas.getElement()
-
-		// Use passive: false to allow preventDefault
-		canvasEl.addEventListener("touchstart", handleTouchStart, {
-			passive: false,
-		})
-		canvasEl.addEventListener("touchmove", handleTouchMove, { passive: false })
-		canvasEl.addEventListener("touchend", handleTouchEnd, { passive: false })
-		canvasEl.addEventListener("touchcancel", handleTouchEnd, { passive: false })
-
-		return () => {
-			canvasEl.removeEventListener("touchstart", handleTouchStart)
-			canvasEl.removeEventListener("touchmove", handleTouchMove)
-			canvasEl.removeEventListener("touchend", handleTouchEnd)
-			canvasEl.removeEventListener("touchcancel", handleTouchEnd)
-		}
-	}, [fabricRef, handleTouchStart, handleTouchMove, handleTouchEnd])
 }
