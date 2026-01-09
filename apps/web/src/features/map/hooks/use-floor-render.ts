@@ -8,6 +8,29 @@ import { getMapColors } from "../lib/colors"
 import { clamp, getFloorPolygon, getRoomPolygon } from "../lib/geometry"
 import type { ViewportState } from "../types"
 
+const iconImageCache = new Map<string, Promise<HTMLImageElement>>()
+
+const getCachedIcon = (src: string) => {
+	if (!iconImageCache.has(src)) {
+		iconImageCache.set(
+			src,
+			new Promise<HTMLImageElement>((resolve, reject) => {
+				const img = new Image()
+				img.crossOrigin = "anonymous"
+				img.onload = () => resolve(img)
+				img.onerror = (error) => reject(error)
+				img.src = src
+			}),
+		)
+	}
+
+	const cached = iconImageCache.get(src)
+	if (!cached) {
+		return Promise.reject(new Error(`Icon not found: ${src}`))
+	}
+	return cached
+}
+
 type UseFloorRenderParams = {
 	fabricRef: RefObject<fabric.Canvas | null>
 	data: BuildingScheme | undefined
@@ -45,6 +68,34 @@ export const useFloorRender = ({
 	enabled = true,
 }: UseFloorRenderParams) => {
 	const routeObjectsRef = useRef<fabric.Object[]>([])
+
+	// Preload all icons once when data is available
+	useEffect(() => {
+		if (!data) return
+
+		const iconsToPreload = new Set<string>()
+
+		// Add stairs icon
+		iconsToPreload.add("/icons/stairs.svg")
+
+		// Collect all room icons
+		data.entities.forEach((entity) => {
+			if (isRoom(entity) && entity.icon) {
+				iconsToPreload.add(`/icons/${entity.icon}.svg`)
+			}
+			if (isPlace(entity)) {
+				const iconName = entity.icon || entity.placeType || "place"
+				iconsToPreload.add(`/icons/${iconName}.svg`)
+			}
+		})
+
+		// Preload all icons
+		iconsToPreload.forEach((iconSrc) => {
+			getCachedIcon(iconSrc).catch(() => {
+				// Ignore errors for missing icons
+			})
+		})
+	}, [data])
 
 	useEffect(() => {
 		if (!enabled) return
@@ -124,75 +175,74 @@ export const useFloorRender = ({
 			const x = floor.position.x + stair.position.x
 			const y = floor.position.y + stair.position.y
 
-			const imgEl = new Image()
-			imgEl.crossOrigin = "anonymous"
-			imgEl.src = "/icons/stairs.svg"
-			imgEl.onload = () => {
-				if (disposed || !fabricRef.current) return
+			getCachedIcon("/icons/stairs.svg")
+				.then((imgEl) => {
+					if (disposed || !fabricRef.current) return
 
-				const img = new fabric.FabricImage(imgEl, {
-					originX: "center",
-					originY: "center",
-					objectCaching: false,
-				})
-
-				if (fabric.filters?.BlendColor) {
-					img.filters = [
-						new fabric.filters.BlendColor({
-							color: colors.stairsIcon,
-							mode: "add",
-						}),
-					]
-					img.applyFilters()
-				}
-
-				const targetSize = 14
-				const scaleX = img.width && img.width > 0 ? targetSize / img.width : 1
-				const scaleY =
-					img.height && img.height > 0 ? targetSize / img.height : 1
-
-				img.set({
-					scaleX,
-					scaleY,
-				})
-
-				const marker = new fabric.Group(
-					[
-						new fabric.Circle({
-							radius: 10,
-							fill: colors.roomStroke,
-							originX: "center",
-							originY: "center",
-						}),
-						img,
-					],
-					{
-						left: x,
-						top: y,
+					const img = new fabric.FabricImage(imgEl, {
 						originX: "center",
 						originY: "center",
-						hoverCursor: "default",
-						selectable: false,
-						evented: false,
 						objectCaching: false,
-					},
-				)
+					})
 
-				const baseScale = marker.scaleX ?? 1
-				iconBaseScaleRef.current.set(marker, baseScale)
-				iconObjectsRef.current.push(marker)
+					if (fabric.filters?.BlendColor) {
+						img.filters = [
+							new fabric.filters.BlendColor({
+								color: colors.stairsIcon,
+								mode: "add",
+							}),
+						]
+						img.applyFilters()
+					}
 
-				// Apply current zoom-based scaling immediately after creation
-				const currentZoom = viewportRef.current.zoom
-				const iconFontScale = clamp(1 / currentZoom ** 0.7, 0.75, 4)
-				marker.set({
-					scaleX: baseScale * iconFontScale,
-					scaleY: baseScale * iconFontScale,
+					const targetSize = 14
+					const scaleX = img.width && img.width > 0 ? targetSize / img.width : 1
+					const scaleY =
+						img.height && img.height > 0 ? targetSize / img.height : 1
+
+					img.set({
+						scaleX,
+						scaleY,
+					})
+
+					const marker = new fabric.Group(
+						[
+							new fabric.Circle({
+								radius: 10,
+								fill: colors.roomStroke,
+								originX: "center",
+								originY: "center",
+							}),
+							img,
+						],
+						{
+							left: x,
+							top: y,
+							originX: "center",
+							originY: "center",
+							hoverCursor: "default",
+							selectable: false,
+							evented: false,
+							objectCaching: false,
+						},
+					)
+
+					const baseScale = marker.scaleX ?? 1
+					iconBaseScaleRef.current.set(marker, baseScale)
+					iconObjectsRef.current.push(marker)
+
+					// Apply current zoom-based scaling immediately after creation
+					const currentZoom = viewportRef.current.zoom
+					const iconFontScale = clamp(1 / currentZoom ** 0.7, 0.75, 4)
+					marker.set({
+						scaleX: baseScale * iconFontScale,
+						scaleY: baseScale * iconFontScale,
+					})
+
+					fabricRef.current.add(marker)
+					fabricRef.current.requestRenderAll()
 				})
-
-				fabricRef.current.add(marker)
-				fabricRef.current.requestRenderAll()
-			}
+				.catch(() => {})
 		})
 
 		// Render places (points of interest)
@@ -202,75 +252,74 @@ export const useFloorRender = ({
 
 			const iconName = place.icon || place.placeType || "place"
 
-			const imgEl = new Image()
-			imgEl.crossOrigin = "anonymous"
-			imgEl.src = `/icons/${iconName}.svg`
-			imgEl.onload = () => {
-				if (disposed || !fabricRef.current) return
+			getCachedIcon(`/icons/${iconName}.svg`)
+				.then((imgEl) => {
+					if (disposed || !fabricRef.current) return
 
-				const img = new fabric.FabricImage(imgEl, {
-					originX: "center",
-					originY: "center",
-					objectCaching: false,
-				})
-
-				if (fabric.filters?.BlendColor) {
-					img.filters = [
-						new fabric.filters.BlendColor({
-							color: colors.stairsIcon,
-							mode: "add",
-						}),
-					]
-					img.applyFilters()
-				}
-
-				const targetSize = 14
-				const scaleX = img.width && img.width > 0 ? targetSize / img.width : 1
-				const scaleY =
-					img.height && img.height > 0 ? targetSize / img.height : 1
-
-				img.set({
-					scaleX,
-					scaleY,
-				})
-
-				const marker = new fabric.Group(
-					[
-						new fabric.Circle({
-							radius: 10,
-							fill: colors.roomStroke,
-							originX: "center",
-							originY: "center",
-						}),
-						img,
-					],
-					{
-						left: x,
-						top: y,
+					const img = new fabric.FabricImage(imgEl, {
 						originX: "center",
 						originY: "center",
-						hoverCursor: "default",
-						selectable: false,
-						evented: false,
 						objectCaching: false,
-					},
-				)
+					})
 
-				const baseScale = marker.scaleX ?? 1
-				iconBaseScaleRef.current.set(marker, baseScale)
-				iconObjectsRef.current.push(marker)
+					if (fabric.filters?.BlendColor) {
+						img.filters = [
+							new fabric.filters.BlendColor({
+								color: colors.stairsIcon,
+								mode: "add",
+							}),
+						]
+						img.applyFilters()
+					}
 
-				// Apply current zoom-based scaling immediately after creation
-				const currentZoom = viewportRef.current.zoom
-				const iconFontScale = clamp(1 / currentZoom ** 0.7, 0.75, 4)
-				marker.set({
-					scaleX: baseScale * iconFontScale,
-					scaleY: baseScale * iconFontScale,
+					const targetSize = 14
+					const scaleX = img.width && img.width > 0 ? targetSize / img.width : 1
+					const scaleY =
+						img.height && img.height > 0 ? targetSize / img.height : 1
+
+					img.set({
+						scaleX,
+						scaleY,
+					})
+
+					const marker = new fabric.Group(
+						[
+							new fabric.Circle({
+								radius: 10,
+								fill: colors.roomStroke,
+								originX: "center",
+								originY: "center",
+							}),
+							img,
+						],
+						{
+							left: x,
+							top: y,
+							originX: "center",
+							originY: "center",
+							hoverCursor: "default",
+							selectable: false,
+							evented: false,
+							objectCaching: false,
+						},
+					)
+
+					const baseScale = marker.scaleX ?? 1
+					iconBaseScaleRef.current.set(marker, baseScale)
+					iconObjectsRef.current.push(marker)
+
+					// Apply current zoom-based scaling immediately after creation
+					const currentZoom = viewportRef.current.zoom
+					const iconFontScale = clamp(1 / currentZoom ** 0.7, 0.75, 4)
+					marker.set({
+						scaleX: baseScale * iconFontScale,
+						scaleY: baseScale * iconFontScale,
+					})
+
+					fabricRef.current.add(marker)
+					fabricRef.current.requestRenderAll()
 				})
-
-				fabricRef.current.add(marker)
-				fabricRef.current.requestRenderAll()
-			}
+				.catch(() => {})
 		})
 
 		const labels: fabric.FabricText[] = []
@@ -317,86 +366,85 @@ export const useFloorRender = ({
 
 				// If room has an icon, render icon with text below
 				if (room.icon) {
-					const imgEl = new Image()
-					imgEl.crossOrigin = "anonymous"
-					imgEl.src = `/icons/${room.icon}.svg`
-					imgEl.onload = () => {
-						if (disposed || !fabricRef.current) return
+					getCachedIcon(`/icons/${room.icon}.svg`)
+						.then((imgEl) => {
+							if (disposed || !fabricRef.current) return
 
-						const img = new fabric.FabricImage(imgEl, {
-							originX: "center",
-							originY: "center",
-							objectCaching: false,
+							const img = new fabric.FabricImage(imgEl, {
+								originX: "center",
+								originY: "center",
+								objectCaching: false,
+							})
+
+							if (fabric.filters?.BlendColor) {
+								img.filters = [
+									new fabric.filters.BlendColor({
+										color: colors.stairsIcon,
+										mode: "add",
+									}),
+								]
+								img.applyFilters()
+							}
+
+							const targetSize = 14
+							const scaleX =
+								img.width && img.width > 0 ? targetSize / img.width : 1
+							const scaleY =
+								img.height && img.height > 0 ? targetSize / img.height : 1
+
+							img.set({
+								scaleX,
+								scaleY,
+							})
+
+							const iconCircle = new fabric.Circle({
+								radius: 10,
+								fill: colors.roomStroke,
+								originX: "center",
+								originY: "center",
+								top: 0,
+							})
+
+							img.set({ top: 0 })
+
+							const label = new fabric.FabricText(room.name, {
+								fontSize: 14,
+								fontFamily,
+								fill: colors.roomLabel,
+								originX: "center",
+								originY: "top",
+								top: 14,
+								objectCaching: false,
+							})
+
+							const marker = new fabric.Group([iconCircle, img, label], {
+								left: centerX,
+								top: centerY,
+								originX: "center",
+								originY: "center",
+								angle: (-viewportRef.current.rotation * 180) / Math.PI,
+								hoverCursor: "default",
+								selectable: false,
+								evented: false,
+								objectCaching: false,
+							})
+
+							const baseScale = marker.scaleX ?? 1
+							iconBaseScaleRef.current.set(marker, baseScale)
+							iconObjectsRef.current.push(marker)
+
+							// Apply current zoom-based scaling immediately after creation
+							const currentZoom = viewportRef.current.zoom
+							const iconFontScale = clamp(1 / currentZoom ** 0.7, 0.75, 4)
+							marker.set({
+								scaleX: baseScale * iconFontScale,
+								scaleY: baseScale * iconFontScale,
+							})
+
+							fabricRef.current.add(marker)
+							fabricRef.current.requestRenderAll()
 						})
-
-						if (fabric.filters?.BlendColor) {
-							img.filters = [
-								new fabric.filters.BlendColor({
-									color: colors.stairsIcon,
-									mode: "add",
-								}),
-							]
-							img.applyFilters()
-						}
-
-						const targetSize = 14
-						const scaleX =
-							img.width && img.width > 0 ? targetSize / img.width : 1
-						const scaleY =
-							img.height && img.height > 0 ? targetSize / img.height : 1
-
-						img.set({
-							scaleX,
-							scaleY,
-						})
-
-						const iconCircle = new fabric.Circle({
-							radius: 10,
-							fill: colors.roomStroke,
-							originX: "center",
-							originY: "center",
-							top: 0,
-						})
-
-						img.set({ top: 0 })
-
-						const label = new fabric.FabricText(room.name, {
-							fontSize: 14,
-							fontFamily,
-							fill: colors.roomLabel,
-							originX: "center",
-							originY: "top",
-							top: 14,
-							objectCaching: false,
-						})
-
-						const marker = new fabric.Group([iconCircle, img, label], {
-							left: centerX,
-							top: centerY,
-							originX: "center",
-							originY: "center",
-							angle: (-viewportRef.current.rotation * 180) / Math.PI,
-							hoverCursor: "default",
-							selectable: false,
-							evented: false,
-							objectCaching: false,
-						})
-
-						const baseScale = marker.scaleX ?? 1
-						iconBaseScaleRef.current.set(marker, baseScale)
-						iconObjectsRef.current.push(marker)
-
-						// Apply current zoom-based scaling immediately after creation
-						const currentZoom = viewportRef.current.zoom
-						const iconFontScale = clamp(1 / currentZoom ** 0.7, 0.75, 4)
-						marker.set({
-							scaleX: baseScale * iconFontScale,
-							scaleY: baseScale * iconFontScale,
-						})
-
-						fabricRef.current.add(marker)
-						fabricRef.current.requestRenderAll()
-					}
+						.catch(() => {})
 				} else {
 					// No icon, just render text as before
 					const label = new fabric.FabricText(room.name, {

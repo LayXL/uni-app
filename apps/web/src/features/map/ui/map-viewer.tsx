@@ -37,7 +37,7 @@ export const MapViewer = () => {
 	const [activeCampus, setActiveCampus] = useState<number>(0)
 	const { activeFloor, setActiveFloor } = useActiveFloor()
 	const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null)
-	const [isDebug] = useState(true)
+	const [isDebug] = useState(process.env.NODE_ENV === "development")
 
 	const canvasRef = useRef<HTMLCanvasElement | null>(null)
 	const fabricRef = useRef<fabric.Canvas | null>(null)
