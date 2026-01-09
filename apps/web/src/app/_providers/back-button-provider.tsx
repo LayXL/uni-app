@@ -35,10 +35,15 @@ const BackButtonProviderComponent = ({ children }: BackButtonProviderProps) => {
 	useEffect(() => {
 		const hasHistory = window.history.length > 1 && Boolean(pathname)
 
-		if (hasHistory) {
-			backButton.show.ifAvailable()
-		} else {
-			backButton.hide.ifAvailable()
+		try {
+			if (hasHistory) {
+				backButton.show.ifAvailable()
+			} else {
+				backButton.hide.ifAvailable()
+			}
+		} catch (error) {
+			// biome-ignore lint/suspicious/noConsole: tma sdk error
+			console.log("Failed to show/hide back button", error)
 		}
 	}, [pathname])
 

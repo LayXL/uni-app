@@ -31,6 +31,23 @@ const getCachedIcon = (src: string) => {
 	return cached
 }
 
+// Process items in batches to avoid blocking the main thread
+const processInBatches = async <T>(
+	items: T[],
+	processor: (item: T) => void,
+	batchSize = 10,
+): Promise<void> => {
+	for (let i = 0; i < items.length; i += batchSize) {
+		const batch = items.slice(i, i + batchSize)
+		batch.forEach(processor)
+
+		// Yield to the main thread between batches
+		if (i + batchSize < items.length) {
+			await new Promise((resolve) => setTimeout(resolve, 0))
+		}
+	}
+}
+
 type UseFloorRenderParams = {
 	fabricRef: RefObject<fabric.Canvas | null>
 	data: BuildingScheme | undefined
@@ -171,141 +188,9 @@ export const useFloorRender = ({
 				getComputedStyle(document.body).fontFamily) ||
 			"Inter, sans-serif"
 
-		const asyncMarkers: Promise<fabric.Object | null>[] = []
-
-		floor.stairs?.forEach((stair) => {
-			const x = floor.position.x + stair.position.x
-			const y = floor.position.y + stair.position.y
-
-			asyncMarkers.push(
-				getCachedIcon("/icons/stairs.svg")
-					.then((imgEl) => {
-						if (disposed) return null
-
-						const img = new fabric.FabricImage(imgEl, {
-							originX: "center",
-							originY: "center",
-							objectCaching: false,
-						})
-
-						if (fabric.filters?.BlendColor) {
-							img.filters = [
-								new fabric.filters.BlendColor({
-									color: colors.stairsIcon,
-									mode: "add",
-								}),
-							]
-							img.applyFilters()
-						}
-
-						const targetSize = 14
-						const scaleX =
-							img.width && img.width > 0 ? targetSize / img.width : 1
-						const scaleY =
-							img.height && img.height > 0 ? targetSize / img.height : 1
-
-						img.set({
-							scaleX,
-							scaleY,
-						})
-
-						const marker = new fabric.Group(
-							[
-								new fabric.Circle({
-									radius: 10,
-									fill: colors.roomStroke,
-									originX: "center",
-									originY: "center",
-								}),
-								img,
-							],
-							{
-								left: x,
-								top: y,
-								originX: "center",
-								originY: "center",
-								hoverCursor: "default",
-								selectable: false,
-								evented: false,
-								objectCaching: false,
-							},
-						)
-
-						return marker
-					})
-					.catch(() => null),
-			)
-		})
-
-		// Render places (points of interest)
-		floorPlaces.forEach((place) => {
-			const x = floor.position.x + place.position.x
-			const y = floor.position.y + place.position.y
-
-			const iconName = place.icon || place.placeType || "place"
-
-			asyncMarkers.push(
-				getCachedIcon(`/icons/${iconName}.svg`)
-					.then((imgEl) => {
-						if (disposed) return null
-
-						const img = new fabric.FabricImage(imgEl, {
-							originX: "center",
-							originY: "center",
-							objectCaching: false,
-						})
-
-						if (fabric.filters?.BlendColor) {
-							img.filters = [
-								new fabric.filters.BlendColor({
-									color: colors.stairsIcon,
-									mode: "add",
-								}),
-							]
-							img.applyFilters()
-						}
-
-						const targetSize = 14
-						const scaleX =
-							img.width && img.width > 0 ? targetSize / img.width : 1
-						const scaleY =
-							img.height && img.height > 0 ? targetSize / img.height : 1
-
-						img.set({
-							scaleX,
-							scaleY,
-						})
-
-						const marker = new fabric.Group(
-							[
-								new fabric.Circle({
-									radius: 10,
-									fill: colors.roomStroke,
-									originX: "center",
-									originY: "center",
-								}),
-								img,
-							],
-							{
-								left: x,
-								top: y,
-								originX: "center",
-								originY: "center",
-								hoverCursor: "default",
-								selectable: false,
-								evented: false,
-								objectCaching: false,
-							},
-						)
-
-						return marker
-					})
-					.catch(() => null),
-			)
-		})
-
 		const labels: fabric.FabricText[] = []
 
+		// Render rooms synchronously (polygons and text labels without icons)
 		floorRooms.forEach((room) => {
 			const roomPolygon = new fabric.Polygon(
 				getRoomPolygon(room, floor.position),
@@ -326,7 +211,7 @@ export const useFloorRender = ({
 
 			canvas.add(roomPolygon)
 
-			if (!room.nameHidden) {
+			if (!room.nameHidden && !room.icon) {
 				const walls = room.wallsPosition ?? []
 				const centroid = walls.length
 					? walls.reduce(
@@ -346,103 +231,30 @@ export const useFloorRender = ({
 				const centerX = floor.position.x + room.position.x + centroid.x
 				const centerY = floor.position.y + room.position.y + centroid.y
 
-				// If room has an icon, render icon with text below
-				if (room.icon) {
-					asyncMarkers.push(
-						getCachedIcon(`/icons/${room.icon}.svg`)
-							.then((imgEl) => {
-								if (disposed) return null
+				const label = new fabric.FabricText(room.name, {
+					fontSize: 14,
+					fontFamily,
+					fill: colors.roomLabel,
+					originX: "center",
+					originY: "center",
+					angle: (-viewportRef.current.rotation * 180) / Math.PI,
+					objectCaching: false,
+					evented: false,
+				})
 
-								const img = new fabric.FabricImage(imgEl, {
-									originX: "center",
-									originY: "center",
-									objectCaching: false,
-								})
+				label.setPositionByOrigin(
+					new fabric.Point(centerX, centerY),
+					"center",
+					"center",
+				)
 
-								if (fabric.filters?.BlendColor) {
-									img.filters = [
-										new fabric.filters.BlendColor({
-											color: colors.stairsIcon,
-											mode: "add",
-										}),
-									]
-									img.applyFilters()
-								}
+				label.set({
+					left: Math.round(label.left ?? 0),
+					top: Math.round(label.top ?? 0),
+				})
 
-								const targetSize = 14
-								const scaleX =
-									img.width && img.width > 0 ? targetSize / img.width : 1
-								const scaleY =
-									img.height && img.height > 0 ? targetSize / img.height : 1
-
-								img.set({
-									scaleX,
-									scaleY,
-								})
-
-								const iconCircle = new fabric.Circle({
-									radius: 10,
-									fill: colors.roomStroke,
-									originX: "center",
-									originY: "center",
-									top: 0,
-								})
-
-								img.set({ top: 0 })
-
-								const label = new fabric.FabricText(room.name, {
-									fontSize: 14,
-									fontFamily,
-									fill: colors.roomLabel,
-									originX: "center",
-									originY: "top",
-									top: 14,
-									objectCaching: false,
-								})
-
-								const marker = new fabric.Group([iconCircle, img, label], {
-									left: centerX,
-									top: centerY,
-									originX: "center",
-									originY: "center",
-									angle: (-viewportRef.current.rotation * 180) / Math.PI,
-									hoverCursor: "default",
-									selectable: false,
-									evented: false,
-									objectCaching: false,
-								})
-
-								return marker
-							})
-							.catch(() => null),
-					)
-				} else {
-					// No icon, just render text as before
-					const label = new fabric.FabricText(room.name, {
-						fontSize: 14,
-						fontFamily,
-						fill: colors.roomLabel,
-						originX: "center",
-						originY: "center",
-						angle: (-viewportRef.current.rotation * 180) / Math.PI,
-						objectCaching: false,
-						evented: false,
-					})
-
-					label.setPositionByOrigin(
-						new fabric.Point(centerX, centerY),
-						"center",
-						"center",
-					)
-
-					label.set({
-						left: Math.round(label.left ?? 0),
-						top: Math.round(label.top ?? 0),
-					})
-
-					labels.push(label)
-					labelBaseSizeRef.current.set(label, 14)
-				}
+				labels.push(label)
+				labelBaseSizeRef.current.set(label, 14)
 			}
 		})
 
@@ -461,37 +273,193 @@ export const useFloorRender = ({
 			label.set("dirty", true)
 		})
 
-		Promise.all(asyncMarkers).then((markers) => {
+		// Render floor and rooms immediately
+		canvas.requestRenderAll()
+
+		// Helper function to create an icon marker (without filters for performance)
+		const createIconMarker = (
+			imgEl: HTMLImageElement,
+			x: number,
+			y: number,
+			extraObjects?: fabric.FabricObject[],
+		): fabric.Group => {
+			const img = new fabric.FabricImage(imgEl, {
+				originX: "center",
+				originY: "center",
+				objectCaching: true, // Enable caching for better performance
+			})
+
+			const targetSize = 14
+			const scaleX = img.width && img.width > 0 ? targetSize / img.width : 1
+			const scaleY = img.height && img.height > 0 ? targetSize / img.height : 1
+
+			img.set({ scaleX, scaleY })
+
+			const groupObjects: fabric.FabricObject[] = [
+				new fabric.Circle({
+					radius: 10,
+					fill: colors.roomStroke,
+					originX: "center",
+					originY: "center",
+				}),
+				img,
+				...(extraObjects ?? []),
+			]
+
+			return new fabric.Group(groupObjects, {
+				left: x,
+				top: y,
+				originX: "center",
+				originY: "center",
+				hoverCursor: "default",
+				selectable: false,
+				evented: false,
+				objectCaching: true, // Enable caching for better performance
+			})
+		}
+
+		// Collect all icon tasks to process in batches
+		type IconTask = {
+			iconSrc: string
+			x: number
+			y: number
+			extraObjects?: fabric.FabricObject[]
+			angle?: number
+		}
+
+		const iconTasks: IconTask[] = []
+
+		// Collect stairs icons
+		floor.stairs?.forEach((stair) => {
+			iconTasks.push({
+				iconSrc: "/icons/stairs.svg",
+				x: floor.position.x + stair.position.x,
+				y: floor.position.y + stair.position.y,
+			})
+		})
+
+		// Collect place icons
+		floorPlaces.forEach((place) => {
+			const iconName = place.icon || place.placeType || "place"
+			iconTasks.push({
+				iconSrc: `/icons/${iconName}.svg`,
+				x: floor.position.x + place.position.x,
+				y: floor.position.y + place.position.y,
+			})
+		})
+
+		// Collect room icons
+		floorRooms.forEach((room) => {
+			if (!room.nameHidden && room.icon) {
+				const walls = room.wallsPosition ?? []
+				const centroid = walls.length
+					? walls.reduce(
+							(acc, point) => ({
+								x: acc.x + point.x,
+								y: acc.y + point.y,
+							}),
+							{ x: 0, y: 0 },
+						)
+					: { x: 0, y: 0 }
+
+				if (walls.length) {
+					centroid.x /= walls.length
+					centroid.y /= walls.length
+				}
+
+				const centerX = floor.position.x + room.position.x + centroid.x
+				const centerY = floor.position.y + room.position.y + centroid.y
+
+				const label = new fabric.FabricText(room.name, {
+					fontSize: 14,
+					fontFamily,
+					fill: colors.roomLabel,
+					originX: "center",
+					originY: "top",
+					top: 14,
+					objectCaching: true,
+				})
+
+				iconTasks.push({
+					iconSrc: `/icons/${room.icon}.svg`,
+					x: centerX,
+					y: centerY,
+					extraObjects: [label],
+					angle: (-viewportRef.current.rotation * 180) / Math.PI,
+				})
+			}
+		})
+
+		// Process icons asynchronously in batches
+		const loadAndRenderIcons = async () => {
 			if (disposed || !fabricRef.current) return
 
-			const validMarkers = markers.filter(
-				(m): m is fabric.Group => m !== null,
+			// First, load all icons in parallel
+			const loadedIcons = await Promise.all(
+				iconTasks.map(async (task) => {
+					try {
+						const imgEl = await getCachedIcon(task.iconSrc)
+						return { ...task, imgEl }
+					} catch {
+						return null
+					}
+				}),
 			)
 
-			if (validMarkers.length === 0) {
-				canvas.requestRenderAll()
-				return
-			}
+			const validIcons = loadedIcons.filter(
+				(icon): icon is NonNullable<typeof icon> => icon !== null,
+			)
 
-			validMarkers.forEach((marker) => {
+			if (disposed || !fabricRef.current) return
+
+			// Create markers in batches to avoid blocking
+			const markers: fabric.Group[] = []
+
+			await processInBatches(
+				validIcons,
+				(iconData) => {
+					if (disposed) return
+
+					const marker = createIconMarker(
+						iconData.imgEl,
+						iconData.x,
+						iconData.y,
+						iconData.extraObjects,
+					)
+
+					if (iconData.angle !== undefined) {
+						marker.set({ angle: iconData.angle })
+					}
+
+					markers.push(marker)
+				},
+				15, // Process 15 icons per batch
+			)
+
+			if (disposed || !fabricRef.current) return
+
+			// Add all markers to canvas in one batch
+			const iconFontScale = clamp(1 / viewportRef.current.zoom ** 0.7, 0.75, 4)
+
+			markers.forEach((marker) => {
 				const baseScale = marker.scaleX ?? 1
 				iconBaseScaleRef.current.set(marker, baseScale)
 				iconObjectsRef.current.push(marker)
-
-				// Apply current zoom-based scaling immediately after creation
-				// Note: currentZoom might have changed since we started, so using viewportRef.current is correct
-				const currentZoom = viewportRef.current.zoom
-				const iconFontScale = clamp(1 / currentZoom ** 0.7, 0.75, 4)
 
 				marker.set({
 					scaleX: baseScale * iconFontScale,
 					scaleY: baseScale * iconFontScale,
 				})
+
+				fabricRef.current?.add(marker)
 			})
 
-			canvas.add(...validMarkers)
-			canvas.requestRenderAll()
-		})
+			// Single render call after all icons are added
+			fabricRef.current?.requestRenderAll()
+		}
+
+		// Start icon loading asynchronously
+		loadAndRenderIcons()
 
 		return () => {
 			disposed = true
