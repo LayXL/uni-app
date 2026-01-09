@@ -45,6 +45,10 @@ export const useMapInteractions = ({
 	const didDragRef = useRef(false)
 	const hadGestureRef = useRef(false)
 	const gestureRef = useRef<{ scale: number; rotation: number } | null>(null)
+	const nativeGestureRef = useRef<{
+		prevDistance: number
+		prevAngle: number
+	} | null>(null)
 
 	const getPointerData = useCallback(
 		(event: MouseEvent | TouchEvent | fabric.TPointerEvent) => {
@@ -298,11 +302,96 @@ export const useMapInteractions = ({
 		gestureCanvas.on("touch:gesture", onGesture)
 		gestureCanvas.on("touch:gesture:end", onGestureEnd)
 
+		let cleanupNative = () => {}
+
 		if (canvas.upperCanvasEl) {
 			canvas.upperCanvasEl.style.touchAction = "none"
+
+			const getTouches = (event: TouchEvent) => {
+				const first = event.touches[0]
+				const second = event.touches[1]
+				return first && second ? [first, second] : null
+			}
+
+			const handleTouchStart = (event: TouchEvent) => {
+				if (event.touches.length < 2) return
+
+				event.preventDefault()
+				isDraggingRef.current = false
+				didDragRef.current = true
+				hadGestureRef.current = true
+
+				const touches = getTouches(event)
+				if (!touches) return
+
+				const [t1, t2] = touches
+				const dx = t1.clientX - t2.clientX
+				const dy = t1.clientY - t2.clientY
+				nativeGestureRef.current = {
+					prevDistance: Math.hypot(dx, dy),
+					prevAngle: Math.atan2(dy, dx),
+				}
+			}
+
+			const handleTouchMove = (event: TouchEvent) => {
+				if (!nativeGestureRef.current) return
+				if (event.touches.length < 2) return
+
+				event.preventDefault()
+				const touches = getTouches(event)
+				if (!touches) return
+
+				const [t1, t2] = touches
+				const dx = t1.clientX - t2.clientX
+				const dy = t1.clientY - t2.clientY
+				const distance = Math.hypot(dx, dy)
+				const angle = Math.atan2(dy, dx)
+
+				const { prevDistance, prevAngle } = nativeGestureRef.current
+				const scaleDelta = distance / (prevDistance || 1)
+				const rotationDelta = angle - prevAngle
+
+				const rect = canvas.getElement().getBoundingClientRect()
+				const center = new fabric.Point(
+					(t1.clientX + t2.clientX) / 2 - rect.left,
+					(t1.clientY + t2.clientY) / 2 - rect.top,
+				)
+
+				zoomAtPoint(center, scaleDelta)
+				rotateAtCenter(rotationDelta)
+
+				nativeGestureRef.current = {
+					prevDistance: distance,
+					prevAngle: angle,
+				}
+			}
+
+			const handleTouchEnd = () => {
+				nativeGestureRef.current = null
+			}
+
+			canvas.upperCanvasEl.addEventListener("touchstart", handleTouchStart, {
+				passive: false,
+			})
+			canvas.upperCanvasEl.addEventListener("touchmove", handleTouchMove, {
+				passive: false,
+			})
+			canvas.upperCanvasEl.addEventListener("touchend", handleTouchEnd)
+			canvas.upperCanvasEl.addEventListener("touchcancel", handleTouchEnd)
+
+			cleanupNative = () => {
+				canvas.upperCanvasEl?.removeEventListener(
+					"touchstart",
+					handleTouchStart,
+				)
+				canvas.upperCanvasEl?.removeEventListener("touchmove", handleTouchMove)
+				canvas.upperCanvasEl?.removeEventListener("touchend", handleTouchEnd)
+				canvas.upperCanvasEl?.removeEventListener("touchcancel", handleTouchEnd)
+			}
 		}
 
 		return () => {
+			cleanupNative()
 			canvas.off("mouse:wheel", onWheel)
 			canvas.off("mouse:down", onMouseDown)
 			canvas.off("mouse:move", handleMouseMove)
@@ -321,6 +410,8 @@ export const useMapInteractions = ({
 		onMouseDown,
 		onMouseUp,
 		onWheel,
+		rotateAtCenter,
+		zoomAtPoint,
 	])
 
 	useEffect(() => {
