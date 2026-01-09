@@ -30,7 +30,15 @@ function authTokenStringToSearchParams(rawAuthToken: string) {
 
 function getAuthorizationHeader(context: Context) {
 	const [authType, authToken] =
-		context.headers?.get("authorization")?.split(" ") ?? []
+		decodeURIComponent(
+			context.headers
+				?.get("cookie")
+				?.split(";")
+				.find((cookie) => cookie.trim().startsWith("session="))
+				?.replace("session=", "") ?? "",
+		)
+			?.trim()
+			.split(" ") ?? []
 
 	return { authType, authToken }
 }
@@ -45,9 +53,7 @@ export const authMiddleware = base.middleware(async ({ context, next }) => {
 
 		if (process.env.NODE_ENV === "production") {
 			try {
-				validate(searchParams, env.botToken, {
-					expiresIn: 60 * 60 * 24,
-				})
+				validate(searchParams, env.botToken, { expiresIn: 60 * 60 * 24 })
 			} catch {
 				throw new ORPCError("UNAUTHORIZED")
 			}
