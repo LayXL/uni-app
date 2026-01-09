@@ -1,3 +1,4 @@
+import type { Viewport } from "next"
 import type { ReactNode } from "react"
 import "./globals.css"
 
@@ -6,6 +7,13 @@ import { Inter } from "next/font/google"
 import { cn } from "@/shared/utils/cn"
 
 import Providers from "./_providers"
+
+export const viewport: Viewport = {
+	width: "device-width",
+	initialScale: 1,
+	maximumScale: 1,
+	userScalable: false,
+}
 
 const inter = Inter({
 	subsets: ["latin", "latin-ext", "cyrillic", "cyrillic-ext"],
