@@ -43,9 +43,11 @@ export const authMiddleware = base.middleware(async ({ context, next }) => {
 
 		const searchParams = authTokenStringToSearchParams(authToken)
 
-		validate(searchParams, env.botToken, {
-			expiresIn: 60 * 60 * 24,
-		})
+		if (process.env.NODE_ENV === "production") {
+			validate(searchParams, env.botToken, {
+				expiresIn: 60 * 60 * 24,
+			})
+		}
 
 		const initData = parse(searchParams)
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { backButton, useSignal } from "@tma.js/sdk-react"
+import { backButton, isTMA, useSignal } from "@tma.js/sdk-react"
 import dynamic from "next/dynamic"
 import { usePathname, useRouter } from "next/navigation"
 import { type ReactNode, useEffect } from "react"
