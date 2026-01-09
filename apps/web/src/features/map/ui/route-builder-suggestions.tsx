@@ -64,9 +64,13 @@ export const RouteBuilderSuggestions = ({
 		[entities],
 	)
 
+  if (!suggestions || suggestions.length === 0) {
+    return null
+  }
+
 	return (
 		<div className="flex flex-col bg-popover border border-border rounded-xl">
-			{suggestions?.map((suggestion, i) => (
+			{suggestions.map((suggestion, i) => (
 				<Fragment key={i}>
 					<Touchable>
 						<button
