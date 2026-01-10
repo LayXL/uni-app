@@ -10,6 +10,7 @@ import { ModalRoot } from "@/shared/ui/modal-root"
 import { cn } from "@/shared/utils/cn"
 
 import { useActiveFloor } from "../hooks/use-active-floor"
+import { useColorScheme } from "../hooks/use-color-scheme"
 import { useFilteredFloors } from "../hooks/use-filtered-floors"
 import { useFloorRender } from "../hooks/use-floor-render"
 import { useMapCanvas } from "../hooks/use-map-canvas"
@@ -25,6 +26,7 @@ import { RouteBuilderModal } from "./route-builder-modal"
 
 export const MapViewer = () => {
 	const mapData = useMapData()
+	const colorScheme = useColorScheme()
 
 	const { start, end } = useRouteBuilder()
 
@@ -196,6 +198,7 @@ export const MapViewer = () => {
 		isDebug,
 		route: routeData?.route,
 		enabled: isCanvasReady,
+		colorScheme,
 	})
 
 	return (

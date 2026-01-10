@@ -61,6 +61,7 @@ type UseFloorRenderParams = {
 	isDebug: boolean
 	route?: RoutePoint[]
 	enabled?: boolean
+	colorScheme?: "light" | "dark"
 }
 
 type RoutePoint = {
@@ -83,6 +84,7 @@ export const useFloorRender = ({
 	isDebug,
 	route,
 	enabled = true,
+	colorScheme,
 }: UseFloorRenderParams) => {
 	const routeObjectsRef = useRef<fabric.Object[]>([])
 
@@ -114,6 +116,7 @@ export const useFloorRender = ({
 		})
 	}, [data])
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: colorScheme triggers re-render to update CSS-based colors from getMapColors()
 	useEffect(() => {
 		if (!enabled) return
 
@@ -475,6 +478,7 @@ export const useFloorRender = ({
 		iconBaseScaleRef,
 		isDebug,
 		enabled,
+		colorScheme,
 	])
 
 	useEffect(() => {
