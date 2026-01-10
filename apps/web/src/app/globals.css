@@ -68,13 +68,14 @@
 		--chart-4: oklch(0.963 0 153.435);
 		--chart-5: oklch(0.207 0.002 17.34);
 
-		--map-floor-fill: var(--card);
-		--map-floor-stroke: var(--border);
-		--map-room-fill: var(--card);
-		--map-room-fill-clickable: var(--card);
-		--map-room-stroke: var(--border);
+		--map-background: #ffffff;
+		--map-floor-fill: #f0efde;
+		--map-floor-stroke: #d6d2c7;
+		--map-room-fill: #fefef0;
+		--map-room-fill-clickable: #fefef0;
+		--map-room-stroke: #d6d2c7;
 		--map-room-label: var(--foreground);
-		--map-stairs-icon: #000;
+		--map-stairs-icon: #000000;
 	}
 
 	.dark {
@@ -103,6 +104,7 @@
 		--chart-4: oklch(0.3 0 180);
 		--chart-5: oklch(1 0 180);
 
+		--map-background: #1b2329;
 		--map-floor-fill: #5b5b5b;
 		--map-floor-stroke: #444342;
 		--map-room-fill: #4b636a;

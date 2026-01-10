@@ -199,7 +199,7 @@ export const MapViewer = () => {
 	})
 
 	return (
-		<div className="relative h-full w-full overflow-hidden bg-[#1B2329]">
+		<div className="relative h-full w-full overflow-hidden bg-(--map-background)">
 			<canvas ref={canvasRef} className="size-full" />
 
 			{isDebug && cursorCoords && (

@@ -138,7 +138,7 @@ export const useMapInteractions = ({
 		(event: MouseEvent | TouchEvent) => {
 			if (!isDraggingRef.current) return
 
-			if (event instanceof TouchEvent) {
+			if ("touches" in event) {
 				event.preventDefault()
 			}
 
@@ -178,7 +178,7 @@ export const useMapInteractions = ({
 	const onMouseDown = useCallback(
 		(event: PointerInfo) => {
 			// Touch events do not have button; start drag immediately.
-			if (event.e instanceof TouchEvent) {
+			if ("touches" in event.e) {
 				event.e.preventDefault()
 				startDrag(event)
 				return
