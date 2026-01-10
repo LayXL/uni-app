@@ -27,7 +27,7 @@ export const WithoutLessonsPlaceholder = ({
 	return (
 		<div className="p-2 rounded-2xl bg-card border border-border flex flex-col items-center justify-center">
 			<p className="font-medium">В этот день нет занятий</p>
-			<p className="text-muted-foreground text-sm">{phrase}</p>
+			<p className="text-muted text-sm">{phrase}</p>
 		</div>
 	)
 }

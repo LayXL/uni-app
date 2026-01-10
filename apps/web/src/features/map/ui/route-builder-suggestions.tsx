@@ -74,7 +74,7 @@ export const RouteBuilderSuggestions = ({
 	}
 
 	return (
-		<div className="flex flex-col bg-popover border border-border rounded-xl">
+		<div className="flex flex-col bg-card border border-border rounded-xl">
 			{suggestions.map((suggestion, i) => (
 				<Fragment key={i}>
 					<Touchable>
@@ -96,7 +96,7 @@ export const RouteBuilderSuggestions = ({
 								<Icon
 									name="iconify:material-symbols:arrow-forward-rounded"
 									size={20}
-									className="bg-muted-foreground"
+									className="bg-muted"
 								/>
 								<span>{entityItems.get(suggestion.to)?.name}</span>
 							</div>

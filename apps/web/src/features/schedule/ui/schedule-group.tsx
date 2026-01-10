@@ -13,7 +13,7 @@ export const ScheduleGroup = () => {
 		<Touchable>
 			<Link
 				href="/onboarding"
-				className="w-26 bg-input/30 border border-input rounded-lg px-3 py-2"
+				className="w-26 bg-card border border-border rounded-lg px-3 py-2"
 			>
 				{group?.displayName}
 			</Link>

@@ -29,8 +29,8 @@ const StepIcon = ({ name, isActive }: StepIconProps) => {
 	return (
 		<div
 			className={cn(
-				"size-12 grid place-items-center rounded-full bg-secondary text-secondary-foreground transition-colors",
-				isActive && "bg-primary text-primary-foreground",
+				"size-12 grid place-items-center rounded-full bg-card transition-colors",
+				isActive && "bg-accent text-accent-foreground",
 			)}
 		>
 			<Icon name={name} size={24} />
@@ -169,7 +169,7 @@ export const RouteNavigation = () => {
 											<div
 												className={cn(
 													"h-1 flex-1 bg-border rounded-full transition-colors",
-													i === currentStep && "bg-primary",
+													i === currentStep && "bg-accent",
 												)}
 											/>
 											<StepIcon name={step.icon} isActive={i === currentStep} />

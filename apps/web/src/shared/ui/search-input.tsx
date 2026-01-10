@@ -140,8 +140,8 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 				onFocus={() => setIsOpen(true)}
 				onKeyDown={handleKeyDown}
 				className={cn(
-					"bg-input border border-border rounded-xl p-3 w-full outline-none",
-					"focus:ring-2 focus:ring-ring/20 transition-shadow",
+					"bg-card border border-border rounded-xl p-3 w-full outline-none",
+					"focus:ring-2 focus:ring-accent transition-shadow",
 					className,
 				)}
 				autoComplete="off"
@@ -152,9 +152,8 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 				<div
 					className={cn(
 						"absolute z-50 w-full mt-1",
-						"bg-popover border border-border rounded-xl shadow-lg",
+						"bg-card border border-border rounded-xl shadow-lg",
 						"max-h-60 overflow-y-auto",
-						"animate-in fade-in-0 zoom-in-95 duration-150",
 					)}
 				>
 					{filteredItems.length > 0 ? (
@@ -167,9 +166,8 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 									className={cn(
 										"w-full px-3 py-2.5 text-left transition-colors",
 										"first:rounded-t-xl last:rounded-b-xl",
-										highlightedIndex === index && "bg-secondary",
-										value === item.key &&
-											"text-accent-foreground font-medium",
+										highlightedIndex === index &&
+											"bg-accent text-accent-foreground",
 									)}
 								>
 									{item.value}
@@ -177,7 +175,7 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 							</Touchable>
 						))
 					) : (
-						<div className="px-3 py-2.5 text-muted-foreground text-center">
+						<div className="px-3 py-2.5 text-muted text-center">
 							{emptyMessage}
 						</div>
 					)}

@@ -14,7 +14,7 @@ export const LessonCard = ({ lesson, group }: LessonCardProps) => {
 	)
 
 	return (
-		<div className="bg-card border border-border text-card-foreground px-2 py-2 rounded-xl flex items-center gap-2">
+		<div className="bg-card border border-border px-2 py-2 rounded-xl flex items-center gap-2">
 			<p className="font-medium tabular-nums">{lesson.order}</p>
 			<div className="w-px self-stretch bg-border" />
 			<div className="flex flex-col tabular-nums">
@@ -26,8 +26,8 @@ export const LessonCard = ({ lesson, group }: LessonCardProps) => {
 				<p className="font-medium line-clamp-1 break-all">
 					{cutSubjectName(lesson.subject.name)}
 				</p>
-				<div className="flex gap-2 text-muted-foreground text-sm">
-					<p className="min-w-max">{lesson.classroom} ауд.</p>
+				<div className="flex gap-1 text-muted text-sm">
+					<p className="min-w-max">{lesson.classroom} ауд</p>
 					<p className="min-w-max">
 						{lesson.groups
 							.filter((group) => group.type === "teacher")

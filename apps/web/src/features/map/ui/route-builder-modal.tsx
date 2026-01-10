@@ -96,7 +96,7 @@ export const RouteBuilderModal = () => {
 		<ModalRoot isOpen={isModalOpen} onClose={closeModal}>
 			<div className="flex flex-col gap-4">
 				<h2 className="text-2xl font-medium">Маршрут</h2>
-				<div className="bg-popover border border-border rounded-xl relative">
+				<div className="bg-card border border-border rounded-xl relative">
 					<div className="relative">
 						<div className="absolute size-12 grid place-items-center pointer-events-none z-10">
 							<Icon name="iconify:material-symbols:near-me-rounded" size={24} />

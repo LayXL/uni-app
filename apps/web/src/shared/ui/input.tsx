@@ -9,7 +9,7 @@ export const Input = (props: InputProps) => {
 		<input
 			type="text"
 			className={cn(
-				"bg-input border border-border rounded-xl p-3",
+				"bg-card border border-border rounded-xl p-3",
 				props.className,
 			)}
 			{...props}

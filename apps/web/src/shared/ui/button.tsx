@@ -36,7 +36,7 @@ type ButtonProps = {
 
 export const Button = (props: ButtonProps) => {
 	const {
-		variant = "primary",
+		variant = "accent",
 		label,
 		onClick,
 		leftIcon,
@@ -50,8 +50,7 @@ export const Button = (props: ButtonProps) => {
 		"flex gap-2 items-center justify-center p-4 rounded-2xl font-medium",
 
 		variant === "accent" && "bg-accent text-accent-foreground",
-		variant === "primary" && "bg-primary text-primary-foreground",
-		variant === "secondary" && "bg-secondary text-secondary-foreground",
+		variant === "secondary" && "bg-card",
 
 		props.disabled && "pointer-events-none",
 		props.className,
