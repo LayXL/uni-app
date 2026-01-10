@@ -17,11 +17,17 @@ type ModalRootProps = {
 	onClose?: () => void
 	close?: () => void
 	className?: string
+	showCloseButton?: boolean
 }
 
-export const ModalRoot = (props: ModalRootProps) => {
-	const { children, isOpen, className, onClose, close } = props
-
+export const ModalRoot = ({
+	children,
+	isOpen,
+	className,
+	onClose,
+	close,
+	showCloseButton = true,
+}: ModalRootProps) => {
 	useDisableScroll(isOpen)
 
 	return (
@@ -31,7 +37,7 @@ export const ModalRoot = (props: ModalRootProps) => {
 					<div className="fixed inset-0 z-50">
 						<motion.div
 							animate={{ opacity: 1 }}
-							className="absolute inset-0 bg-black/40"
+							className="absolute inset-0 bg-black/60"
 							exit={{ opacity: 0 }}
 							initial={{ opacity: 0 }}
 							onClick={onClose ?? close}
@@ -39,22 +45,24 @@ export const ModalRoot = (props: ModalRootProps) => {
 						/>
 						<motion.div
 							animate={{ opacity: 1, y: 0 }}
-							className="absolute left-0 right-0 bottom-0 bg-background rounded-3xl p-4"
+							className="absolute left-0 right-0 bottom-0 bg-background border-t border-border rounded-3xl p-4"
 							exit={{ opacity: 0, y: "100%" }}
 							initial={{ opacity: 0, y: "100%" }}
 							transition={TRANSITION}
 						>
-							<div className="absolute top-2 right-2">
-								<Touchable>
-									<button
-										type="button"
-										className="cursor-pointer bg-card border border-border rounded-full p-1"
-										onClick={onClose ?? close}
-									>
-										<Icon name="cancel-24" className="icon-secondary" />
-									</button>
-								</Touchable>
-							</div>
+							{showCloseButton && (
+								<div className="absolute top-4 right-4">
+									<Touchable>
+										<button
+											type="button"
+											className="cursor-pointer bg-card border border-border rounded-full p-1"
+											onClick={onClose ?? close}
+										>
+											<Icon name="cancel-24" className="icon-secondary" />
+										</button>
+									</Touchable>
+								</div>
+							)}
 							<div className={className}>{children}</div>
 						</motion.div>
 					</div>

@@ -96,7 +96,7 @@ export const RouteBuilderModal = () => {
 		<ModalRoot isOpen={isModalOpen} onClose={closeModal}>
 			<div className="flex flex-col gap-4">
 				<h2 className="text-2xl font-medium">Маршрут</h2>
-				<div className="bg-card border border-border rounded-xl relative">
+				<div className="bg-card border border-border rounded-3xl relative">
 					<div className="relative">
 						<div className="absolute size-12 grid place-items-center pointer-events-none z-10">
 							<Icon name="iconify:material-symbols:near-me-rounded" size={24} />
@@ -109,7 +109,7 @@ export const RouteBuilderModal = () => {
 							placeholder="Откуда"
 							maxSuggestions={8}
 							emptyMessage="Место не найдено"
-							className="bg-transparent border-none rounded-xl pl-12 h-12"
+							className="bg-transparent border-none rounded-3xl pl-12 h-12"
 						/>
 					</div>
 					<div className="h-px ml-13 bg-border" />
@@ -125,7 +125,7 @@ export const RouteBuilderModal = () => {
 							placeholder="Куда"
 							maxSuggestions={8}
 							emptyMessage="Место не найдено"
-							className="bg-transparent border-none rounded-xl pl-12 h-12"
+							className="bg-transparent border-none rounded-3xl pl-12 h-12"
 						/>
 					</div>
 				</div>
