@@ -34,7 +34,7 @@ export default async function () {
 					<MapViewer />
 				</MapViewerHome>
 				<ScheduleViewerHome>
-					<div className="-mt-4 flex flex-col bg-background rounded-t-2xl relative pb-(--safe-area-inset-bottom)">
+					<div className="-mt-4 flex flex-col bg-background rounded-t-2xl relative pb-(--safe-area-inset-bottom) mb-16">
 						<div className="absolute bottom-full left-3 py-2">
 							<MapBottomBar />
 						</div>

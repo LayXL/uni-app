@@ -102,7 +102,7 @@ export const RouteBuilderModal = () => {
 							<Icon name="iconify:material-symbols:near-me-rounded" size={24} />
 						</div>
 						<SearchInput
-							items={entityItems}
+							items={entityItems.filter((item) => item.key !== endRoomId)}
 							value={startRoomId ?? undefined}
 							onChange={handleStartSelect}
 							filterFn={filterEntity}
@@ -118,7 +118,7 @@ export const RouteBuilderModal = () => {
 							<Icon name="iconify:material-symbols:flag-rounded" size={24} />
 						</div>
 						<SearchInput
-							items={entityItems}
+							items={entityItems.filter((item) => item.key !== startRoomId)}
 							value={endRoomId ?? undefined}
 							onChange={handleEndSelect}
 							filterFn={filterEntity}
