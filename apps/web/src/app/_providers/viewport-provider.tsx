@@ -11,28 +11,28 @@ const useContentSafeAreaInsets = () => {
 		() => defaultContentSafeAreaInsets,
 	)
 
-	useEffect(() => {
-		if (typeof window === "undefined") {
-			return
-		}
+	// useEffect(() => {
+	// 	if (typeof window === "undefined") {
+	// 		return
+	// 	}
 
-		document.documentElement.style.setProperty(
-			"--content-safe-area-inset-top",
-			`${contentSafeAreaInsets.top}px`,
-		)
-		document.documentElement.style.setProperty(
-			"--content-safe-area-inset-right",
-			`${contentSafeAreaInsets.right}px`,
-		)
-		document.documentElement.style.setProperty(
-			"--content-safe-area-inset-bottom",
-			`${contentSafeAreaInsets.bottom}px`,
-		)
-		document.documentElement.style.setProperty(
-			"--content-safe-area-inset-left",
-			`${contentSafeAreaInsets.left}px`,
-		)
-	}, [contentSafeAreaInsets])
+	// 	document.documentElement.style.setProperty(
+	// 		"--content-safe-area-inset-top",
+	// 		`${contentSafeAreaInsets.top}px`,
+	// 	)
+	// 	document.documentElement.style.setProperty(
+	// 		"--content-safe-area-inset-right",
+	// 		`${contentSafeAreaInsets.right}px`,
+	// 	)
+	// 	document.documentElement.style.setProperty(
+	// 		"--content-safe-area-inset-bottom",
+	// 		`${contentSafeAreaInsets.bottom}px`,
+	// 	)
+	// 	document.documentElement.style.setProperty(
+	// 		"--content-safe-area-inset-left",
+	// 		`${contentSafeAreaInsets.left}px`,
+	// 	)
+	// }, [contentSafeAreaInsets])
 
 	return contentSafeAreaInsets
 }
