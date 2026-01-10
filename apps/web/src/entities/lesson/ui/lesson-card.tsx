@@ -10,6 +10,8 @@ import { cutSubjectName } from "@repo/shared/subjects/cut-subject-name"
 import { ModalRoot } from "@/shared/ui/modal-root"
 import { Touchable } from "@/shared/ui/touchable"
 
+import { LessonModal } from "./lesson-modal"
+
 type LessonCardProps = {
 	group: number
 	lesson: Lesson
@@ -27,7 +29,7 @@ export const LessonCard = ({ lesson, group }: LessonCardProps) => {
 			<Touchable>
 				<button
 					type="button"
-					className="bg-card border border-border px-2 py-2 rounded-xl flex items-center gap-2"
+					className="bg-card border border-border px-2 py-2 rounded-3xl flex items-center gap-2"
 					onClick={() => setIsOpen(true)}
 				>
 					<p className="font-medium tabular-nums">{lesson.order}</p>
@@ -64,16 +66,7 @@ export const LessonCard = ({ lesson, group }: LessonCardProps) => {
 				</button>
 			</Touchable>
 			<ModalRoot isOpen={isOpen} onClose={() => setIsOpen(false)}>
-				<div className="flex flex-col gap-2">
-					<h2 className="text-lg font-medium">{lesson.subject.name}</h2>
-					<p className="text-muted text-sm">{lesson.classroom} ауд</p>
-					<p className="text-muted text-sm">
-						{lesson.groups
-							.filter((group) => group.type === "teacher")
-							.map((group) => transformToGroupName(group))
-							.join(", ")}
-					</p>
-				</div>
+				<LessonModal lesson={lesson} />
 			</ModalRoot>
 		</>
 	)

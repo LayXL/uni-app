@@ -18,7 +18,7 @@ export const Touchable = ({ children, hapticType }: TouchableProps) => {
 		children,
 		{
 			className: cn(
-				"cursor-pointer active:brightness-60 transition-[filter]",
+				"cursor-pointer active:brightness-80 transition-[filter]",
 				children.props.className,
 			),
 			onClick: (e: React.MouseEvent<Element, MouseEvent> | undefined) => {
