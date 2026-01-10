@@ -216,7 +216,7 @@ export const MapViewer = () => {
 				</div>
 			)}
 
-			<div className="absolute mt-(--tg-content-safe-area-inset-top) top-2 left-2 bg-card border-border flex flex-col gap-2 rounded-lg">
+			<div className="absolute mt-(--safe-area-inset-top) top-2 left-2 bg-card border-border flex flex-col gap-2 rounded-lg">
 				<button
 					type="button"
 					className="size-8 text-xs grid place-items-center"

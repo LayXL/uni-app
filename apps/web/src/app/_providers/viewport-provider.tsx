@@ -3,36 +3,74 @@
 import { retrieveLaunchParams, useSignal, viewport } from "@tma.js/sdk-react"
 import { type ReactNode, useEffect, useMemo } from "react"
 
-const defaultContentSafeAreaInsets = { top: 0, right: 0, bottom: 0, left: 0 }
+const defaultSafeAreaInsets = { top: 0, right: 0, bottom: 0, left: 0 }
 
 const useContentSafeAreaInsets = () => {
+	const safeAreaInsets = useSignal(
+		viewport.safeAreaInsets,
+		() => defaultSafeAreaInsets,
+	)
 	const contentSafeAreaInsets = useSignal(
 		viewport.contentSafeAreaInsets,
-		() => defaultContentSafeAreaInsets,
+		() => defaultSafeAreaInsets,
 	)
 
-	// useEffect(() => {
-	// 	if (typeof window === "undefined") {
-	// 		return
-	// 	}
+	useEffect(() => {
+		if (typeof window === "undefined") {
+			return
+		}
 
-	// 	document.documentElement.style.setProperty(
-	// 		"--content-safe-area-inset-top",
-	// 		`${contentSafeAreaInsets.top}px`,
-	// 	)
-	// 	document.documentElement.style.setProperty(
-	// 		"--content-safe-area-inset-right",
-	// 		`${contentSafeAreaInsets.right}px`,
-	// 	)
-	// 	document.documentElement.style.setProperty(
-	// 		"--content-safe-area-inset-bottom",
-	// 		`${contentSafeAreaInsets.bottom}px`,
-	// 	)
-	// 	document.documentElement.style.setProperty(
-	// 		"--content-safe-area-inset-left",
-	// 		`${contentSafeAreaInsets.left}px`,
-	// 	)
-	// }, [contentSafeAreaInsets])
+		document.documentElement.style.setProperty(
+			"--safe-area-inset-top",
+			`${safeAreaInsets.top + contentSafeAreaInsets.top}px`,
+		)
+		document.documentElement.style.setProperty(
+			"--safe-area-inset-right",
+			`${safeAreaInsets.right + contentSafeAreaInsets.right}px`,
+		)
+		document.documentElement.style.setProperty(
+			"--safe-area-inset-bottom",
+			`${safeAreaInsets.bottom + contentSafeAreaInsets.bottom}px`,
+		)
+		document.documentElement.style.setProperty(
+			"--safe-area-inset-left",
+			`${safeAreaInsets.left + contentSafeAreaInsets.left}px`,
+		)
+
+		document.documentElement.style.setProperty(
+			"--screen-safe-area-inset-top",
+			`${safeAreaInsets.top + contentSafeAreaInsets.top}px`,
+		)
+		document.documentElement.style.setProperty(
+			"--screen-safe-area-inset-right",
+			`${safeAreaInsets.right + contentSafeAreaInsets.right}px`,
+		)
+		document.documentElement.style.setProperty(
+			"--screen-safe-area-inset-bottom",
+			`${safeAreaInsets.bottom + contentSafeAreaInsets.bottom}px`,
+		)
+		document.documentElement.style.setProperty(
+			"--screen-safe-area-inset-left",
+			`${safeAreaInsets.left + contentSafeAreaInsets.left}px`,
+		)
+
+		document.documentElement.style.setProperty(
+			"--content-safe-area-inset-top",
+			`${contentSafeAreaInsets.top}px`,
+		)
+		document.documentElement.style.setProperty(
+			"--content-safe-area-inset-right",
+			`${contentSafeAreaInsets.right}px`,
+		)
+		document.documentElement.style.setProperty(
+			"--content-safe-area-inset-bottom",
+			`${contentSafeAreaInsets.bottom}px`,
+		)
+		document.documentElement.style.setProperty(
+			"--content-safe-area-inset-left",
+			`${contentSafeAreaInsets.left}px`,
+		)
+	}, [safeAreaInsets, contentSafeAreaInsets])
 
 	return contentSafeAreaInsets
 }
