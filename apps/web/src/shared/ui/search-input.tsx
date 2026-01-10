@@ -141,7 +141,7 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 				onFocus={() => setIsOpen(true)}
 				onKeyDown={handleKeyDown}
 				className={cn(
-					"bg-card border border-border rounded-4xl p-3 w-full outline-none placeholder:text-muted",
+					"bg-card border border-border rounded-3xl p-3 w-full outline-none placeholder:text-muted",
 					"focus:ring-2 focus:ring-accent transition-shadow",
 					className,
 				)}
