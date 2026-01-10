@@ -32,7 +32,8 @@ const BackButtonProviderComponent = ({ children }: BackButtonProviderProps) => {
 	}, [router, isAvailable])
 
 	useEffect(() => {
-		const hasHistory = window.history.length > 1 && Boolean(pathname)
+		const hasHistory =
+			window.history.length > 1 && Boolean(pathname) && pathname !== "/"
 
 		try {
 			if (hasHistory) {
