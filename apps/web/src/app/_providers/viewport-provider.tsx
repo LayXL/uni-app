@@ -1,7 +1,6 @@
 "use client"
 
 import { retrieveLaunchParams, useSignal, viewport } from "@tma.js/sdk-react"
-import dynamic from "next/dynamic"
 import { type ReactNode, useEffect, useMemo } from "react"
 
 type ViewportProviderProps = {
@@ -9,12 +8,17 @@ type ViewportProviderProps = {
 }
 
 const ViewportProviderComponent = ({ children }: ViewportProviderProps) => {
-	const isAvailable = useSignal(viewport.mount.isAvailable)
+	const isAvailable = useSignal(viewport.mount.isAvailable, () => false)
 	const isRequestFullscreenAvailable = useSignal(
 		viewport.requestFullscreen.isAvailable,
+		() => false,
 	)
 
 	const isMobile = useMemo(() => {
+		if (typeof window === "undefined") {
+			return false
+		}
+
 		const { tgWebAppPlatform } = retrieveLaunchParams()
 		return tgWebAppPlatform === "android" || tgWebAppPlatform === "ios"
 	}, [])
@@ -38,7 +42,6 @@ const ViewportProviderComponent = ({ children }: ViewportProviderProps) => {
 	return children
 }
 
-export const ViewportProvider = dynamic(
-	() => Promise.resolve(ViewportProviderComponent),
-	{ ssr: false },
-) as typeof ViewportProviderComponent
+export const ViewportProvider = ({ children }: ViewportProviderProps) => {
+	return <ViewportProviderComponent>{children}</ViewportProviderComponent>
+}

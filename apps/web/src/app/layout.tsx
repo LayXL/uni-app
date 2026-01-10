@@ -32,7 +32,6 @@ export default function ({ children }: LayoutProps) {
 				className={cn(inter.className, "bg-background text-foreground")}
 			>
 				<Providers>{children}</Providers>
-				<script src="https://telegram.org/js/telegram-web-app.js"></script>
 			</body>
 		</html>
 	)

@@ -1,7 +1,6 @@
 "use client"
 
 import { backButton, useSignal } from "@tma.js/sdk-react"
-import dynamic from "next/dynamic"
 import { usePathname, useRouter } from "next/navigation"
 import { type ReactNode, useEffect } from "react"
 
@@ -13,7 +12,7 @@ const BackButtonProviderComponent = ({ children }: BackButtonProviderProps) => {
 	const router = useRouter()
 	const pathname = usePathname()
 
-	const isAvailable = useSignal(backButton.mount.isAvailable)
+	const isAvailable = useSignal(backButton.mount.isAvailable, () => false)
 
 	useEffect(() => {
 		if (!isAvailable) {
@@ -50,7 +49,6 @@ const BackButtonProviderComponent = ({ children }: BackButtonProviderProps) => {
 	return children
 }
 
-export const BackButtonProvider = dynamic(
-	() => Promise.resolve(BackButtonProviderComponent),
-	{ ssr: false },
-) as typeof BackButtonProviderComponent
+export const BackButtonProvider = ({ children }: BackButtonProviderProps) => {
+	return <BackButtonProviderComponent>{children}</BackButtonProviderComponent>
+}
