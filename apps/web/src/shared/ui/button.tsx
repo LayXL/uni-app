@@ -47,12 +47,12 @@ export const Button = (props: ButtonProps) => {
 	const className = cn(
 		"block truncate transition-[background-color,filter,color] cursor-pointer",
 
-		"flex gap-2 items-center justify-center p-4 rounded-2xl font-medium",
+		"flex gap-2 items-center justify-center p-4 rounded-4xl font-medium",
 
 		variant === "accent" && "bg-accent text-accent-foreground",
 		variant === "secondary" && "bg-card",
 
-		props.disabled && "pointer-events-none",
+		props.disabled && "pointer-events-none bg-border",
 		props.className,
 	)
 

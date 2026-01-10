@@ -39,7 +39,7 @@ export const ModalRoot = (props: ModalRootProps) => {
 						/>
 						<motion.div
 							animate={{ opacity: 1, y: 0 }}
-							className="absolute bottom-1 left-1 right-1 bg-background border border-border rounded-3xl p-4"
+							className="absolute bottom-1 left-1 right-1 bg-card border border-border rounded-3xl p-4"
 							exit={{ opacity: 0, y: "100%" }}
 							initial={{ opacity: 0, y: "100%" }}
 							transition={TRANSITION}
@@ -48,7 +48,7 @@ export const ModalRoot = (props: ModalRootProps) => {
 								<Touchable>
 									<button
 										type="button"
-										className="cursor-pointer bg-card border border-border rounded-full p-1"
+										className="cursor-pointer bg-border rounded-full p-1"
 										onClick={onClose ?? close}
 									>
 										<Icon name="cancel-24" className="icon-secondary" />
