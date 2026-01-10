@@ -221,11 +221,11 @@ export const MapViewer = () => {
 				</div>
 			)}
 
-			<div className="absolute mt-(--safe-area-inset-top) top-2 left-2 bg-background border-border flex flex-col rounded-lg">
+			<div className="absolute mt-(--safe-area-inset-top) top-3 left-3 bg-background border border-border flex flex-col rounded-3xl">
 				<Touchable>
 					<button
 						type="button"
-						className="size-8 text-xs grid place-items-center"
+						className="size-8 text-xs grid place-items-center bg-background rounded-3xl"
 						onClick={() => setActiveCampus(activeCampus === 0 ? 1 : 0)}
 					>
 						<Icon name={activeCampus === 0 ? "midis" : "seven"} size={24} />
@@ -236,7 +236,7 @@ export const MapViewer = () => {
 						<button
 							type="button"
 							className={cn(
-								"size-8 text-xs grid place-items-center rounded-lg",
+								"size-8 text-sm grid place-items-center bg-background rounded-3xl",
 								activeFloor === floor.id && "bg-accent text-accent-foreground",
 							)}
 							onClick={() => {

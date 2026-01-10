@@ -153,7 +153,7 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 				<div
 					className={cn(
 						"absolute z-50 w-full mt-1",
-						"bg-card border border-border rounded-xl shadow-lg",
+						"bg-card border border-border rounded-3xl shadow-lg",
 						"max-h-60 overflow-y-auto",
 					)}
 				>
