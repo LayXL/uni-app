@@ -15,11 +15,11 @@ export const MapControls = ({
 	resetRotation,
 }: MapControlsProps) => {
 	return (
-		<div className="absolute mt-(--safe-area-inset-top) top-2 right-2 bg-card border-border flex flex-col gap-2 rounded-lg">
+		<div className="absolute mt-(--safe-area-inset-top) top-2 right-2 bg-background border-border flex flex-col gap-2 rounded-lg">
 			<Touchable>
 				<button
 					type="button"
-					className="size-8 text-lg grid place-items-center rounded-lg"
+					className="size-8 text-lg grid place-items-center rounded-lg bg-background"
 					onClick={() => zoomByStep(1.2)}
 				>
 					<Icon name="add-16" />
@@ -28,7 +28,7 @@ export const MapControls = ({
 			<Touchable>
 				<button
 					type="button"
-					className="size-8 text-lg grid place-items-center rounded-lg"
+					className="size-8 text-lg grid place-items-center rounded-lg bg-background"
 					onClick={() => zoomByStep(1 / 1.2)}
 				>
 					<Icon name="minus-16" />
@@ -38,7 +38,7 @@ export const MapControls = ({
 				<Touchable>
 					<button
 						type="button"
-						className="size-8 text-lg grid place-items-center rounded-lg"
+						className="size-8 text-lg grid place-items-center rounded-lg bg-background"
 						onClick={resetRotation}
 					>
 						<motion.span

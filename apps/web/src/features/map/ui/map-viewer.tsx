@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
 
+import { Icon } from "@/shared/ui/icon"
 import { ModalRoot } from "@/shared/ui/modal-root"
 import { Touchable } from "@/shared/ui/touchable"
 import { cn } from "@/shared/utils/cn"
@@ -220,14 +221,14 @@ export const MapViewer = () => {
 				</div>
 			)}
 
-			<div className="absolute mt-(--safe-area-inset-top) top-2 left-2 bg-card border-border flex flex-col gap-2 rounded-lg">
+			<div className="absolute mt-(--safe-area-inset-top) top-2 left-2 bg-background border-border flex flex-col rounded-lg">
 				<Touchable>
 					<button
 						type="button"
 						className="size-8 text-xs grid place-items-center"
 						onClick={() => setActiveCampus(activeCampus === 0 ? 1 : 0)}
 					>
-						{activeCampus === 0 ? "МИДИС" : "Школа"}
+						<Icon name={activeCampus === 0 ? "midis" : "seven"} size={24} />
 					</button>
 				</Touchable>
 				{filteredFloors?.map((floor) => (
