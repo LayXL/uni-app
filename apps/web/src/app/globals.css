@@ -43,6 +43,23 @@
 		-moz-user-select: none;
 		-ms-user-select: none;
 
+		--safe-area-inset-top: calc(
+			var(--tg-viewport-safe-area-inset-top) +
+			var(--tg-viewport-content-safe-area-inset-top)
+		);
+		--safe-area-inset-right: calc(
+			var(--tg-viewport-safe-area-inset-right) +
+			var(--tg-viewport-content-safe-area-inset-right)
+		);
+		--safe-area-inset-bottom: calc(
+			var(--tg-viewport-safe-area-inset-bottom) +
+			var(--tg-viewport-content-safe-area-inset-bottom)
+		);
+		--safe-area-inset-left: calc(
+			var(--tg-viewport-safe-area-inset-left) +
+			var(--tg-viewport-content-safe-area-inset-left)
+		);
+
 		--background: oklch(0.973 0 180);
 		--foreground: oklch(0.209 0 180);
 		--muted: oklch(0.94 0 172.405);
