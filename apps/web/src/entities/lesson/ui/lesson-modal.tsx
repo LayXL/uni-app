@@ -14,10 +14,6 @@ export const LessonModal = ({ lesson }: LessonModalProps) => {
 			<p className="text-muted">
 				С {lesson.startTime} до {lesson.endTime}
 			</p>
-			<div className="bg-card border border-border rounded-3xl p-4">
-				<p className="text-lg font-medium">{lesson.classroom}</p>
-				<p className="text-muted">Аудитория</p>
-			</div>
 			{teachers.length > 0 &&
 				teachers.map((teacher) => (
 					<div
@@ -30,6 +26,10 @@ export const LessonModal = ({ lesson }: LessonModalProps) => {
 						<p className="text-muted">Преподаватель</p>
 					</div>
 				))}
+			<div className="bg-card border border-border rounded-3xl p-4">
+				<p className="text-lg font-medium">{lesson.classroom}</p>
+				<p className="text-muted">Аудитория</p>
+			</div>
 		</div>
 	)
 }

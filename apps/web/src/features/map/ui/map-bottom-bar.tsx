@@ -16,7 +16,7 @@ const MapBottomBarButton = ({ icon, onClick }: MapBottomBarButtonProps) => {
 		<Touchable>
 			<button
 				type="button"
-				className="flex items-center justify-center size-12 rounded-2xl bg-background border border-border"
+				className="flex items-center justify-center size-12 rounded-3xl bg-background border border-border"
 				onClick={onClick}
 			>
 				<Icon name={icon} size={20} />

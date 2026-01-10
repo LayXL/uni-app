@@ -11,6 +11,7 @@ import { ScheduleViewer } from "@/features/schedule/ui/schedule-viewer"
 import { Fetcher } from "@/shared/utils/fetcher"
 
 import { RouteNavigation } from "../../features/map/ui/route-navigation"
+import { MapBottomBarHome } from "./_ui/map-bottom-bar-home"
 import { ScheduleViewerHome } from "./_ui/schedule-viewer-home"
 
 export default async function () {
@@ -36,7 +37,9 @@ export default async function () {
 				<ScheduleViewerHome>
 					<div className="-mt-4 flex flex-col bg-background rounded-t-3xl relative pb-(--safe-area-inset-bottom) mb-16">
 						<div className="absolute bottom-full left-3 py-2">
-							<MapBottomBar />
+							<MapBottomBarHome>
+								<MapBottomBar />
+							</MapBottomBarHome>
 						</div>
 						<ScheduleHeader />
 						<ScheduleViewer />
