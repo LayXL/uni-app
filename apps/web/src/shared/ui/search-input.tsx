@@ -165,7 +165,7 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 									onMouseEnter={() => setHighlightedIndex(index)}
 									className={cn(
 										"w-full px-3 py-2.5 text-left transition-colors",
-										"first:rounded-t-xl last:rounded-b-xl",
+										"first:rounded-t-3xl last:rounded-b-3xl",
 										highlightedIndex === index &&
 											"bg-accent text-accent-foreground",
 									)}
