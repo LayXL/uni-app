@@ -3,15 +3,12 @@
 import { retrieveLaunchParams, useSignal, viewport } from "@tma.js/sdk-react"
 import { type ReactNode, useEffect, useMemo } from "react"
 
+const defaultContentSafeAreaInsets = { top: 0, right: 0, bottom: 0, left: 0 }
+
 const useContentSafeAreaInsets = () => {
 	const contentSafeAreaInsets = useSignal(
 		viewport.contentSafeAreaInsets,
-		() => ({
-			top: 0,
-			right: 0,
-			bottom: 0,
-			left: 0,
-		}),
+		() => defaultContentSafeAreaInsets,
 	)
 
 	useEffect(() => {
