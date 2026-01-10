@@ -29,6 +29,9 @@ type SearchInputProps<T> = Omit<
 	emptyMessage?: string
 }
 
+const defaultFilter = <T,>(item: SearchInputItem<T>, q: string) =>
+	item.value.toLowerCase().includes(q.toLowerCase())
+
 export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 	const {
 		items,
@@ -59,9 +62,6 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 		}
 	}, [value, items])
 
-	const defaultFilter = (item: SearchInputItem<T>, q: string) =>
-		item.value.toLowerCase().includes(q.toLowerCase())
-
 	const filteredItems = useMemo(() => {
 		const filter = filterFn ?? defaultFilter
 		const filtered = query ? items.filter((item) => filter(item, query)) : items
@@ -69,6 +69,7 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 		return filtered.slice(0, maxSuggestions)
 	}, [items, query, filterFn, maxSuggestions])
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: filteredItems is used in the useEffect
 	useEffect(() => {
 		setHighlightedIndex(0)
 	}, [filteredItems])
