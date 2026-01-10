@@ -33,6 +33,7 @@ export default function ({ children }: LayoutProps) {
 			>
 				<Providers>{children}</Providers>
 			</body>
+			<script src="https://telegram.org/js/telegram-web-app.js"></script>
 		</html>
 	)
 }
