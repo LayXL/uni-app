@@ -221,7 +221,7 @@ export const MapViewer = () => {
 				</div>
 			)}
 
-			<div className="absolute mt-(--safe-area-inset-top) top-3 left-3 bg-background border border-border flex flex-col rounded-3xl">
+			<div className="absolute top-1/2 -translate-y-1/2 left-3 bg-background border border-border flex flex-col rounded-3xl">
 				<Touchable>
 					<button
 						type="button"

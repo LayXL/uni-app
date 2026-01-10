@@ -15,7 +15,7 @@ export const MapControls = ({
 	resetRotation,
 }: MapControlsProps) => {
 	return (
-		<div className="absolute mt-(--safe-area-inset-top) top-3 right-3 bg-background border border-border flex flex-col gap-2 rounded-3xl">
+		<div className="absolute top-1/2 -translate-y-1/2 right-3 bg-background border border-border flex flex-col gap-2 rounded-3xl">
 			<Touchable>
 				<button
 					type="button"
