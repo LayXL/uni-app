@@ -1,6 +1,7 @@
 import { motion } from "motion/react"
 
 import { Icon } from "@/shared/ui/icon"
+import { Touchable } from "@/shared/ui/touchable"
 
 type MapControlsProps = {
 	zoomByStep: (deltaZoom: number) => void
@@ -15,33 +16,39 @@ export const MapControls = ({
 }: MapControlsProps) => {
 	return (
 		<div className="absolute mt-(--safe-area-inset-top) top-2 right-2 bg-card border-border flex flex-col gap-2 rounded-lg">
-			<button
-				type="button"
-				className="size-8 text-lg grid place-items-center rounded-lg"
-				onClick={() => zoomByStep(1.2)}
-			>
-				<Icon name="add-16" />
-			</button>
-			<button
-				type="button"
-				className="size-8 text-lg grid place-items-center rounded-lg"
-				onClick={() => zoomByStep(1 / 1.2)}
-			>
-				<Icon name="minus-16" />
-			</button>
-			{rotation !== 0 && (
+			<Touchable>
 				<button
 					type="button"
 					className="size-8 text-lg grid place-items-center rounded-lg"
-					onClick={resetRotation}
+					onClick={() => zoomByStep(1.2)}
 				>
-					<motion.span
-						initial={{ rotate: (rotation * 180 - 140) / Math.PI }}
-						animate={{ rotate: (rotation * 180 - 140) / Math.PI }}
-					>
-						<Icon name="compass-24" size={16} />
-					</motion.span>
+					<Icon name="add-16" />
 				</button>
+			</Touchable>
+			<Touchable>
+				<button
+					type="button"
+					className="size-8 text-lg grid place-items-center rounded-lg"
+					onClick={() => zoomByStep(1 / 1.2)}
+				>
+					<Icon name="minus-16" />
+				</button>
+			</Touchable>
+			{rotation !== 0 && (
+				<Touchable>
+					<button
+						type="button"
+						className="size-8 text-lg grid place-items-center rounded-lg"
+						onClick={resetRotation}
+					>
+						<motion.span
+							initial={{ rotate: (rotation * 180 - 140) / Math.PI }}
+							animate={{ rotate: (rotation * 180 - 140) / Math.PI }}
+						>
+							<Icon name="compass-24" size={16} />
+						</motion.span>
+					</button>
+				</Touchable>
 			)}
 		</div>
 	)

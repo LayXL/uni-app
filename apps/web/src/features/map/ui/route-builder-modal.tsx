@@ -67,15 +67,15 @@ export const RouteBuilderModal = () => {
 		return entities
 			.filter((entity) => !entity.hiddenInSearch && entity.name)
 			.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
-			.map((entity) => ({ key: entity.name, value: entity.id }))
+			.map((entity) => ({ key: entity.id, value: entity.name }))
 	}, [entities])
 
 	const filterEntity = (item: SearchInputItem<number>, query: string) => {
-		const entity = entities.find((e) => e.id === item.value)
+		const entity = entities.find((e) => e.id === item.key)
 		const q = query.toLowerCase()
 
 		return (
-			item.key.toLowerCase().includes(q) ||
+			item.value.toLowerCase().includes(q) ||
 			entity?.aliases?.some((alias) => alias.toLowerCase().includes(q)) ||
 			false
 		)

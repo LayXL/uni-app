@@ -49,11 +49,16 @@ export const RouteBuilderSuggestions = ({
 			const entityId = entities.find((e) => e.name === lesson.classroom)?.id
 
 			if (entityId) {
-				acc.push({
-					from: acc[index - 1]?.to ?? 166,
-					to: entityId,
-				})
+				const from = acc[index - 1]?.to ?? 166
+				const to = entityId
+
+				if (from === to || acc.find((s) => s.from === from && s.to === to)) {
+					return acc
+				}
+
+				acc.push({ from, to })
 			}
+
 			return acc
 		},
 		[] as { from: number; to: number }[],
@@ -64,9 +69,9 @@ export const RouteBuilderSuggestions = ({
 		[entities],
 	)
 
-  if (!suggestions || suggestions.length === 0) {
-    return null
-  }
+	if (!suggestions || suggestions.length === 0) {
+		return null
+	}
 
 	return (
 		<div className="flex flex-col bg-popover border border-border rounded-xl">

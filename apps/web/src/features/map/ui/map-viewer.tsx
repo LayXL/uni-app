@@ -7,6 +7,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { orpc } from "@repo/orpc/react"
 
 import { ModalRoot } from "@/shared/ui/modal-root"
+import { Touchable } from "@/shared/ui/touchable"
 import { cn } from "@/shared/utils/cn"
 
 import { useActiveFloor } from "../hooks/use-active-floor"
@@ -220,28 +221,31 @@ export const MapViewer = () => {
 			)}
 
 			<div className="absolute mt-(--safe-area-inset-top) top-2 left-2 bg-card border-border flex flex-col gap-2 rounded-lg">
-				<button
-					type="button"
-					className="size-8 text-xs grid place-items-center"
-					onClick={() => setActiveCampus(activeCampus === 0 ? 1 : 0)}
-				>
-					{activeCampus === 0 ? "МИДИС" : "Школа"}
-				</button>
-				{filteredFloors?.map((floor) => (
+				<Touchable>
 					<button
-						key={floor.id}
 						type="button"
-						className={cn(
-							"size-8 text-xs grid place-items-center rounded-lg",
-							activeFloor === floor.id && "bg-accent text-accent-foreground",
-						)}
-						onClick={() => {
-							setActiveFloor(floor.id)
-							centerOnFloor(floor.id)
-						}}
+						className="size-8 text-xs grid place-items-center"
+						onClick={() => setActiveCampus(activeCampus === 0 ? 1 : 0)}
 					>
-						{floor.acronym ?? floor.name}
+						{activeCampus === 0 ? "МИДИС" : "Школа"}
 					</button>
+				</Touchable>
+				{filteredFloors?.map((floor) => (
+					<Touchable key={floor.id}>
+						<button
+							type="button"
+							className={cn(
+								"size-8 text-xs grid place-items-center rounded-lg",
+								activeFloor === floor.id && "bg-accent text-accent-foreground",
+							)}
+							onClick={() => {
+								setActiveFloor(floor.id)
+								centerOnFloor(floor.id)
+							}}
+						>
+							{floor.acronym ?? floor.name}
+						</button>
+					</Touchable>
 				))}
 			</div>
 

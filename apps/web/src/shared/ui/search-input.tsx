@@ -9,10 +9,11 @@ import {
 } from "react"
 
 import { cn } from "../utils/cn"
+import { Touchable } from "./touchable"
 
 export type SearchInputItem<T = string> = {
-	key: string
-	value: T
+	key: T
+	value: string
 }
 
 type SearchInputProps<T> = Omit<
@@ -51,15 +52,15 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 	// Sync input with selected value
 	useEffect(() => {
 		if (value !== undefined) {
-			const selectedItem = items.find((item) => item.value === value)
+			const selectedItem = items.find((item) => item.key === value)
 			if (selectedItem) {
-				setQuery(selectedItem.key)
+				setQuery(selectedItem.value)
 			}
 		}
 	}, [value, items])
 
 	const defaultFilter = (item: SearchInputItem<T>, q: string) =>
-		item.key.toLowerCase().includes(q.toLowerCase())
+		item.value.toLowerCase().includes(q.toLowerCase())
 
 	const filteredItems = useMemo(() => {
 		const filter = filterFn ?? defaultFilter
@@ -87,8 +88,8 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 	}, [])
 
 	const handleSelect = (item: SearchInputItem<T>) => {
-		setQuery(item.key)
-		onChange?.(item.value)
+		setQuery(item.value)
+		onChange?.(item.key)
 		setIsOpen(false)
 		inputRef.current?.blur()
 	}
@@ -158,20 +159,22 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 				>
 					{filteredItems.length > 0 ? (
 						filteredItems.map((item, index) => (
-							<button
-								key={String(item.value)}
-								type="button"
-								onClick={() => handleSelect(item)}
-								onMouseEnter={() => setHighlightedIndex(index)}
-								className={cn(
-									"w-full px-3 py-2.5 text-left transition-colors",
-									"first:rounded-t-xl last:rounded-b-xl",
-									highlightedIndex === index && "bg-secondary",
-									value === item.value && "text-accent-foreground font-medium",
-								)}
-							>
-								{item.key}
-							</button>
+							<Touchable key={String(item.key)}>
+								<button
+									type="button"
+									onClick={() => handleSelect(item)}
+									onMouseEnter={() => setHighlightedIndex(index)}
+									className={cn(
+										"w-full px-3 py-2.5 text-left transition-colors",
+										"first:rounded-t-xl last:rounded-b-xl",
+										highlightedIndex === index && "bg-secondary",
+										value === item.key &&
+											"text-accent-foreground font-medium",
+									)}
+								>
+									{item.value}
+								</button>
+							</Touchable>
 						))
 					) : (
 						<div className="px-3 py-2.5 text-muted-foreground text-center">

@@ -13,6 +13,7 @@ import { useDisableScroll } from "@/shared/hooks/use-disable-scroll"
 import { Button } from "@/shared/ui/button"
 import { Icon } from "@/shared/ui/icon"
 import { TRANSITION } from "@/shared/ui/modal-root"
+import { Touchable } from "@/shared/ui/touchable"
 import { cn } from "@/shared/utils/cn"
 import type { IconName } from "@/types/icon-name"
 
@@ -155,24 +156,25 @@ export const RouteNavigation = () => {
 							<div className="flex gap-2">
 								<StepIcon name="location-24" />
 								{steps.map((step, i) => (
-									<button
-										key={i}
-										type="button"
-										className="flex gap-2 flex-1 items-center"
-										onClick={() => {
-											setCurrentStep(i)
-											setActiveFloor(step.floor)
-											moveTo(step.x, step.y)
-										}}
-									>
-										<div
-											className={cn(
-												"h-1 flex-1 bg-border rounded-full transition-colors",
-												i === currentStep && "bg-primary",
-											)}
-										/>
-										<StepIcon name={step.icon} isActive={i === currentStep} />
-									</button>
+									<Touchable key={i}>
+										<button
+											type="button"
+											className="flex gap-2 flex-1 items-center"
+											onClick={() => {
+												setCurrentStep(i)
+												setActiveFloor(step.floor)
+												moveTo(step.x, step.y)
+											}}
+										>
+											<div
+												className={cn(
+													"h-1 flex-1 bg-border rounded-full transition-colors",
+													i === currentStep && "bg-primary",
+												)}
+											/>
+											<StepIcon name={step.icon} isActive={i === currentStep} />
+										</button>
+									</Touchable>
 								))}
 							</div>
 						</>

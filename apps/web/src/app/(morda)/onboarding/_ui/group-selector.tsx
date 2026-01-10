@@ -7,6 +7,8 @@ import { useMemo, useState } from "react"
 import { orpc } from "@repo/orpc/react"
 import { isInsensitiveMatch } from "@repo/shared/is-insensitive-match"
 
+import { Touchable } from "@/shared/ui/touchable"
+
 export const GroupSelector = () => {
 	const [groupName, setGroupName] = useState("")
 
@@ -51,14 +53,15 @@ export const GroupSelector = () => {
 			/>
 
 			{filteredGroups?.map((group) => (
-				<button
-					key={group.id}
-					type="button"
-					className="p-2 rounded-2xl bg-card border border-border"
-					onClick={handleGroupClick(group.id)}
-				>
-					{group.displayName}
-				</button>
+				<Touchable key={group.id}>
+					<button
+						type="button"
+						className="p-2 rounded-2xl bg-card border border-border"
+						onClick={handleGroupClick(group.id)}
+					>
+						{group.displayName}
+					</button>
+				</Touchable>
 			))}
 		</div>
 	)
