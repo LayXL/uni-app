@@ -2,7 +2,9 @@
 
 import { backButton, useSignal } from "@tma.js/sdk-react"
 import { usePathname, useRouter } from "next/navigation"
-import { type ReactNode, useEffect } from "react"
+import { type ReactNode, useEffect, useRef } from "react"
+
+import { usePopupCloseTop, usePopupStackCount } from "@/shared/ui/popup"
 
 type BackButtonProviderProps = {
 	children: ReactNode
@@ -12,7 +14,15 @@ const BackButtonProviderComponent = ({ children }: BackButtonProviderProps) => {
 	const router = useRouter()
 	const pathname = usePathname()
 
+	const popupCount = usePopupStackCount()
+	const closeTopPopup = usePopupCloseTop()
+
 	const isAvailable = useSignal(backButton.mount.isAvailable, () => false)
+
+	const closeTopPopupRef = useRef(closeTopPopup)
+	useEffect(() => {
+		closeTopPopupRef.current = closeTopPopup
+	}, [closeTopPopup])
 
 	useEffect(() => {
 		if (!isAvailable) {
@@ -22,7 +32,10 @@ const BackButtonProviderComponent = ({ children }: BackButtonProviderProps) => {
 		backButton.mount()
 
 		const offClick = backButton.onClick(() => {
-			router.back()
+			const closed = closeTopPopupRef.current()
+			if (!closed) {
+				router.back()
+			}
 		})
 
 		return () => {
@@ -32,20 +45,18 @@ const BackButtonProviderComponent = ({ children }: BackButtonProviderProps) => {
 	}, [router, isAvailable])
 
 	useEffect(() => {
+		if (!isAvailable) return
+
 		const hasHistory =
 			window.history.length > 1 && Boolean(pathname) && pathname !== "/"
+		const hasPopups = popupCount > 0
 
-		try {
-			if (hasHistory) {
-				backButton.show.ifAvailable()
-			} else {
-				backButton.hide.ifAvailable()
-			}
-		} catch (error) {
-			// biome-ignore lint/suspicious/noConsole: tma sdk error
-			console.log("Failed to show/hide back button", error)
+		if (hasHistory || hasPopups) {
+			backButton.show()
+		} else {
+			backButton.hide()
 		}
-	}, [pathname])
+	}, [pathname, popupCount, isAvailable])
 
 	return children
 }

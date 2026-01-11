@@ -7,6 +7,7 @@ import { Button } from "@/shared/ui/button"
 import { Icon } from "@/shared/ui/icon"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { ModalRoot } from "@/shared/ui/modal-root"
+import { usePopupClose } from "@/shared/ui/popup"
 import { SearchInput, type SearchInputItem } from "@/shared/ui/search-input"
 import { Touchable } from "@/shared/ui/touchable"
 import { cn } from "@/shared/utils/cn"
@@ -38,6 +39,8 @@ const SearchInputTrigger = ({
 	displayValue,
 }: SearchInputTriggerProps) => {
 	const [isOpen, setIsOpen] = useState(false)
+
+	usePopupClose(isOpen, () => setIsOpen(false))
 
 	const handleChange = (id: number) => {
 		onChange(id)

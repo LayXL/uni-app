@@ -3,6 +3,7 @@ import type { ReactNode } from "react"
 
 import { useDisableScroll } from "../hooks/use-disable-scroll"
 import { Icon } from "./icon"
+import { usePopupClose } from "./popup"
 import { Portal } from "./portal"
 import { Touchable } from "./touchable"
 
@@ -30,7 +31,10 @@ export const ModalRoot = ({
 	showCloseButton = true,
 	fullHeight = false,
 }: ModalRootProps) => {
+	const handleClose = onClose ?? close ?? (() => {})
+
 	useDisableScroll(isOpen)
+	usePopupClose(isOpen, handleClose)
 
 	return (
 		<AnimatePresence>
@@ -42,7 +46,7 @@ export const ModalRoot = ({
 							className="absolute inset-0 bg-black/60"
 							exit={{ opacity: 0 }}
 							initial={{ opacity: 0 }}
-							onClick={onClose ?? close}
+							onClick={handleClose}
 							transition={TRANSITION}
 						/>
 						<motion.div
@@ -58,7 +62,7 @@ export const ModalRoot = ({
 										<button
 											type="button"
 											className="cursor-pointer bg-card border border-border rounded-full p-1"
-											onClick={onClose ?? close}
+											onClick={handleClose}
 										>
 											<Icon name="cancel-24" className="icon-secondary" />
 										</button>
