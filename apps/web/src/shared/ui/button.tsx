@@ -11,6 +11,7 @@ import type { IconName } from "@/types/icon-name"
 
 import { cn } from "../utils/cn"
 import { Icon } from "./icon"
+import { LiquidBorder } from "./liquid-border"
 import { Touchable } from "./touchable"
 
 type ButtonProps = {
@@ -45,7 +46,7 @@ export const Button = (props: ButtonProps) => {
 	} = props
 
 	const className = cn(
-		"block truncate transition-[background-color,filter,color] cursor-pointer",
+		"block truncate transition-[background-color,filter,color] cursor-pointer relative",
 
 		"flex gap-2 items-center justify-center p-4 rounded-3xl font-medium",
 
@@ -59,6 +60,7 @@ export const Button = (props: ButtonProps) => {
 	const children =
 		leftIcon || rightIcon ? (
 			<>
+				<LiquidBorder />
 				{leftIcon && <Icon name={leftIcon} size={20} />}
 				{label}
 				{rightIcon && <Icon name={rightIcon} size={20} />}

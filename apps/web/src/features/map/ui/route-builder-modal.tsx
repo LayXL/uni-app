@@ -5,6 +5,7 @@ import { isRoom } from "@repo/shared/building-scheme"
 
 import { Button } from "@/shared/ui/button"
 import { Icon } from "@/shared/ui/icon"
+import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { ModalRoot } from "@/shared/ui/modal-root"
 import { SearchInput, type SearchInputItem } from "@/shared/ui/search-input"
 
@@ -96,7 +97,8 @@ export const RouteBuilderModal = () => {
 		<ModalRoot isOpen={isModalOpen} onClose={closeModal}>
 			<div className="flex flex-col gap-4">
 				<h2 className="text-2xl font-medium">Маршрут</h2>
-				<div className="bg-card border border-border rounded-3xl relative">
+				<div className="relative bg-card rounded-3xl">
+					<LiquidBorder />
 					<div className="relative">
 						<div className="absolute size-12 grid place-items-center pointer-events-none z-10">
 							<Icon name="iconify:material-symbols:near-me-rounded" size={24} />
@@ -112,7 +114,7 @@ export const RouteBuilderModal = () => {
 							className="bg-transparent border-none rounded-3xl pl-12 h-12"
 						/>
 					</div>
-					<div className="h-px ml-13 bg-border" />
+					<div className="h-px ml-13 mr-px bg-border" />
 					<div className="relative">
 						<div className="absolute size-12 grid place-items-center pointer-events-none z-10">
 							<Icon name="iconify:material-symbols:flag-rounded" size={24} />

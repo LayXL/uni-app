@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 
+import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { Touchable } from "@/shared/ui/touchable"
 
 import { useScheduleGroup } from "../hooks/use-schedule-group"
@@ -13,8 +14,9 @@ export const ScheduleGroup = () => {
 		<Touchable>
 			<Link
 				href="/onboarding"
-				className="w-26 bg-card border border-border rounded-3xl px-3 py-2"
+				className="relative w-26 bg-card rounded-3xl px-3 py-2"
 			>
+				<LiquidBorder />
 				{group?.displayName}
 			</Link>
 		</Touchable>

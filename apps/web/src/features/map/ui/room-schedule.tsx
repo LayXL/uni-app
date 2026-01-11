@@ -10,6 +10,7 @@ import { getNextTwoWeeksDates } from "@repo/shared/lessons/get-next-two-weeks-da
 import { LessonCard } from "@/entities/lesson/ui/lesson-card"
 import { Touchable } from "@/shared/ui/touchable"
 import { cn } from "@/shared/utils/cn"
+import { LiquidBorder } from "@/shared/ui/liquid-border"
 
 const weekdays = ["вс", "пн", "вт", "ср", "чт", "пт", "сб"]
 
@@ -68,11 +69,12 @@ export const RoomSchedule = ({ room }: RoomScheduleProps) => {
 							<button
 								type="button"
 								className={cn(
-									"bg-card border border-border rounded-3xl px-3 py-2 flex gap-1 items-end transition-colors",
+									"relative bg-card rounded-3xl px-3 py-2 flex gap-1 items-end transition-colors",
 									selectedDate === date && "bg-accent text-accent-foreground",
 								)}
 								onClick={() => setSelectedDate(date)}
 							>
+								<LiquidBorder />
 								<span>{format(parseISO(date), "dd.MM")}</span>
 								<p
 									className={cn(

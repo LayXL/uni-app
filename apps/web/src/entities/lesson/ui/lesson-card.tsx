@@ -7,6 +7,7 @@ import { transformToGroupName } from "@repo/shared/groups/transform-to-group-nam
 import type { Lesson } from "@repo/shared/lessons/types/lesson"
 import { cutSubjectName } from "@repo/shared/subjects/cut-subject-name"
 
+import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { ModalRoot } from "@/shared/ui/modal-root"
 import { Touchable } from "@/shared/ui/touchable"
 
@@ -29,9 +30,10 @@ export const LessonCard = ({ lesson, group }: LessonCardProps) => {
 			<Touchable>
 				<button
 					type="button"
-					className="bg-card border border-border px-2 py-2 rounded-3xl flex items-center gap-2"
+					className="relative bg-card px-2 py-2 rounded-3xl flex items-center gap-2"
 					onClick={() => setIsOpen(true)}
 				>
+					<LiquidBorder />
 					<p className="font-medium tabular-nums">{lesson.order}</p>
 					<div className="w-px self-stretch bg-border" />
 					<div className="flex flex-col tabular-nums">

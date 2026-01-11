@@ -1,6 +1,7 @@
 "use client"
 
 import { Icon } from "@/shared/ui/icon"
+import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { Touchable } from "@/shared/ui/touchable"
 import type { IconName } from "@/types/icon-name"
 
@@ -16,9 +17,10 @@ const MapBottomBarButton = ({ icon, onClick }: MapBottomBarButtonProps) => {
 		<Touchable>
 			<button
 				type="button"
-				className="flex items-center justify-center size-12 rounded-3xl bg-background border border-border"
+				className="relative flex items-center justify-center size-12 rounded-3xl bg-background"
 				onClick={onClick}
 			>
+				<LiquidBorder />
 				<Icon name={icon} size={20} />
 			</button>
 		</Touchable>
