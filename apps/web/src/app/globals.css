@@ -45,7 +45,7 @@
 			var(--tg-viewport-content-safe-area-inset-left)
 		);
 
-		--background: var(--tg-theme-secondary-bg-color);
+		/* --background: var(--tg-theme-secondary-bg-color);
 		--foreground: var(--tg-theme-text-color);
 		--secondary: var(--tg-theme-secondary-bg-color);
 		--muted: var(--tg-theme-subtitle-text-color);
@@ -53,7 +53,17 @@
 		--border: var(--tg-theme-section-separator-color);
 		--accent: var(--tg-theme-button-color);
 		--accent-foreground: var(--tg-theme-button-text-color);
-		--destructive: var(--tg-theme-destructive-text-color);
+		--destructive: var(--tg-theme-destructive-text-color); */
+
+		--background: #ffffff;
+		--foreground: #000000;
+		--secondary: #efeff4;
+		--muted: #8e8e93;
+		--card: #fafafa;
+		--border: #c8c7cc;
+		--accent: #fc4c01;
+		--accent-foreground: #ffffff;
+		--destructive: #ff3b30;
 
 		--map-background: #ffffff;
 		--map-floor-fill: #f0efde;
@@ -66,6 +76,16 @@
 	}
 
 	.dark {
+		--background: #1a1a1a;
+		--foreground: #ffffff;
+		--secondary: #1c1c1d;
+		--muted: #98989e;
+		--card: #2c2c2e;
+		--border: #545458;
+		--accent: #fc4c01;
+		--accent-foreground: #ffffff;
+		--destructive: #ff3b30;
+
 		--map-background: #1b2329;
 		--map-floor-fill: #5b5b5b;
 		--map-floor-stroke: #444342;

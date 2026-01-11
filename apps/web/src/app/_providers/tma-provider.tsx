@@ -7,7 +7,7 @@ export const TmaProvider = ({ children }: { children: ReactNode }) => {
 	useEffect(() => {
 		try {
 			init()
-			setDebug(true)
+			setDebug(process.env.NODE_ENV === "development")
 		} catch (error) {
 			// biome-ignore lint/suspicious/noConsole: tma sdk error
 			console.log("Failed to initialize TMA SDK", error)
