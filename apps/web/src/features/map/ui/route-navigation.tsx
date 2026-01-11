@@ -13,6 +13,7 @@ import { useDisableScroll } from "@/shared/hooks/use-disable-scroll"
 import { Button } from "@/shared/ui/button"
 import { Icon } from "@/shared/ui/icon"
 import { TRANSITION } from "@/shared/ui/modal-root"
+import { usePopupClose } from "@/shared/ui/popup"
 import { Touchable } from "@/shared/ui/touchable"
 import { cn } from "@/shared/utils/cn"
 import type { IconName } from "@/types/icon-name"
@@ -117,6 +118,8 @@ export const RouteNavigation = () => {
 	)
 
 	useDisableScroll(isActive)
+
+	usePopupClose(isActive, resetRoute)
 
 	useEffect(() => {
 		if (isActive) {
