@@ -8,9 +8,9 @@ import type { Room } from "@repo/shared/building-scheme"
 import { getNextTwoWeeksDates } from "@repo/shared/lessons/get-next-two-weeks-dates"
 
 import { LessonCard } from "@/entities/lesson/ui/lesson-card"
+import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { Touchable } from "@/shared/ui/touchable"
 import { cn } from "@/shared/utils/cn"
-import { LiquidBorder } from "@/shared/ui/liquid-border"
 
 const weekdays = ["вс", "пн", "вт", "ср", "чт", "пт", "сб"]
 
@@ -90,26 +90,28 @@ export const RoomSchedule = ({ room }: RoomScheduleProps) => {
 				</div>
 			</div>
 			<div className="relative">
-				<AnimatePresence>
-					{position !== "top" && (
-						<motion.div
-							key="top"
-							initial={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-							exit={{ opacity: 0 }}
-							className="absolute top-0 left-0 right-0 min-h-12 bg-linear-to-b from-background to-transparent"
-						/>
-					)}
-					{position !== "bottom" && (
-						<motion.div
-							key="bottom"
-							initial={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-							exit={{ opacity: 0 }}
-							className="absolute bottom-0 left-0 right-0 min-h-12 bg-linear-to-t from-background to-transparent"
-						/>
-					)}
-				</AnimatePresence>
+				{filteredSchedule && filteredSchedule.length > 0 && (
+					<AnimatePresence>
+						{position !== "top" && (
+							<motion.div
+								key="top"
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								exit={{ opacity: 0 }}
+								className="absolute top-0 left-0 right-0 min-h-12 bg-linear-to-b from-background to-transparent"
+							/>
+						)}
+						{position !== "bottom" && (
+							<motion.div
+								key="bottom"
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								exit={{ opacity: 0 }}
+								className="absolute bottom-0 left-0 right-0 min-h-12 bg-linear-to-t from-background to-transparent"
+							/>
+						)}
+					</AnimatePresence>
+				)}
 				<div
 					className="flex flex-col gap-2 max-h-64 overflow-scroll"
 					onScroll={handleScroll}
