@@ -1,7 +1,7 @@
 import { skipToken, useQuery } from "@tanstack/react-query"
 import { format, parseISO } from "date-fns"
 import { AnimatePresence, motion } from "motion/react"
-import { useMemo, useState } from "react"
+import { type UIEvent, useMemo, useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
 import type { Room } from "@repo/shared/building-scheme"
@@ -42,15 +42,13 @@ export const RoomSchedule = ({ room }: RoomScheduleProps) => {
 
 	const [position, setPosition] = useState<"top" | "bottom" | null>("top")
 
-	const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
-		const target = event.target as HTMLDivElement
-		const scrollTop = target.scrollTop
-		const scrollHeight = target.scrollHeight
-		const clientHeight = target.clientHeight
-		const isAtBottom = scrollTop + clientHeight >= scrollHeight
-		if (isAtBottom) {
+	const handleScroll = (event: UIEvent<HTMLDivElement>) => {
+		const { scrollTop, scrollHeight, clientHeight } =
+			event.target as HTMLDivElement
+
+		if (scrollTop + clientHeight >= scrollHeight) {
 			setPosition("bottom")
-		} else if (scrollTop === 0) {
+		} else if (scrollTop <= 0) {
 			setPosition("top")
 		} else {
 			setPosition(null)
@@ -90,6 +88,20 @@ export const RoomSchedule = ({ room }: RoomScheduleProps) => {
 				</div>
 			</div>
 			<div className="relative">
+				<div
+					className="flex flex-col gap-2 max-h-64 overflow-scroll"
+					onScroll={handleScroll}
+				>
+					{filteredSchedule && filteredSchedule.length > 0 ? (
+						filteredSchedule.map((lesson, i) => (
+							<LessonCard key={i} lesson={lesson} />
+						))
+					) : (
+						<p className="text-sm text-muted">
+							У этого кабинета нет расписания на этот день
+						</p>
+					)}
+				</div>
 				{filteredSchedule && filteredSchedule.length > 0 && (
 					<AnimatePresence>
 						{position !== "top" && (
@@ -112,20 +124,6 @@ export const RoomSchedule = ({ room }: RoomScheduleProps) => {
 						)}
 					</AnimatePresence>
 				)}
-				<div
-					className="flex flex-col gap-2 max-h-64 overflow-scroll"
-					onScroll={handleScroll}
-				>
-					{filteredSchedule && filteredSchedule.length > 0 ? (
-						filteredSchedule.map((lesson, i) => (
-							<LessonCard key={i} lesson={lesson} />
-						))
-					) : (
-						<p className="text-sm text-muted">
-							У этого кабинета нет расписания на этот день
-						</p>
-					)}
-				</div>
 			</div>
 		</div>
 	)
