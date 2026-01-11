@@ -20,12 +20,11 @@ import { RouteBuilderSuggestions } from "./route-builder-suggestions"
 type SearchInputTriggerProps = {
 	icon: IconName
 	value?: number
-	placeholder?: string
+	placeholder: string
 	items: SearchInputItem<number>[]
 	excludeKey?: number | null
 	onChange: (id: number) => void
-	filterFn: (item: SearchInputItem<number>, query: string) => boolean
-	displayValue?: string
+	filterFn?: (item: SearchInputItem<number>, query: string) => boolean
 }
 
 const SearchInputTrigger = ({
@@ -36,11 +35,16 @@ const SearchInputTrigger = ({
 	excludeKey,
 	onChange,
 	filterFn,
-	displayValue,
 }: SearchInputTriggerProps) => {
 	const [isOpen, setIsOpen] = useState(false)
 
 	usePopupClose(isOpen, () => setIsOpen(false))
+
+	const displayValue = items.find((item) => item.key === value)?.value
+
+	const filteredItems = excludeKey
+		? items.filter((item) => item.key !== excludeKey)
+		: items
 
 	const handleChange = (id: number) => {
 		onChange(id)
@@ -61,7 +65,7 @@ const SearchInputTrigger = ({
 					<p
 						className={cn(
 							"text-muted rounded-3xl line-clamp-1 w-full break-all pr-4",
-							value && "text-foreground",
+							displayValue && "text-foreground",
 						)}
 					>
 						{displayValue ?? placeholder}
@@ -72,7 +76,7 @@ const SearchInputTrigger = ({
 				<div className="fixed inset-0 bg-background z-50 p-4 pt-[calc(var(--safe-area-inset-top)+1rem)]">
 					<SearchInput
 						autoFocus
-						items={items.filter((item) => item.key !== excludeKey)}
+						items={filteredItems}
 						value={value}
 						onChange={handleChange}
 						filterFn={filterFn}
@@ -182,9 +186,6 @@ export const RouteBuilderModal = () => {
 							excludeKey={endRoomId}
 							onChange={handleStartSelect}
 							filterFn={filterEntity}
-							displayValue={
-								entityItems.find((e) => e.key === startRoomId)?.value
-							}
 						/>
 						<div className="h-px ml-12 mr-px bg-border" />
 						<SearchInputTrigger
@@ -195,7 +196,6 @@ export const RouteBuilderModal = () => {
 							excludeKey={startRoomId}
 							onChange={handleEndSelect}
 							filterFn={filterEntity}
-							displayValue={entityItems.find((e) => e.key === endRoomId)?.value}
 						/>
 					</div>
 					<RouteBuilderSuggestions
