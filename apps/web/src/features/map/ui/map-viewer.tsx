@@ -6,14 +6,8 @@ import { useCallback, useEffect, useRef, useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
 
-import { Icon } from "@/shared/ui/icon"
-import { ModalRoot } from "@/shared/ui/modal-root"
-import { Touchable } from "@/shared/ui/touchable"
-import { cn } from "@/shared/utils/cn"
-
 import { useActiveFloor } from "../hooks/use-active-floor"
 import { useColorScheme } from "../hooks/use-color-scheme"
-import { useFilteredFloors } from "../hooks/use-filtered-floors"
 import { useFloorRender } from "../hooks/use-floor-render"
 import { useMapCanvas } from "../hooks/use-map-canvas"
 import { useMapData } from "../hooks/use-map-data"
@@ -22,7 +16,9 @@ import { useMapViewport } from "../hooks/use-map-viewport"
 import { useRouteBuilder } from "../hooks/use-route-builder"
 import { clamp, collectBounds, createViewportMatrix } from "../lib/geometry"
 import type { ViewportState } from "../types"
+import { CursorPositionDebug } from "./cursor-position-debug"
 import { MapControls } from "./map-controls"
+import { MapFloorSelector } from "./map-floor-selector"
 import { RoomModal } from "./room-modal"
 import { RouteBuilderModal } from "./route-builder-modal"
 
@@ -38,7 +34,6 @@ export const MapViewer = () => {
 		}),
 	)
 
-	const [activeCampus, setActiveCampus] = useState<number>(0)
 	const { activeFloor, setActiveFloor } = useActiveFloor()
 	const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null)
 	const [isDebug] = useState(process.env.NODE_ENV === "development")
@@ -173,8 +168,6 @@ export const MapViewer = () => {
 		rotateAtCenter(-currentRotation)
 	}, [rotateAtCenter, viewportRef])
 
-	const filteredFloors = useFilteredFloors(mapData, activeCampus)
-
 	useMapInteractions({
 		fabricRef,
 		zoomAtPoint,
@@ -184,7 +177,6 @@ export const MapViewer = () => {
 		screenToWorld,
 		onRoomClick: (roomId) => setSelectedRoomId(roomId),
 		onPointerMove: isDebug ? setCursorCoords : undefined,
-		// onRightClick: isDebug ? handleDebugRightClick : undefined,
 	})
 
 	useFloorRender({
@@ -208,66 +200,32 @@ export const MapViewer = () => {
 			<canvas ref={canvasRef} className="size-full" />
 
 			{isDebug && cursorCoords && (
-				<div
-					className="pointer-events-none absolute rounded-md bg-neutral-900/80 px-2 py-1 text-xs text-white shadow"
-					style={{
-						left: cursorCoords.screen.x + 10,
-						top: cursorCoords.screen.y + 10,
-					}}
-				>
-					<div>
-						{cursorCoords.world.x.toFixed(0)}, {cursorCoords.world.y.toFixed(0)}
-					</div>
-				</div>
+				<CursorPositionDebug cursorCoords={cursorCoords} />
 			)}
 
-			<div className="absolute top-1/2 -translate-y-1/2 left-3 bg-background border border-border flex flex-col rounded-3xl">
-				<Touchable>
-					<button
-						type="button"
-						className="size-8 text-xs grid place-items-center bg-background rounded-3xl"
-						onClick={() => setActiveCampus(activeCampus === 0 ? 1 : 0)}
-					>
-						<Icon name={activeCampus === 0 ? "midis" : "seven"} size={24} />
-					</button>
-				</Touchable>
-				{filteredFloors?.map((floor) => (
-					<Touchable key={floor.id}>
-						<button
-							type="button"
-							className={cn(
-								"size-8 text-sm grid place-items-center bg-background rounded-3xl",
-								activeFloor === floor.id && "bg-accent text-accent-foreground",
-							)}
-							onClick={() => {
-								setActiveFloor(floor.id)
-								centerOnFloor(floor.id)
-							}}
-						>
-							{floor.acronym ?? floor.name}
-						</button>
-					</Touchable>
-				))}
+			<div className="absolute top-1/2 -translate-y-1/2 left-3">
+				<MapFloorSelector
+					activeFloor={activeFloor}
+					onChangeFloor={(floorId) => {
+						setActiveFloor(floorId)
+						centerOnFloor(floorId)
+					}}
+					mapData={mapData}
+				/>
 			</div>
 
-			<MapControls
-				zoomByStep={zoomByStep}
-				rotation={rotation}
-				resetRotation={resetRotation}
-			/>
+			<div className="absolute top-1/2 -translate-y-1/2 right-3">
+				<MapControls
+					zoomByStep={zoomByStep}
+					rotation={rotation}
+					resetRotation={resetRotation}
+				/>
+			</div>
 
-			<ModalRoot
-				isOpen={selectedRoomId !== null}
+			<RoomModal
+				roomId={selectedRoomId}
 				onClose={() => setSelectedRoomId(null)}
-			>
-				{selectedRoomId && (
-					<RoomModal
-						roomId={selectedRoomId}
-						onClose={() => setSelectedRoomId(null)}
-					/>
-				)}
-			</ModalRoot>
-
+			/>
 			<RouteBuilderModal />
 		</div>
 	)
