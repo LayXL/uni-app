@@ -1,6 +1,6 @@
 import { skipToken, useQuery } from "@tanstack/react-query"
 import { format, parseISO } from "date-fns"
-import { AnimatePresence, motion } from "motion/react"
+import { motion } from "motion/react"
 import { type UIEvent, useMemo, useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
@@ -102,27 +102,19 @@ export const RoomSchedule = ({ room }: RoomScheduleProps) => {
 						</p>
 					)}
 				</div>
-				{filteredSchedule && filteredSchedule.length > 4 && (
-					<AnimatePresence>
-						{position !== "top" && (
-							<motion.div
-								key="top"
-								initial={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
-								exit={{ opacity: 0 }}
-								className="absolute top-0 left-0 right-0 min-h-12 bg-linear-to-b from-background to-transparent pointer-events-none"
-							/>
-						)}
-						{position !== "bottom" && (
-							<motion.div
-								key="bottom"
-								initial={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
-								exit={{ opacity: 0 }}
-								className="absolute bottom-0 left-0 right-0 min-h-12 bg-linear-to-t from-background to-transparent pointer-events-none"
-							/>
-						)}
-					</AnimatePresence>
+				{filteredSchedule && filteredSchedule.length > 3 && (
+					<>
+						<motion.div
+							key="top"
+							animate={{ opacity: position !== "top" ? 1 : 0 }}
+							className="absolute top-0 left-0 right-0 min-h-12 bg-linear-to-b from-background to-transparent pointer-events-none"
+						/>
+						<motion.div
+							key="bottom"
+							animate={{ opacity: position !== "bottom" ? 1 : 0 }}
+							className="absolute bottom-0 left-0 right-0 min-h-12 bg-linear-to-t from-background to-transparent pointer-events-none"
+						/>
+					</>
 				)}
 			</div>
 		</div>

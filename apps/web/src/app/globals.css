@@ -45,16 +45,6 @@
 			var(--tg-viewport-content-safe-area-inset-left)
 		);
 
-		/* --background: var(--tg-theme-secondary-bg-color);
-		--foreground: var(--tg-theme-text-color);
-		--secondary: var(--tg-theme-secondary-bg-color);
-		--muted: var(--tg-theme-subtitle-text-color);
-		--card: var(--tg-theme-section-bg-color);
-		--border: var(--tg-theme-section-separator-color);
-		--accent: var(--tg-theme-button-color);
-		--accent-foreground: var(--tg-theme-button-text-color);
-		--destructive: var(--tg-theme-destructive-text-color); */
-
 		--background: #ffffff;
 		--foreground: #000000;
 		--secondary: #efeff4;
