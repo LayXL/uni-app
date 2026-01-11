@@ -41,8 +41,6 @@ export const RoomSchedule = ({ room }: RoomScheduleProps) => {
 
 	const [position, setPosition] = useState<"top" | "bottom" | null>("top")
 
-	console.log(position)
-
 	const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
 		const target = event.target as HTMLDivElement
 		const scrollTop = target.scrollTop
