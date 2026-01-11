@@ -52,18 +52,21 @@ const SearchInputTrigger = ({
 					className="h-12 w-full flex items-center"
 					onClick={() => setIsOpen(true)}
 				>
-					<div className="size-12 grid place-items-center pointer-events-none">
+					<div className="size-12 min-w-12 grid place-items-center pointer-events-none">
 						<Icon name={icon} size={24} />
 					</div>
 					<p
-						className={cn("text-muted rounded-3xl", value && "text-foreground")}
+						className={cn(
+							"text-muted rounded-3xl line-clamp-1 w-full break-all pr-4",
+							value && "text-foreground",
+						)}
 					>
 						{displayValue ?? placeholder}
 					</p>
 				</button>
 			</Touchable>
 			{isOpen && (
-				<div className="fixed inset-0 bg-background z-50 p-4">
+				<div className="fixed inset-0 bg-background z-50 p-4 pt-[calc(var(--safe-area-inset-top)+1rem)]">
 					<SearchInput
 						autoFocus
 						items={items.filter((item) => item.key !== excludeKey)}

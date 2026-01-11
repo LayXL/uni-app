@@ -164,6 +164,7 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 							<Touchable key={String(item.key)}>
 								<button
 									type="button"
+									onMouseDown={(e) => e.preventDefault()}
 									onClick={() => handleSelect(item)}
 									onMouseEnter={() => setHighlightedIndex(index)}
 									className={cn(
