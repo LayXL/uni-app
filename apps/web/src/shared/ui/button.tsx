@@ -60,7 +60,7 @@ export const Button = (props: ButtonProps) => {
 	const children =
 		leftIcon || rightIcon ? (
 			<>
-				<LiquidBorder />
+				<LiquidBorder variant={variant === "accent" ? "accent" : undefined} />
 				{leftIcon && <Icon name={leftIcon} size={20} />}
 				{label}
 				{rightIcon && <Icon name={rightIcon} size={20} />}
