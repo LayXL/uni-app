@@ -25,7 +25,7 @@ const ScheduleViewerWithGroup = ({ group }: { group: number }) => {
 	const groupedSchedule = data ? groupScheduleItems(data, dates) : []
 
 	return (
-		<div className="pb-2 flex flex-col gap-2">
+		<div className="pb-2 flex flex-col gap-6">
 			{groupedSchedule.map(({ date, lessons }) => (
 				<div key={date} className="px-2 flex flex-col gap-2">
 					<h2 className="text-lg font-semibold px-2">
