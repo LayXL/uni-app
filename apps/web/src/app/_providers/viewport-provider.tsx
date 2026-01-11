@@ -37,7 +37,7 @@ export const ViewportProvider = ({ children }: ViewportProviderProps) => {
 			return
 		}
 
-		// viewport.requestFullscreen()
+		viewport.requestFullscreen()
 	}, [isRequestFullscreenAvailable, isMobile])
 
 	return children
