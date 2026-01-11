@@ -1,7 +1,5 @@
 "use client"
 
-import Link from "next/link"
-
 import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { Touchable } from "@/shared/ui/touchable"
 
@@ -12,13 +10,13 @@ export const ScheduleGroup = () => {
 
 	return (
 		<Touchable>
-			<Link
-				href="/onboarding"
+			<button
+				type="button"
 				className="relative w-26 bg-card rounded-3xl px-3 py-2"
 			>
 				<LiquidBorder />
 				{group?.displayName}
-			</Link>
+			</button>
 		</Touchable>
 	)
 }
