@@ -102,7 +102,7 @@ export const RoomSchedule = ({ room }: RoomScheduleProps) => {
 						</p>
 					)}
 				</div>
-				{filteredSchedule && filteredSchedule.length > 0 && (
+				{filteredSchedule && filteredSchedule.length > 4 && (
 					<AnimatePresence>
 						{position !== "top" && (
 							<motion.div
@@ -110,7 +110,7 @@ export const RoomSchedule = ({ room }: RoomScheduleProps) => {
 								initial={{ opacity: 0 }}
 								animate={{ opacity: 1 }}
 								exit={{ opacity: 0 }}
-								className="absolute top-0 left-0 right-0 min-h-12 bg-linear-to-b from-background to-transparent"
+								className="absolute top-0 left-0 right-0 min-h-12 bg-linear-to-b from-background to-transparent pointer-events-none"
 							/>
 						)}
 						{position !== "bottom" && (
@@ -119,7 +119,7 @@ export const RoomSchedule = ({ room }: RoomScheduleProps) => {
 								initial={{ opacity: 0 }}
 								animate={{ opacity: 1 }}
 								exit={{ opacity: 0 }}
-								className="absolute bottom-0 left-0 right-0 min-h-12 bg-linear-to-t from-background to-transparent"
+								className="absolute bottom-0 left-0 right-0 min-h-12 bg-linear-to-t from-background to-transparent pointer-events-none"
 							/>
 						)}
 					</AnimatePresence>
