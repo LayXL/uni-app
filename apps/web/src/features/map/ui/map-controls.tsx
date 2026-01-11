@@ -1,55 +1,58 @@
-import { motion } from "motion/react"
+import { motion, useScroll, useTransform } from "motion/react"
 
-import { Icon } from "@/shared/ui/icon"
-import { Touchable } from "@/shared/ui/touchable"
+import { useViewportDimensions } from "@/shared/hooks/use-viewport-dimensions"
+
+import { FloorControls } from "./floor-control"
+import { PositionControls } from "./position-controls"
 
 type MapControlsProps = {
+	activeFloor: number
+	onChangeFloor: (floorId: number) => void
 	zoomByStep: (deltaZoom: number) => void
 	rotation: number
 	resetRotation: () => void
 }
 
 export const MapControls = ({
+	activeFloor,
+	onChangeFloor,
 	zoomByStep,
 	rotation,
 	resetRotation,
 }: MapControlsProps) => {
+	const { scrollY } = useScroll()
+
+	const { height } = useViewportDimensions()
+	const heightSafe = Math.max(height, 1)
+
+	const value = useTransform(scrollY, [0, heightSafe], [0, 1])
+
+	const y = useTransform(value, [0, 0.7], ["-50%", "-200%"])
+	const opacity = useTransform(value, [0.3, 0.4], [1, 0])
+	const pointerEvents = useTransform(value, [0.3, 0.38], ["auto", "none"])
+
 	return (
-		<div className="bg-background border border-border flex flex-col gap-2 rounded-3xl">
-			<Touchable>
-				<button
-					type="button"
-					className="size-8 text-lg grid place-items-center rounded-3xl bg-background"
-					onClick={() => zoomByStep(1.2)}
-				>
-					<Icon name="add-16" />
-				</button>
-			</Touchable>
-			<Touchable>
-				<button
-					type="button"
-					className="size-8 text-lg grid place-items-center rounded-3xl bg-background"
-					onClick={() => zoomByStep(1 / 1.2)}
-				>
-					<Icon name="minus-16" />
-				</button>
-			</Touchable>
-			{rotation !== 0 && (
-				<Touchable>
-					<button
-						type="button"
-						className="size-8 text-lg grid place-items-center rounded-3xl bg-background"
-						onClick={resetRotation}
-					>
-						<motion.span
-							initial={{ rotate: (rotation * 180 - 140) / Math.PI }}
-							animate={{ rotate: (rotation * 180 - 140) / Math.PI }}
-						>
-							<Icon name="compass-24" size={16} />
-						</motion.span>
-					</button>
-				</Touchable>
-			)}
-		</div>
+		<>
+			<motion.div
+				className="absolute top-1/2 left-3"
+				style={{ y, opacity, pointerEvents }}
+			>
+				<FloorControls
+					activeFloor={activeFloor}
+					onChangeFloor={onChangeFloor}
+				/>
+			</motion.div>
+
+			<motion.div
+				className="absolute top-1/2 right-3"
+				style={{ y, opacity, pointerEvents }}
+			>
+				<PositionControls
+					zoomByStep={zoomByStep}
+					rotation={rotation}
+					resetRotation={resetRotation}
+				/>
+			</motion.div>
+		</>
 	)
 }

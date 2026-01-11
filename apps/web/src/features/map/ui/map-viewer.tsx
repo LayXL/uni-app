@@ -18,7 +18,6 @@ import { clamp, collectBounds, createViewportMatrix } from "../lib/geometry"
 import type { ViewportState } from "../types"
 import { CursorPositionDebug } from "./cursor-position-debug"
 import { MapControls } from "./map-controls"
-import { MapFloorSelector } from "./map-floor-selector"
 import { RoomModal } from "./room-modal"
 import { RouteBuilderModal } from "./route-builder-modal"
 
@@ -203,24 +202,16 @@ export const MapViewer = () => {
 				<CursorPositionDebug cursorCoords={cursorCoords} />
 			)}
 
-			<div className="absolute top-1/2 -translate-y-1/2 left-3">
-				<MapFloorSelector
-					activeFloor={activeFloor}
-					onChangeFloor={(floorId) => {
-						setActiveFloor(floorId)
-						centerOnFloor(floorId)
-					}}
-					mapData={mapData}
-				/>
-			</div>
-
-			<div className="absolute top-1/2 -translate-y-1/2 right-3">
-				<MapControls
-					zoomByStep={zoomByStep}
-					rotation={rotation}
-					resetRotation={resetRotation}
-				/>
-			</div>
+			<MapControls
+				activeFloor={activeFloor}
+				onChangeFloor={(floorId) => {
+					setActiveFloor(floorId)
+					centerOnFloor(floorId)
+				}}
+				zoomByStep={zoomByStep}
+				rotation={rotation}
+				resetRotation={resetRotation}
+			/>
 
 			<RoomModal
 				roomId={selectedRoomId}

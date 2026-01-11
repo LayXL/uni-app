@@ -1,24 +1,23 @@
 import { useState } from "react"
 
-import type { BuildingScheme } from "@repo/shared/building-scheme"
-
 import { Icon } from "@/shared/ui/icon"
 import { Touchable } from "@/shared/ui/touchable"
 import { cn } from "@/shared/utils/cn"
 
 import { useFilteredFloors } from "../hooks/use-filtered-floors"
+import { useMapData } from "../hooks/use-map-data"
 
-type MapFloorSelectorProps = {
+type FloorControlsProps = {
 	activeFloor: number
 	onChangeFloor: (floorId: number) => void
-	mapData: BuildingScheme | undefined
 }
 
-export const MapFloorSelector = ({
-	mapData,
+export const FloorControls = ({
 	activeFloor,
 	onChangeFloor,
-}: MapFloorSelectorProps) => {
+}: FloorControlsProps) => {
+	const mapData = useMapData()
+
 	const [activeCampus, setActiveCampus] = useState<number>(0)
 
 	const filteredFloors = useFilteredFloors(mapData, activeCampus)
