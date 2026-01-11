@@ -9,6 +9,7 @@ import {
 } from "react"
 
 import { cn } from "../utils/cn"
+import { LiquidBorder } from "./liquid-border"
 import { Touchable } from "./touchable"
 
 export type SearchInputItem<T = string> = {
@@ -128,7 +129,8 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 	}
 
 	return (
-		<div ref={containerRef} className="relative w-full">
+		<div ref={containerRef} className="relative w-full rounded-3xl">
+			<LiquidBorder />
 			<input
 				ref={inputRef}
 				type="text"

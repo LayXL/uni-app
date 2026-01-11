@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 
 import type { MapEntity } from "@repo/shared/building-scheme"
 import { isRoom } from "@repo/shared/building-scheme"
@@ -8,10 +8,78 @@ import { Icon } from "@/shared/ui/icon"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { ModalRoot } from "@/shared/ui/modal-root"
 import { SearchInput, type SearchInputItem } from "@/shared/ui/search-input"
+import { Touchable } from "@/shared/ui/touchable"
+import { cn } from "@/shared/utils/cn"
+import type { IconName } from "@/types/icon-name"
 
 import { useMapData } from "../hooks/use-map-data"
 import { useRouteBuilder } from "../hooks/use-route-builder"
 import { RouteBuilderSuggestions } from "./route-builder-suggestions"
+
+type SearchInputTriggerProps = {
+	icon: IconName
+	value?: number
+	placeholder?: string
+	items: SearchInputItem<number>[]
+	excludeKey?: number | null
+	onChange: (id: number) => void
+	filterFn: (item: SearchInputItem<number>, query: string) => boolean
+	displayValue?: string
+}
+
+const SearchInputTrigger = ({
+	icon,
+	value,
+	placeholder,
+	items,
+	excludeKey,
+	onChange,
+	filterFn,
+	displayValue,
+}: SearchInputTriggerProps) => {
+	const [isOpen, setIsOpen] = useState(false)
+
+	const handleChange = (id: number) => {
+		onChange(id)
+		setIsOpen(false)
+	}
+
+	return (
+		<>
+			<Touchable>
+				<button
+					type="button"
+					className="h-12 w-full flex items-center"
+					onClick={() => setIsOpen(true)}
+				>
+					<div className="size-12 grid place-items-center pointer-events-none">
+						<Icon name={icon} size={24} />
+					</div>
+					<p
+						className={cn("text-muted rounded-3xl", value && "text-foreground")}
+					>
+						{displayValue ?? placeholder}
+					</p>
+				</button>
+			</Touchable>
+			{isOpen && (
+				<div className="fixed inset-0 bg-background z-50 p-4">
+					<SearchInput
+						autoFocus
+						items={items.filter((item) => item.key !== excludeKey)}
+						value={value}
+						onChange={handleChange}
+						filterFn={filterFn}
+						placeholder={placeholder}
+						maxSuggestions={8}
+						emptyMessage="Место не найдено"
+						onBlur={() => setIsOpen(false)}
+					/>
+				</div>
+			)}
+		</>
+	)
+}
 
 type Point = { floor: number; x: number; y: number }
 
@@ -100,41 +168,29 @@ export const RouteBuilderModal = () => {
 					<h2 className="text-2xl font-medium">Маршрут</h2>
 					<div className="relative bg-card rounded-3xl">
 						<LiquidBorder />
-						<div className="relative">
-							<div className="absolute size-12 grid place-items-center pointer-events-none z-10">
-								<Icon
-									name="iconify:material-symbols:near-me-rounded"
-									size={24}
-								/>
-							</div>
-							<SearchInput
-								autoFocus
-								items={entityItems.filter((item) => item.key !== endRoomId)}
-								value={startRoomId ?? undefined}
-								onChange={handleStartSelect}
-								filterFn={filterEntity}
-								placeholder="Откуда"
-								maxSuggestions={8}
-								emptyMessage="Место не найдено"
-								className="bg-transparent border-none rounded-3xl pl-12 h-12"
-							/>
-						</div>
+						<SearchInputTrigger
+							icon="iconify:material-symbols:near-me-rounded"
+							value={startRoomId ?? undefined}
+							placeholder="Откуда"
+							items={entityItems}
+							excludeKey={endRoomId}
+							onChange={handleStartSelect}
+							filterFn={filterEntity}
+							displayValue={
+								entityItems.find((e) => e.key === startRoomId)?.value
+							}
+						/>
 						<div className="h-px ml-12 mr-px bg-border" />
-						<div className="relative">
-							<div className="absolute size-12 grid place-items-center pointer-events-none z-10">
-								<Icon name="iconify:material-symbols:flag-rounded" size={24} />
-							</div>
-							<SearchInput
-								items={entityItems.filter((item) => item.key !== startRoomId)}
-								value={endRoomId ?? undefined}
-								onChange={handleEndSelect}
-								filterFn={filterEntity}
-								placeholder="Куда"
-								maxSuggestions={8}
-								emptyMessage="Место не найдено"
-								className="bg-transparent border-none rounded-3xl pl-12 h-12"
-							/>
-						</div>
+						<SearchInputTrigger
+							icon="iconify:material-symbols:flag-rounded"
+							value={endRoomId ?? undefined}
+							placeholder="Куда"
+							items={entityItems}
+							excludeKey={startRoomId}
+							onChange={handleEndSelect}
+							filterFn={filterEntity}
+							displayValue={entityItems.find((e) => e.key === endRoomId)?.value}
+						/>
 					</div>
 					<RouteBuilderSuggestions
 						handleStartSelect={handleStartSelect}
