@@ -128,6 +128,8 @@ export const RouteNavigation = () => {
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: moveTo and setActiveFloor are dependencies of useEffect
 	useEffect(() => {
+		if (!isActive) return
+
 		setCurrentStep(0)
 
 		const step = steps[0]
@@ -136,7 +138,7 @@ export const RouteNavigation = () => {
 			setActiveFloor(step.floor)
 			moveTo(step.x, step.y)
 		}
-	}, [steps])
+	}, [steps, isActive])
 
 	return (
 		<AnimatePresence>
