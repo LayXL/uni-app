@@ -4,6 +4,7 @@ import { type ReactNode, useEffect, useState } from "react"
 import { useDisableScroll } from "../hooks/use-disable-scroll"
 import { cn } from "../utils/cn"
 import { Icon } from "./icon"
+import { LiquidBorder } from "./liquid-border"
 import { usePopupClose } from "./popup"
 import { Portal } from "./portal"
 import { Touchable } from "./touchable"
@@ -82,9 +83,10 @@ export const ModalRoot = ({
 							<Touchable>
 								<button
 									type="button"
-									className="cursor-pointer bg-card border border-border rounded-full p-1"
+									className="relative bg-card rounded-full p-1"
 									onClick={handleClose}
 								>
+									<LiquidBorder />
 									<Icon name="cancel-24" className="icon-secondary" />
 								</button>
 							</Touchable>

@@ -8,6 +8,7 @@ import { Icon } from "@/shared/ui/icon"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { ModalRoot } from "@/shared/ui/modal-root"
 import { usePopupClose } from "@/shared/ui/popup"
+import { Portal } from "@/shared/ui/portal"
 import { SearchInput, type SearchInputItem } from "@/shared/ui/search-input"
 import { Touchable } from "@/shared/ui/touchable"
 import { cn } from "@/shared/utils/cn"
@@ -73,19 +74,21 @@ const SearchInputTrigger = ({
 				</button>
 			</Touchable>
 			{isOpen && (
-				<div className="fixed inset-0 bg-background z-50 p-4 pt-[calc(var(--safe-area-inset-top)+1rem)]">
-					<SearchInput
-						autoFocus
-						items={filteredItems}
-						value={value}
-						onChange={handleChange}
-						filterFn={filterFn}
-						placeholder={placeholder}
-						maxSuggestions={8}
-						emptyMessage="Место не найдено"
-						onBlur={() => setIsOpen(false)}
-					/>
-				</div>
+				<Portal>
+					<div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 p-4 pt-[calc(var(--safe-area-inset-top)+1rem)]">
+						<SearchInput
+							autoFocus
+							items={filteredItems}
+							value={value}
+							onChange={handleChange}
+							filterFn={filterFn}
+							placeholder={placeholder}
+							maxSuggestions={8}
+							emptyMessage="Место не найдено"
+							onBlur={() => setIsOpen(false)}
+						/>
+					</div>
+				</Portal>
 			)}
 		</>
 	)
