@@ -13,7 +13,7 @@ import { Touchable } from "@/shared/ui/touchable"
 import { LessonModal } from "./lesson-modal"
 
 type LessonCardProps = {
-	group: number
+	group?: number
 	lesson: Lesson
 }
 
@@ -55,7 +55,7 @@ export const LessonCard = ({ lesson, group }: LessonCardProps) => {
 							</p>
 							{otherGroups.length > 0 && (
 								<p className="break-all line-clamp-1">
-									+{" "}
+									{group ? "+ " : ""}
 									{otherGroups
 										.map((group) => transformToGroupName(group))
 										.join(", ")}

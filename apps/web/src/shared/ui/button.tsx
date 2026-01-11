@@ -50,7 +50,7 @@ export const Button = (props: ButtonProps) => {
 		"flex gap-2 items-center justify-center p-4 rounded-3xl font-medium",
 
 		variant === "accent" && "bg-accent text-accent-foreground",
-		variant === "secondary" && "bg-card",
+		variant === "secondary" && "bg-card border border-border",
 
 		props.disabled && "pointer-events-none bg-border",
 		props.className,

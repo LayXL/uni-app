@@ -23,7 +23,20 @@ const addZeroToTime = (time: string) => {
 	return time.padStart(5, "0")
 }
 
-const getScheduleFromDb = async (dates: string[], group: number) => {
+const getScheduleFromDb = async (
+	dates: string[],
+	options: { group?: number; classrooms?: string[] },
+) => {
+	const conditions = [inArray(classesTable.date, dates)]
+
+	if (options.group !== undefined) {
+		conditions.push(arrayContains(classesTable.groups, [options.group]))
+	}
+
+	if (options.classrooms && options.classrooms.length > 0) {
+		conditions.push(inArray(classesTable.classroom, options.classrooms))
+	}
+
 	return db
 		.select({
 			...getTableColumns(classesTable),
@@ -41,12 +54,7 @@ const getScheduleFromDb = async (dates: string[], group: number) => {
 		})
 		.from(classesTable)
 		.innerJoin(subjectsTable, eq(classesTable.subject, subjectsTable.id))
-		.where(
-			and(
-				inArray(classesTable.date, dates),
-				arrayContains(classesTable.groups, [group]),
-			),
-		)
+		.where(and(...conditions))
 		.orderBy(asc(classesTable.date), asc(classesTable.order))
 }
 
@@ -58,16 +66,17 @@ export const getSchedule = publicProcedure
 				.regex(/^\d{4}-\d{2}-\d{2}$/)
 				.array()
 				.max(90),
-			group: z.number(),
+			group: z.number().optional(),
+			classrooms: z.string().array().optional(),
 		}),
 	)
 	.output(lessonSchema.array())
 	.handler(async ({ input }) => {
-		const { dates, group } = input
+		const { dates, group, classrooms } = input
 
 		const timetable = await getConfig("timetable")
 
-		const schedule = await getScheduleFromDb(dates, group)
+		const schedule = await getScheduleFromDb(dates, { group, classrooms })
 
 		const daysWithoutClasses = dates.filter(
 			(date) => !schedule.some((lesson) => lesson.date === date),
@@ -78,7 +87,7 @@ export const getSchedule = publicProcedure
 				const parsedDate = parseISO(date)
 				const predictedSchedule = await getScheduleFromDb(
 					[format(subDays(parsedDate, 14), "yyyy-MM-dd")],
-					group,
+					{ group, classrooms },
 				)
 
 				return predictedSchedule.map((lesson) => ({ ...lesson, date }))
