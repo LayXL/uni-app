@@ -18,6 +18,7 @@ type ModalRootProps = {
 	close?: () => void
 	className?: string
 	showCloseButton?: boolean
+	fullHeight?: boolean
 }
 
 export const ModalRoot = ({
@@ -27,6 +28,7 @@ export const ModalRoot = ({
 	onClose,
 	close,
 	showCloseButton = true,
+	fullHeight = false,
 }: ModalRootProps) => {
 	useDisableScroll(isOpen)
 
@@ -45,7 +47,7 @@ export const ModalRoot = ({
 						/>
 						<motion.div
 							animate={{ opacity: 1, y: 0 }}
-							className="absolute left-0 right-0 bottom-0 bg-background border-t border-border rounded-3xl p-4 pb-[calc(var(--safe-area-inset-bottom)+1rem)]"
+							className={`absolute left-0 right-0 bottom-0 bg-background border-t border-border rounded-3xl p-4 pb-[calc(var(--safe-area-inset-bottom)+1rem)] ${fullHeight ? "h-dvh" : ""}`}
 							exit={{ opacity: 0, y: "100%" }}
 							initial={{ opacity: 0, y: "100%" }}
 							transition={TRANSITION}

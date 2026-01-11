@@ -95,7 +95,7 @@ export const RouteBuilderModal = () => {
 
 	return (
 		<ModalRoot isOpen={isModalOpen} onClose={closeModal}>
-			<div className="flex flex-col gap-4 justify-between min-h-[50vh]">
+			<div className="flex flex-col gap-4 justify-between">
 				<div className="flex flex-col gap-4">
 					<h2 className="text-2xl font-medium">Маршрут</h2>
 					<div className="relative bg-card rounded-3xl">
