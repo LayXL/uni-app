@@ -25,7 +25,7 @@ export const MapViewer = () => {
 	const mapData = useMapData()
 	const colorScheme = useColorScheme()
 
-	const { start, end } = useRouteBuilder()
+	const { start, end, isActive } = useRouteBuilder()
 
 	const { data: routeData } = useQuery(
 		orpc.map.buildRoute.queryOptions({
@@ -189,7 +189,7 @@ export const MapViewer = () => {
 		iconObjectsRef,
 		iconBaseScaleRef,
 		isDebug,
-		route: routeData?.route,
+		route: isActive ? routeData?.route : undefined,
 		enabled: isCanvasReady,
 		colorScheme,
 	})

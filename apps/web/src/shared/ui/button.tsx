@@ -57,17 +57,14 @@ export const Button = (props: ButtonProps) => {
 		props.className,
 	)
 
-	const children =
-		leftIcon || rightIcon ? (
-			<>
-				<LiquidBorder variant={variant === "accent" ? "accent" : undefined} />
-				{leftIcon && <Icon name={leftIcon} size={20} />}
-				{label}
-				{rightIcon && <Icon name={rightIcon} size={20} />}
-			</>
-		) : (
-			label
-		)
+	const children = (
+		<>
+			<LiquidBorder variant={variant === "accent" ? "accent" : undefined} />
+			{leftIcon && <Icon name={leftIcon} size={20} />}
+			{label}
+			{rightIcon && <Icon name={rightIcon} size={20} />}
+		</>
+	)
 
 	const childProps = {
 		className,
