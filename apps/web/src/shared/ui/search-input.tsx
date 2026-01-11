@@ -1,5 +1,6 @@
 "use client"
 
+import { AnimatePresence, motion } from "motion/react"
 import {
 	type InputHTMLAttributes,
 	useEffect,
@@ -9,6 +10,7 @@ import {
 } from "react"
 
 import { cn } from "../utils/cn"
+import { Icon } from "./icon"
 import { LiquidBorder } from "./liquid-border"
 import { Touchable } from "./touchable"
 
@@ -128,6 +130,12 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 		}
 	}
 
+	const handleClear = () => {
+		setQuery("")
+		onInputChange?.("")
+		inputRef.current?.focus()
+	}
+
 	return (
 		<div ref={containerRef} className="relative w-full rounded-3xl">
 			<LiquidBorder />
@@ -143,13 +151,32 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 				onFocus={() => setIsOpen(true)}
 				onKeyDown={handleKeyDown}
 				className={cn(
-					"bg-card border border-border rounded-3xl p-3 w-full outline-none placeholder:text-muted",
+					"bg-card border border-border rounded-3xl p-3 pr-10 w-full outline-none placeholder:text-muted",
 					"focus:ring-2 focus:ring-accent transition-shadow",
 					className,
 				)}
 				autoComplete="off"
 				{...inputProps}
 			/>
+			<AnimatePresence>
+				{query && (
+					<Touchable>
+						<motion.button
+							initial={{ scale: 0 }}
+							animate={{ scale: 1 }}
+							exit={{ scale: 0 }}
+							transition={{ duration: 0.2, ease: "easeInOut" }}
+							type="button"
+							onMouseDown={(e) => e.preventDefault()}
+							onClick={handleClear}
+							className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-muted hover:text-foreground transition-colors"
+							aria-label="Очистить"
+						>
+							<Icon name="iconify:material-symbols:close-rounded" size={24} />
+						</motion.button>
+					</Touchable>
+				)}
+			</AnimatePresence>
 
 			{isOpen && (
 				<div
