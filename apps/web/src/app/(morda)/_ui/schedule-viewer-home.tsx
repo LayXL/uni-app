@@ -10,14 +10,14 @@ type ScheduleViewerHomeProps = {
 }
 
 export const ScheduleViewerHome = ({ children }: ScheduleViewerHomeProps) => {
-	const hasPoints = useRouteBuilder((state) => state.hasPoints)
+	const isActive = useRouteBuilder((state) => state.isActive)
 
 	return (
 		<motion.div
 			className="mt-[80vh] z-10"
 			animate={{
-				opacity: hasPoints ? 0 : 1,
-				pointerEvents: hasPoints ? "none" : "auto",
+				opacity: isActive ? 0 : 1,
+				pointerEvents: isActive ? "none" : "auto",
 			}}
 		>
 			{children}

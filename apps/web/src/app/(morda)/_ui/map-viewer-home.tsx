@@ -11,7 +11,7 @@ type MapViewerHomeProps = {
 }
 
 export const MapViewerHome = ({ children }: MapViewerHomeProps) => {
-	const hasPoints = useRouteBuilder((state) => state.hasPoints)
+	const isActive = useRouteBuilder((state) => state.isActive)
 
 	const { scrollY } = useScroll()
 
@@ -28,7 +28,7 @@ export const MapViewerHome = ({ children }: MapViewerHomeProps) => {
 		<motion.div
 			style={{ opacity, filter, pointerEvents }}
 			initial={{ height: "80vh" }}
-			animate={{ height: hasPoints ? "100vh" : "80vh" }}
+			animate={{ height: isActive ? "calc(100vh - 174px)" : "80vh" }}
 			className="fixed w-full"
 		>
 			{children}

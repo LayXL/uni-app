@@ -103,7 +103,7 @@ const buildSteps = (route: z.infer<typeof routeSchema>) => {
 }
 
 export const RouteNavigation = () => {
-	const { start, end, hasPoints, isActive, resetRoute } = useRouteBuilder()
+	const { start, end, isActive, resetRoute } = useRouteBuilder()
 
 	const setActiveFloor = useActiveFloor((state) => state.setActiveFloor)
 	const moveTo = useMapState((state) => state.moveTo)
@@ -116,13 +116,13 @@ export const RouteNavigation = () => {
 		}),
 	)
 
-	useDisableScroll(hasPoints)
+	useDisableScroll(isActive)
 
 	useEffect(() => {
-		if (hasPoints) {
+		if (isActive) {
 			window.scrollTo({ top: 0, behavior: "smooth" })
 		}
-	}, [hasPoints])
+	}, [isActive])
 
 	const steps = useMemo(() => buildSteps(data?.route ?? []), [data?.route])
 
@@ -140,13 +140,13 @@ export const RouteNavigation = () => {
 
 	return (
 		<AnimatePresence>
-			{hasPoints && (
+			{isActive && (
 				<motion.div
 					initial={{ y: "100%" }}
 					animate={{ y: 0 }}
 					exit={{ y: "100%" }}
 					transition={TRANSITION}
-					className="absolute bottom-1 left-1 right-1 bg-background border border-border rounded-3xl p-4 flex flex-col gap-4"
+					className="absolute bottom-0 left-0 right-0 bg-background border-t border-border rounded-3xl p-4 flex flex-col gap-4"
 				>
 					{steps.length > 0 && (
 						<>

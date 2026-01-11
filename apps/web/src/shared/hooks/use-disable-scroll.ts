@@ -1,14 +1,19 @@
 import { useEffect } from "react"
 
+let count = 0
+
 export const useDisableScroll = (disabled = true) => {
 	useEffect(() => {
-		if (disabled) {
-			document.body.style.overflow = "hidden"
-		} else {
-			document.body.style.overflow = "auto"
-		}
+		if (!disabled) return
+
+		count++
+		document.body.style.overflow = "hidden"
+
 		return () => {
-			document.body.style.overflow = "auto"
+			count--
+			if (count === 0) {
+				document.body.style.overflow = ""
+			}
 		}
 	}, [disabled])
 }
