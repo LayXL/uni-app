@@ -43,6 +43,7 @@ export const GroupSelector = () => {
 				filterFn={(item, query) => isInsensitiveMatch(item.value, query)}
 				onChange={handleGroupClick}
 				autoFocus
+				maxSuggestions={searchItems.length}
 			/>
 		</div>
 	)

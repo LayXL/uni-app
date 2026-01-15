@@ -7,6 +7,7 @@ import type { MapEntity } from "@repo/shared/building-scheme"
 
 import { useUser } from "@/entities/user/hooks/useUser"
 import { Icon } from "@/shared/ui/icon"
+import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { Touchable } from "@/shared/ui/touchable"
 
 import { useMapData } from "../hooks/use-map-data"
@@ -74,7 +75,8 @@ export const RouteBuilderSuggestions = ({
 	}
 
 	return (
-		<div className="flex flex-col bg-card border border-border rounded-xl">
+		<div className="flex flex-col bg-card rounded-3xl relative">
+			<LiquidBorder />
 			{suggestions.map((suggestion, i) => (
 				<Fragment key={i}>
 					<Touchable>
@@ -103,7 +105,7 @@ export const RouteBuilderSuggestions = ({
 						</button>
 					</Touchable>
 					{i < suggestions.length - 1 && (
-						<div className="h-px ml-13 bg-border" />
+						<div className="h-px ml-13 bg-border mr-px" />
 					)}
 				</Fragment>
 			))}

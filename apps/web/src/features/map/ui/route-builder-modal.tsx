@@ -75,7 +75,7 @@ const SearchInputTrigger = ({
 			</Touchable>
 			{isOpen && (
 				<Portal>
-					<div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 p-4 pt-[calc(var(--safe-area-inset-top)+1rem)]">
+					<div className="fixed inset-0 bg-background z-50 p-4 pt-[calc(var(--safe-area-inset-top)+1rem)]">
 						<SearchInput
 							autoFocus
 							items={filteredItems}
