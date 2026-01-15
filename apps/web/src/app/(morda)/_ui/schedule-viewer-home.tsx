@@ -25,9 +25,11 @@ export const ScheduleViewerHome = ({ children }: ScheduleViewerHomeProps) => {
 	return (
 		<motion.div
 			className="mt-[80vh] z-10 [&>div]:border-t [&>div]:border-(--border-color)"
-			style={{
-				"--border-opacity": borderOpacity,
+			initial={{
+				"--border-color":
+					"color-mix(in oklab, var(--border) 100%, transparent)",
 			}}
+			style={{ "--border-opacity": borderOpacity }}
 			animate={{
 				"--border-color":
 					"color-mix(in oklab, var(--border) var(--border-opacity), transparent)",
