@@ -2,67 +2,48 @@
 
 import { useQuery } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
-import { useMemo, useState } from "react"
+import { useMemo } from "react"
 
 import { orpc } from "@repo/orpc/react"
 import { isInsensitiveMatch } from "@repo/shared/is-insensitive-match"
 
-import { Touchable } from "@/shared/ui/touchable"
+import { LottiePlayer } from "@/shared/ui/lottie"
+import { SearchInput, type SearchInputItem } from "@/shared/ui/search-input"
 
 export const GroupSelector = () => {
-	const [groupName, setGroupName] = useState("")
-
 	const router = useRouter()
 	const groups = useQuery(orpc.groups.getAllGroups.queryOptions({}))
 
-	const handleGroupClick = (groupId: number) => async () => {
+	const handleGroupClick = async (groupId: number) => {
 		await orpc.users.updateUserGroup.call({ groupId })
 		router.push("/")
 	}
 
-	const filteredGroups = useMemo(() => {
-		if (!groups.data) return groups.data
-		if (!groupName) return groups.data
-
-		return groups.data.filter((group) =>
-			isInsensitiveMatch(group.displayName, groupName),
-		)
-	}, [groups.data, groupName])
-
-	const handleEnterPress = () => {
-		if (!filteredGroups?.length) return
-
-		void handleGroupClick(filteredGroups[0].id)()
-	}
+	const searchItems = useMemo<SearchInputItem<number>[]>(() => {
+		if (!groups.data) return []
+		return groups.data.map((group) => ({
+			key: group.id,
+			value: group.displayName,
+		}))
+	}, [groups.data])
 
 	return (
-		<div className="flex flex-col gap-2">
-			<input
-				type="text"
+		<div className="flex flex-col gap-4 pt-4">
+			<div className="flex flex-col gap-2 items-center">
+				<LottiePlayer src="duck-wave" className="w-40 h-40 self-center" />
+				<h2 className="text-center text-xl font-bold">Давай знакомиться!</h2>
+				<p className="text-center text-sm text-muted text-balance">
+					Выбери группу, чтобы расписание всегда было под крылом!
+				</p>
+			</div>
+			<SearchInput
 				placeholder="Введите название группы"
-				className="p-2 rounded-2xl bg-card border border-border"
-				value={groupName}
-				onChange={(e) => setGroupName(e.target.value)}
-				onKeyDown={(e) => {
-					if (e.key === "Enter") {
-						e.preventDefault()
-						handleEnterPress()
-					}
-				}}
+				className=""
+				items={searchItems}
+				filterFn={(item, query) => isInsensitiveMatch(item.value, query)}
+				onChange={handleGroupClick}
 				autoFocus
 			/>
-
-			{filteredGroups?.map((group) => (
-				<Touchable key={group.id}>
-					<button
-						type="button"
-						className="p-2 rounded-2xl bg-card border border-border"
-						onClick={handleGroupClick(group.id)}
-					>
-						{group.displayName}
-					</button>
-				</Touchable>
-			))}
 		</div>
 	)
 }

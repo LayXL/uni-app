@@ -1,4 +1,5 @@
 import { HydrationBoundary } from "@tanstack/react-query"
+import Link from "next/link"
 
 import { orpc } from "@repo/orpc/react"
 import { getNextTwoWeeksDates } from "@repo/shared/lessons/get-next-two-weeks-dates"
@@ -36,6 +37,7 @@ export default async function () {
 				</MapViewerHome>
 				<ScheduleViewerHome>
 					<div className="-mt-4 flex flex-col bg-background rounded-t-3xl relative pb-(--safe-area-inset-bottom) mb-16">
+						<Link href="onboarding">Начать</Link>
 						<div className="absolute bottom-full left-3 py-2">
 							<MapBottomBarHome>
 								<MapBottomBar />
