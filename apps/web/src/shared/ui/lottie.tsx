@@ -20,10 +20,7 @@ export const LottiePlayer = ({
 	loop = false,
 	autoplay = true,
 }: LottiePlayerProps) => {
-	const [animationData, setAnimationData] = useState<Record<
-		string,
-		unknown
-	> | null>(null)
+	const [animationData, setAnimationData] = useState<unknown>(null)
 	const [isComplete, setIsComplete] = useState(false)
 	const lottieRef = useRef<LottieRefCurrentProps | null>(null)
 
@@ -50,12 +47,20 @@ export const LottiePlayer = ({
 		}
 	}, [src])
 
-	if (!animationData) return null
+	if (!animationData)
+		return (
+			<div
+				className={cn("inline-flex p-0 bg-transparent border-0", className)}
+			/>
+		)
 
 	return (
 		<button
 			type="button"
-			className={cn("inline-flex p-0 bg-transparent border-0", className)}
+			className={cn(
+				"inline-flex p-0 bg-transparent border-0 animate-fade-in",
+				className,
+			)}
 			onClick={() => {
 				if (!isComplete) return
 

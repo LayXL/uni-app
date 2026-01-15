@@ -47,7 +47,6 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 		className,
 		...inputProps
 	} = props
-	const { autoFocus } = inputProps
 
 	const containerRef = useRef<HTMLDivElement>(null)
 	const inputRef = useRef<HTMLInputElement>(null)
@@ -55,38 +54,6 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 	const [isOpen, setIsOpen] = useState(false)
 	const [query, setQuery] = useState("")
 	const [highlightedIndex, setHighlightedIndex] = useState(0)
-
-	useEffect(() => {
-		if (!autoFocus) return
-		const input = inputRef.current
-		if (!input) return
-
-		const focusInput = () => input.focus()
-		const cleanup = () => {
-			window.removeEventListener("pointerdown", handleUserActivation)
-			window.removeEventListener("touchstart", handleUserActivation)
-		}
-		const handleUserActivation = () => {
-			if (document.activeElement !== input) {
-				focusInput()
-			}
-			cleanup()
-		}
-
-		focusInput()
-		const timeoutId = window.setTimeout(focusInput, 50)
-		window.addEventListener("pointerdown", handleUserActivation, {
-			passive: true,
-		})
-		window.addEventListener("touchstart", handleUserActivation, {
-			passive: true,
-		})
-
-		return () => {
-			window.clearTimeout(timeoutId)
-			cleanup()
-		}
-	}, [autoFocus])
 
 	// Sync input with selected value
 	useEffect(() => {
@@ -184,7 +151,7 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 				onFocus={() => setIsOpen(true)}
 				onKeyDown={handleKeyDown}
 				className={cn(
-					"bg-card border border-border rounded-3xl p-3 pr-10 w-full outline-none placeholder:text-muted",
+					"bg-card border border-border rounded-3xl p-3 w-full outline-none placeholder:text-muted",
 					"focus:ring-2 focus:ring-accent transition-shadow",
 					className,
 				)}
