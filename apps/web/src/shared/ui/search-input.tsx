@@ -48,6 +48,8 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 		...inputProps
 	} = props
 
+	const shouldAutoFocus = Boolean(inputProps.autoFocus)
+
 	const containerRef = useRef<HTMLDivElement>(null)
 	const inputRef = useRef<HTMLInputElement>(null)
 
@@ -90,6 +92,23 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 		document.addEventListener("mousedown", handleClickOutside)
 		return () => document.removeEventListener("mousedown", handleClickOutside)
 	}, [])
+
+	useEffect(() => {
+		if (!shouldAutoFocus) return
+		const input = inputRef.current
+		if (!input) return
+
+		const focusInput = () => {
+			input.focus({ preventScroll: true })
+		}
+
+		const rafId = requestAnimationFrame(() => {
+			focusInput()
+			setTimeout(focusInput, 50)
+		})
+
+		return () => cancelAnimationFrame(rafId)
+	}, [shouldAutoFocus])
 
 	const handleSelect = (item: SearchInputItem<T>) => {
 		setQuery(item.value)
