@@ -49,6 +49,9 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 	} = props
 
 	const shouldAutoFocus = Boolean(inputProps.autoFocus)
+	const isIOS =
+		typeof window !== "undefined" &&
+		/iP(hone|od|ad)/.test(window.navigator.userAgent)
 
 	const containerRef = useRef<HTMLDivElement>(null)
 	const inputRef = useRef<HTMLInputElement>(null)
@@ -99,16 +102,26 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 		if (!input) return
 
 		const focusInput = () => {
-			input.focus({ preventScroll: true })
+			input.focus()
+			if (isIOS) {
+				input.click()
+				try {
+					const end = input.value.length
+					input.setSelectionRange(end, end)
+				} catch {
+					// noop
+				}
+			}
 		}
 
 		const rafId = requestAnimationFrame(() => {
 			focusInput()
-			setTimeout(focusInput, 50)
+			const timeoutId = window.setTimeout(focusInput, 150)
+			return () => window.clearTimeout(timeoutId)
 		})
 
 		return () => cancelAnimationFrame(rafId)
-	}, [shouldAutoFocus])
+	}, [shouldAutoFocus, isIOS])
 
 	const handleSelect = (item: SearchInputItem<T>) => {
 		setQuery(item.value)
