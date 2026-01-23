@@ -37,24 +37,16 @@ export const ScheduleGroup = () => {
 					{group?.displayName}
 				</button>
 			</Touchable>
-			<AnimatePresence>
-				{isOpen && (
-					<Portal>
-						<motion.div
-							initial={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-							exit={{ opacity: 0 }}
-							transition={{ duration: 0.2 }}
-							className="fixed inset-0 bg-background z-50 p-4 pt-[calc(var(--safe-area-inset-top)+1rem)]"
-						>
-							<GroupSelector
-								onChange={handleChange}
-								onBlur={() => setIsOpen(false)}
-							/>
-						</motion.div>
-					</Portal>
-				)}
-			</AnimatePresence>
+			{isOpen && (
+				<Portal>
+					<div className="fixed inset-0 bg-background z-50 p-4 pt-[calc(var(--safe-area-inset-top)+1rem)]">
+						<GroupSelector
+							onChange={handleChange}
+							onBlur={() => setIsOpen(false)}
+						/>
+					</div>
+				</Portal>
+			)}
 		</>
 	)
 }
