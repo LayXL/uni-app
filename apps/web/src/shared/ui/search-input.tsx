@@ -2,8 +2,11 @@
 
 import { AnimatePresence, motion } from "motion/react"
 import {
+	type ForwardedRef,
 	type InputHTMLAttributes,
+	type KeyboardEvent,
 	useEffect,
+	useImperativeHandle,
 	useMemo,
 	useRef,
 	useState,
@@ -30,6 +33,7 @@ type SearchInputProps<T> = Omit<
 	filterFn?: (item: SearchInputItem<T>, query: string) => boolean
 	maxSuggestions?: number
 	emptyMessage?: string
+	ref?: ForwardedRef<HTMLInputElement>
 }
 
 const defaultFilter = <T,>(item: SearchInputItem<T>, q: string) =>
@@ -45,6 +49,7 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 		maxSuggestions = 5,
 		emptyMessage = "Ничего не найдено",
 		className,
+		ref,
 		...inputProps
 	} = props
 
@@ -55,6 +60,8 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 
 	const containerRef = useRef<HTMLDivElement>(null)
 	const inputRef = useRef<HTMLInputElement>(null)
+
+	useImperativeHandle(ref, () => inputRef.current as HTMLInputElement)
 
 	const [isOpen, setIsOpen] = useState(false)
 	const [query, setQuery] = useState("")
@@ -130,7 +137,7 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 		inputRef.current?.blur()
 	}
 
-	const handleKeyDown = (e: React.KeyboardEvent) => {
+	const handleKeyDown = (e: KeyboardEvent) => {
 		if (!isOpen) {
 			if (e.key === "ArrowDown" || e.key === "Enter") {
 				setIsOpen(true)
@@ -183,7 +190,7 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 				onFocus={() => setIsOpen(true)}
 				onKeyDown={handleKeyDown}
 				className={cn(
-					"bg-card border border-border rounded-3xl p-3 w-full outline-none placeholder:text-muted",
+					"bg-card rounded-3xl p-3 w-full outline-none placeholder:text-muted",
 					"focus:ring-2 focus:ring-accent transition-shadow",
 					className,
 				)}

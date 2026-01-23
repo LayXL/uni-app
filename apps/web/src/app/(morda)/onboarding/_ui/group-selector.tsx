@@ -2,17 +2,20 @@
 
 import { useQuery } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
-import { useMemo } from "react"
+import { useMemo, useRef } from "react"
 
 import { orpc } from "@repo/orpc/react"
 import { isInsensitiveMatch } from "@repo/shared/is-insensitive-match"
 
+import { useTimeout } from "@/shared/hooks/use-timeout"
 import { LottiePlayer } from "@/shared/ui/lottie"
 import { SearchInput, type SearchInputItem } from "@/shared/ui/search-input"
 
 export const GroupSelector = () => {
 	const router = useRouter()
 	const groups = useQuery(orpc.groups.getAllGroups.queryOptions({}))
+
+	const inputRef = useRef<HTMLInputElement>(null)
 
 	const handleGroupClick = async (groupId: number) => {
 		await orpc.users.updateUserGroup.call({ groupId })
@@ -27,6 +30,10 @@ export const GroupSelector = () => {
 		}))
 	}, [groups.data])
 
+	useTimeout(() => {
+		inputRef.current?.focus()
+	}, 100)
+
 	return (
 		<div className="flex flex-col gap-4 pt-4">
 			<div className="flex flex-col gap-2 items-center">
@@ -37,6 +44,7 @@ export const GroupSelector = () => {
 				</p>
 			</div>
 			<SearchInput
+				ref={inputRef}
 				placeholder="Введите название группы"
 				items={searchItems}
 				filterFn={(item, query) => isInsensitiveMatch(item.value, query)}
