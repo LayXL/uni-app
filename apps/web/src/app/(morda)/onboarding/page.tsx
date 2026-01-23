@@ -8,6 +8,7 @@ import { useMemo, useState } from "react"
 import { orpc } from "@repo/orpc/react"
 import { isInsensitiveMatch } from "@repo/shared/is-insensitive-match"
 
+import { GroupSelector } from "@/entities/group/ui/group-selector"
 import { Button } from "@/shared/ui/button"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { LottiePlayer } from "@/shared/ui/lottie"
@@ -48,20 +49,10 @@ const Step1 = ({ onNext }: StepProps) => {
 }
 
 const Step2 = ({ onNext }: StepProps) => {
-	const groups = useQuery(orpc.groups.getAllGroups.queryOptions({}))
-
 	const handleGroupClick = async (groupId: number) => {
 		await orpc.users.updateUserGroup.call({ groupId })
 		onNext()
 	}
-
-	const searchItems = useMemo<SearchInputItem<number>[]>(() => {
-		if (!groups.data) return []
-		return groups.data.map((group) => ({
-			key: group.id,
-			value: group.displayName,
-		}))
-	}, [groups.data])
 
 	return (
 		<div className="flex flex-col gap-4 pt-4">
@@ -76,14 +67,7 @@ const Step2 = ({ onNext }: StepProps) => {
 					Выбери группу, чтобы расписание всегда было под крылом!
 				</p>
 			</div>
-			<SearchInput
-				placeholder="Введите название группы"
-				items={searchItems}
-				filterFn={(item, query) => isInsensitiveMatch(item.value, query)}
-				onChange={handleGroupClick}
-				autoFocus
-				maxSuggestions={searchItems.length}
-			/>
+			<GroupSelector onChange={handleGroupClick} />
 		</div>
 	)
 }

@@ -1,5 +1,5 @@
 import { HydrationBoundary } from "@tanstack/react-query"
-import Link from "next/link"
+import { redirect } from "next/navigation"
 
 import { orpc } from "@repo/orpc/react"
 import { getNextTwoWeeksDates } from "@repo/shared/lessons/get-next-two-weeks-dates"
@@ -12,6 +12,7 @@ import { ScheduleViewer } from "@/features/schedule/ui/schedule-viewer"
 import { Fetcher } from "@/shared/utils/fetcher"
 
 import { RouteNavigation } from "../../features/map/ui/route-navigation"
+import { DebugResetUserGroupButton } from "./_ui/debug-reset-user-group-button"
 import { MapBottomBarHome } from "./_ui/map-bottom-bar-home"
 import { ScheduleViewerHome } from "./_ui/schedule-viewer-home"
 
@@ -27,6 +28,8 @@ export default async function () {
 			dates: getNextTwoWeeksDates(),
 			group: user.group.id,
 		})
+	} else {
+		redirect("/onboarding")
 	}
 
 	return (
@@ -38,7 +41,6 @@ export default async function () {
 				</MapViewerHome>
 				<ScheduleViewerHome>
 					<div className="-mt-4 flex flex-col bg-background rounded-t-3xl relative pb-(--safe-area-inset-bottom) mb-16">
-						<Link href="onboarding">Начать</Link>
 						<div className="absolute bottom-full left-3 py-2">
 							<MapBottomBarHome>
 								<MapBottomBar />
@@ -46,6 +48,7 @@ export default async function () {
 						</div>
 						<ScheduleHeader />
 						<ScheduleViewer />
+						<DebugResetUserGroupButton />
 					</div>
 				</ScheduleViewerHome>
 			</div>
