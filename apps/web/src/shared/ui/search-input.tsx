@@ -226,7 +226,11 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 									type="button"
 									onMouseDown={(e) => e.preventDefault()}
 									onClick={() => handleSelect(item)}
-									onMouseEnter={() => setHighlightedIndex(index)}
+									onPointerMove={(e) => {
+										if (e.pointerType === "mouse") {
+											setHighlightedIndex(index)
+										}
+									}}
 									className={cn(
 										"w-full px-3 py-2.5 text-left transition-colors",
 										"first:rounded-t-3xl last:rounded-b-3xl",
