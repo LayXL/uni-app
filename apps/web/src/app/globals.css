@@ -33,6 +33,12 @@
 		text-align: left;
 	}
 
+	input,
+	textarea {
+		user-select: text;
+		-webkit-user-select: text;
+	}
+
 	:root {
 		user-select: none;
 		-webkit-user-select: none;
