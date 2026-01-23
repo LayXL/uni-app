@@ -12,6 +12,7 @@ export type LottiePlayerProps = {
 	className?: ClassValue
 	loop?: boolean
 	autoplay?: boolean
+	disableFadeIn?: boolean
 }
 
 export const LottiePlayer = ({
@@ -19,6 +20,7 @@ export const LottiePlayer = ({
 	className,
 	loop = false,
 	autoplay = true,
+	disableFadeIn = false,
 }: LottiePlayerProps) => {
 	const [animationData, setAnimationData] = useState<unknown>(null)
 	const [isComplete, setIsComplete] = useState(false)
@@ -58,7 +60,8 @@ export const LottiePlayer = ({
 		<button
 			type="button"
 			className={cn(
-				"inline-flex p-0 bg-transparent border-0 animate-fade-in",
+				"inline-flex p-0 bg-transparent border-0",
+				!disableFadeIn && "animate-fade-in",
 				className,
 			)}
 			onClick={() => {
