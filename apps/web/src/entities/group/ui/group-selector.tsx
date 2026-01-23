@@ -8,7 +8,7 @@ import { SearchInput, type SearchInputItem } from "@/shared/ui/search-input"
 
 type GroupSelectorProps = {
 	onChange: (groupId: number) => void
-	onBlur: () => void
+	onBlur?: () => void
 }
 
 export const GroupSelector = ({ onChange, onBlur }: GroupSelectorProps) => {
