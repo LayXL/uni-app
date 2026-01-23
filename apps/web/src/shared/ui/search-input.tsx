@@ -111,7 +111,7 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 		const focusInput = () => {
 			input.focus()
 			if (isIOS) {
-				input.click()
+				// input.click() // this might be causing issues if not trusted
 				try {
 					const end = input.value.length
 					input.setSelectionRange(end, end)
@@ -121,13 +121,7 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 			}
 		}
 
-		const rafId = requestAnimationFrame(() => {
-			focusInput()
-			const timeoutId = window.setTimeout(focusInput, 150)
-			return () => window.clearTimeout(timeoutId)
-		})
-
-		return () => cancelAnimationFrame(rafId)
+		focusInput()
 	}, [shouldAutoFocus, isIOS])
 
 	const handleSelect = (item: SearchInputItem<T>) => {
