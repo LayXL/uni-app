@@ -1,6 +1,7 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
+import { AnimatePresence, motion } from "motion/react"
 import { useRouter } from "next/navigation"
 import { useMemo, useState } from "react"
 
@@ -88,15 +89,25 @@ export const GroupSelector = () => {
 	const Step = STEPS[step]
 
 	return (
-		<Step
-			onNext={() => {
-				if (step === STEPS.length - 1) {
-					router.replace("/")
-					return
-				}
+		<AnimatePresence>
+			<motion.div
+				key={step}
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
+				exit={{ opacity: 0 }}
+				className="absolute inset-0 p-4 flex flex-col gap-2 pt-(--tg-viewport-safe-area-inset-top) min-h-lvh max-h-lvh h-lvh"
+			>
+				<Step
+					onNext={() => {
+						if (step === STEPS.length - 1) {
+							router.replace("/")
+							return
+						}
 
-				setStep(step + 1)
-			}}
-		/>
+						setStep(step + 1)
+					}}
+				/>
+			</motion.div>
+		</AnimatePresence>
 	)
 }
