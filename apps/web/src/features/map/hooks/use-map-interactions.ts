@@ -1,6 +1,8 @@
 import * as fabric from "fabric"
 import { useCallback, useEffect, useRef } from "react"
 
+import { haptic } from "@/shared/utils/haptic"
+
 import { getPointerCoords } from "../lib/pointer"
 import type { PointerInfo, ViewportState } from "../types"
 
@@ -225,6 +227,7 @@ export const useMapInteractions = ({
 
 				const roomId = target?.data?.roomId
 				if (roomId !== undefined && onRoomClick) {
+					haptic("selection")
 					onRoomClick(roomId)
 				}
 			}
