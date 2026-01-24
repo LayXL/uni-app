@@ -6,7 +6,7 @@ import { getNextTwoWeeksDates } from "@repo/shared/lessons/get-next-two-weeks-da
 
 import { MapViewerHome } from "@/app/(morda)/_ui/map-viewer-home"
 import { MapBottomBar } from "@/features/map/ui/map-bottom-bar"
-import { MapViewer } from "@/features/map/ui/map-viewer"
+import { MapViewer3D } from "@/features/map/ui/map-viewer-3d"
 import { ScheduleHeader } from "@/features/schedule/ui/schedule-header"
 import { ScheduleViewer } from "@/features/schedule/ui/schedule-viewer"
 import { Fetcher } from "@/shared/utils/fetcher"
@@ -38,7 +38,7 @@ export default async function () {
 			<div className="h-screen absolute top-0 left-0 w-full bg-(--map-background)" />
 			<div className="flex flex-col">
 				<MapViewerHome>
-					<MapViewer />
+					<MapViewer3D />
 				</MapViewerHome>
 				<ScheduleViewerHome>
 					<div className="-mt-4 flex flex-col bg-background rounded-t-3xl relative pb-(--safe-area-inset-bottom) mb-16">
