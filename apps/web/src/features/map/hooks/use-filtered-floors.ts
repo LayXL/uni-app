@@ -8,8 +8,10 @@ export const useFilteredFloors = (
 ) =>
 	useMemo(
 		() =>
-			data?.floors.filter(
-				(floor) => floor.name.includes("школы") === (activeCampus === 1),
-			),
+			data?.floors
+				.filter(
+					(floor) => floor.name.includes("школы") === (activeCampus === 1),
+				)
+				.toReversed(),
 		[data, activeCampus],
 	)

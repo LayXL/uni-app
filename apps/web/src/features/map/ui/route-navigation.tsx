@@ -7,11 +7,13 @@ import type { z } from "zod"
 
 import { orpc } from "@repo/orpc/react"
 import type { routeSchema } from "@repo/orpc/routes/map/build-route"
+import type { BuildingScheme } from "@repo/shared/building-scheme"
 
 import { useRouteBuilder } from "@/features/map/hooks/use-route-builder"
 import { useDisableScroll } from "@/shared/hooks/use-disable-scroll"
 import { Button } from "@/shared/ui/button"
 import { Icon } from "@/shared/ui/icon"
+import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { TRANSITION } from "@/shared/ui/modal-root"
 import { usePopupClose } from "@/shared/ui/popup"
 import { Touchable } from "@/shared/ui/touchable"
@@ -19,6 +21,7 @@ import { cn } from "@/shared/utils/cn"
 import type { IconName } from "@/types/icon-name"
 
 import { useActiveFloor } from "../hooks/use-active-floor"
+import { useMapData } from "../hooks/use-map-data"
 import { useMapState } from "../hooks/use-map-state"
 
 type StepIconProps = {
@@ -30,10 +33,11 @@ const StepIcon = ({ name, isActive }: StepIconProps) => {
 	return (
 		<div
 			className={cn(
-				"size-12 grid place-items-center rounded-full bg-card transition-colors",
+				"size-12 grid place-items-center rounded-full bg-card transition-colors relative",
 				isActive && "bg-accent text-accent-foreground",
 			)}
 		>
+			<LiquidBorder />
 			<Icon name={name} size={24} />
 		</div>
 	)
@@ -47,7 +51,10 @@ type Step = {
 	floor: number
 }
 
-const buildSteps = (route: z.infer<typeof routeSchema>) => {
+const buildSteps = (
+	route: z.infer<typeof routeSchema>,
+	data: BuildingScheme,
+) => {
 	const steps: Step[] = []
 
 	const points = [
@@ -75,15 +82,27 @@ const buildSteps = (route: z.infer<typeof routeSchema>) => {
 					: "down"
 				: undefined
 
+			const targetFloor = data.floors.find((f) => f.id === step.toFloor)
+			const floorLabel = targetFloor?.acronym ?? step.toFloor
+
 			steps.push({
-				icon: "stairs",
+				icon:
+					step.floor === 1 && step.toFloor === 5
+						? "seven"
+						: step.floor === 5 && step.toFloor === 1
+							? "midis"
+							: "stairs",
 				x: points[lastPointIndex].x,
 				y: points[lastPointIndex].y,
 				floor: points[lastPointIndex].floor,
 				title:
-					direction === "up"
-						? `Поднимись на ${step.toFloor} этаж`
-						: `Спустись на ${step.toFloor} этаж`,
+					step.floor === 1 && step.toFloor === 5
+						? "Перейди в школу через переход"
+						: step.floor === 5 && step.toFloor === 1
+							? "Перейди в МИДИС через переход"
+							: direction === "up"
+								? `Поднимись на ${floorLabel} этаж`
+								: `Спустись на ${floorLabel} этаж`,
 			})
 
 			lastPointIndex++
@@ -104,6 +123,8 @@ const buildSteps = (route: z.infer<typeof routeSchema>) => {
 }
 
 export const RouteNavigation = () => {
+	const mapData = useMapData()
+
 	const { start, end, isActive, resetRoute } = useRouteBuilder()
 
 	const setActiveFloor = useActiveFloor((state) => state.setActiveFloor)
@@ -123,11 +144,16 @@ export const RouteNavigation = () => {
 
 	useEffect(() => {
 		if (isActive) {
-			window.scrollTo({ top: 0, behavior: "smooth" })
+			requestAnimationFrame(() => {
+				window.scrollTo({ top: 0, behavior: "smooth" })
+			})
 		}
 	}, [isActive])
 
-	const steps = useMemo(() => buildSteps(data?.route ?? []), [data?.route])
+	const steps = useMemo(
+		() => buildSteps(data?.route ?? [], mapData),
+		[data?.route, mapData],
+	)
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: moveTo and setActiveFloor are dependencies of useEffect
 	useEffect(() => {
@@ -188,7 +214,10 @@ export const RouteNavigation = () => {
 						variant="secondary"
 						leftIcon="done-24"
 						label="Завершить навигацию"
-						onClick={resetRoute}
+						onClick={() => {
+							setCurrentStep(0)
+							resetRoute()
+						}}
 					/>
 				</motion.div>
 			)}

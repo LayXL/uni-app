@@ -28,11 +28,13 @@ export const LessonModal = ({ lesson }: LessonModalProps) => {
 						<p className="text-muted">Преподаватель</p>
 					</div>
 				))}
-			<div className="relative bg-card rounded-3xl p-4">
-				<LiquidBorder />
-				<p className="text-lg font-medium">{lesson.classroom}</p>
-				<p className="text-muted">Аудитория</p>
-			</div>
+			{!lesson.isDistance && (
+				<div className="relative bg-card rounded-3xl p-4">
+					<LiquidBorder />
+					<p className="text-lg font-medium">{lesson.classroom}</p>
+					<p className="text-muted">Аудитория</p>
+				</div>
+			)}
 		</div>
 	)
 }

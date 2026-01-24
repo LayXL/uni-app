@@ -93,12 +93,12 @@
 		--accent-foreground: #ffffff;
 		--destructive: #ff3b30;
 
-		--map-background: #1b2329;
-		--map-floor-fill: #5b5b5b;
-		--map-floor-stroke: #444342;
-		--map-room-fill: #4b636a;
-		--map-room-fill-clickable: #4b636a;
-		--map-room-stroke: #444342;
+		--map-background: #191d25;
+		--map-floor-fill: #222832;
+		--map-floor-stroke: #323232;
+		--map-room-fill: #2d3444;
+		--map-room-fill-clickable: #2d3444;
+		--map-room-stroke: #505050;
 		--map-room-label: #ffffff;
 		--map-stairs-icon: #ffffff;
 	}

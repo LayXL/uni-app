@@ -10,6 +10,7 @@ import { cutSubjectName } from "@repo/shared/subjects/cut-subject-name"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { ModalRoot } from "@/shared/ui/modal-root"
 import { Touchable } from "@/shared/ui/touchable"
+import { cn } from "@/shared/utils/cn"
 
 import { LessonModal } from "./lesson-modal"
 
@@ -46,7 +47,11 @@ export const LessonCard = ({ lesson, group }: LessonCardProps) => {
 							{cutSubjectName(lesson.subject.name)}
 						</p>
 						<div className="flex gap-1 text-muted text-sm">
-							<p className="min-w-max">{lesson.classroom} ауд</p>
+							<p
+								className={cn("min-w-max", lesson.isDistance && "text-accent")}
+							>
+								{lesson.isDistance ? "дистант" : `${lesson.classroom} ауд`}
+							</p>
 							<p className="min-w-max">
 								{lesson.groups
 									.filter((group) => group.type === "teacher")

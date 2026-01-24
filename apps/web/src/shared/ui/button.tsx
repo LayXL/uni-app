@@ -51,7 +51,7 @@ export const Button = (props: ButtonProps) => {
 		"flex gap-2 items-center justify-center p-4 rounded-3xl font-medium",
 
 		variant === "accent" && "bg-accent text-accent-foreground",
-		variant === "secondary" && "bg-card border border-border",
+		variant === "secondary" && "bg-card",
 
 		props.disabled && "pointer-events-none bg-border",
 		props.className,
@@ -66,14 +66,7 @@ export const Button = (props: ButtonProps) => {
 		</>
 	)
 
-	const childProps = {
-		className,
-		onClick: () => {
-			onClick?.()
-			// if (props.disableHaptic !== true) haptic("light")
-		},
-		children,
-	}
+	const childProps = { className, onClick, children }
 
 	if (asChild) {
 		if (!isValidElement(props.children)) {
