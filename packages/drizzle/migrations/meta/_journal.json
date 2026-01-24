@@ -43,6 +43,13 @@
       "when": 1767864516215,
       "tag": "0005_modern_tempest",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1769286690516,
+      "tag": "0006_large_dragon_lord",
+      "breakpoints": true
     }
   ]
 }
