@@ -35,7 +35,7 @@ export default async function () {
 
 	return (
 		<HydrationBoundary state={fetcher.dehydrate()}>
-			<div className="h-screen absolute top-0 left-0 w-full bg-(--map-background)" />
+			<div className="h-screen absolute top-0 left-0 w-full" />
 			<div className="flex flex-col">
 				<MapViewerHome>
 					<MapViewer />

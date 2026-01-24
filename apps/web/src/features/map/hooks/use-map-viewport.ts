@@ -139,7 +139,7 @@ export const useMapViewport = ({
 
 			iconObjectsRef.current.forEach((icon) => {
 				icon.set("angle", rotationDeg)
-				const baseScale =
+				const baseScaleX =
 					iconBaseScaleRef.current.get(icon) ??
 					(icon.scaleX !== undefined ? icon.scaleX : 1)
 				const baseScaleY =
@@ -147,7 +147,7 @@ export const useMapViewport = ({
 					(icon.scaleY !== undefined ? icon.scaleY : 1)
 
 				icon.set({
-					scaleX: baseScale * fontScale,
+					scaleX: baseScaleX * fontScale,
 					scaleY: baseScaleY * fontScale,
 				})
 				icon.set("dirty", true)
@@ -174,7 +174,6 @@ export const useMapViewport = ({
 		},
 		[],
 	)
-	// ... rest of functions
 
 	const zoomAtPoint = useCallback(
 		(screenPoint: fabric.Point, deltaZoom: number) => {

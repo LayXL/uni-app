@@ -46,6 +46,7 @@ export const MapViewer = () => {
 	const iconBaseScaleRef = useRef(new WeakMap<fabric.Object, number>())
 	const [rotation, setRotation] = useState(0)
 	const [isCanvasReady, setIsCanvasReady] = useState(false)
+	const [isFloorVisible, setIsFloorVisible] = useState(false)
 	const [cursorCoords, setCursorCoords] = useState<{
 		screen: { x: number; y: number }
 		world: { x: number; y: number }
@@ -146,6 +147,20 @@ export const MapViewer = () => {
 		}
 	}, [isCanvasReady, mapData, activeFloor, centerOnFloor])
 
+	// Fade in the floor after it's rendered
+	useEffect(() => {
+		if (isCanvasReady && mapData) {
+			// Small delay to allow the floor to render before fading in
+			const timer = requestAnimationFrame(() => {
+				requestAnimationFrame(() => {
+					setIsFloorVisible(true)
+				})
+			})
+			return () => cancelAnimationFrame(timer)
+		}
+		setIsFloorVisible(false)
+	}, [isCanvasReady, mapData])
+
 	const zoomByStep = useCallback(
 		(deltaZoom: number) => {
 			const canvas = fabricRef.current
@@ -196,7 +211,11 @@ export const MapViewer = () => {
 
 	return (
 		<div className="relative h-full w-full overflow-hidden bg-(--map-background)">
-			<canvas ref={canvasRef} className="size-full" />
+			<canvas
+				ref={canvasRef}
+				className="size-full transition-opacity duration-300"
+				style={{ opacity: isFloorVisible ? 1 : 0 }}
+			/>
 
 			{isDebug && cursorCoords && (
 				<CursorPositionDebug cursorCoords={cursorCoords} />
