@@ -20,7 +20,7 @@ const MapBottomBarButton = ({ icon, onClick }: MapBottomBarButtonProps) => {
 				className="relative flex items-center justify-center size-12 rounded-3xl bg-background"
 				onClick={onClick}
 			>
-				<LiquidBorder />
+				<LiquidBorder degree={45} />
 				<Icon name={icon} size={20} />
 			</button>
 		</Touchable>
