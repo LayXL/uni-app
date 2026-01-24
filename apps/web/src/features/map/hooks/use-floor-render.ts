@@ -72,6 +72,45 @@ type RoutePoint = {
 	toFloor?: number | null
 }
 
+const getRoundedPath = (points: fabric.Point[], radius = 10): string => {
+	if (points.length < 2) return ""
+
+	let d = `M ${points[0].x} ${points[0].y}`
+
+	for (let i = 1; i < points.length - 1; i++) {
+		const p0 = points[i - 1]
+		const p1 = points[i]
+		const p2 = points[i + 1]
+
+		const v1 = { x: p1.x - p0.x, y: p1.y - p0.y }
+		const v2 = { x: p2.x - p1.x, y: p2.y - p1.y }
+
+		const l1 = Math.sqrt(v1.x * v1.x + v1.y * v1.y)
+		const l2 = Math.sqrt(v2.x * v2.x + v2.y * v2.y)
+
+		const r = Math.min(radius, l1 / 2, l2 / 2)
+
+		if (r < 1) {
+			d += ` L ${p1.x} ${p1.y}`
+			continue
+		}
+
+		const startX = p1.x - (v1.x / l1) * r
+		const startY = p1.y - (v1.y / l1) * r
+
+		const endX = p1.x + (v2.x / l2) * r
+		const endY = p1.y + (v2.y / l2) * r
+
+		d += ` L ${startX} ${startY}`
+		d += ` Q ${p1.x} ${p1.y} ${endX} ${endY}`
+	}
+
+	const last = points[points.length - 1]
+	d += ` L ${last.x} ${last.y}`
+
+	return d
+}
+
 export const useFloorRender = ({
 	fabricRef,
 	data,
@@ -497,6 +536,8 @@ export const useFloorRender = ({
 		const floor = data?.floors.find((f) => f.id === activeFloor)
 		if (!floor) return
 
+		const colors = getMapColors()
+
 		const withOffset = (point: RoutePoint) =>
 			new fabric.Point(point.x + floor.position.x, point.y + floor.position.y)
 
@@ -508,8 +549,9 @@ export const useFloorRender = ({
 				return
 			}
 
-			const polyline = new fabric.Polyline(chain, {
-				stroke: "#22c55e",
+			const pathData = getRoundedPath(chain, 15)
+			const polyline = new fabric.Path(pathData, {
+				stroke: colors.route,
 				strokeWidth: 6,
 				strokeLineCap: "round",
 				strokeLineJoin: "round",
@@ -524,6 +566,31 @@ export const useFloorRender = ({
 
 			routeObjectsRef.current.push(polyline)
 			canvas.add(polyline)
+
+			const objects = canvas.getObjects()
+			let insertIndex = objects.indexOf(polyline)
+			const originalIndex = insertIndex
+
+			const firstLabel = textObjectsRef.current[0]
+			if (firstLabel) {
+				const idx = objects.indexOf(firstLabel)
+				if (idx > -1 && idx < insertIndex) {
+					insertIndex = idx
+				}
+			}
+
+			const firstIcon = iconObjectsRef.current[0]
+			if (firstIcon) {
+				const idx = objects.indexOf(firstIcon)
+				if (idx > -1 && idx < insertIndex) {
+					insertIndex = idx
+				}
+			}
+
+			if (insertIndex < originalIndex) {
+				canvas.moveObjectTo(polyline, insertIndex)
+			}
+
 			chain = []
 		}
 
@@ -557,5 +624,5 @@ export const useFloorRender = ({
 			})
 			routeObjectsRef.current = []
 		}
-	}, [activeFloor, data, fabricRef, route])
+	}, [activeFloor, data, fabricRef, route, iconObjectsRef, textObjectsRef])
 }

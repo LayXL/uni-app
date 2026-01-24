@@ -80,6 +80,7 @@
 		--map-room-stroke: #d6d2c7;
 		--map-room-label: #000000;
 		--map-stairs-icon: #000000;
+		--map-route: #fc4c01;
 	}
 
 	.dark {
@@ -101,5 +102,6 @@
 		--map-room-stroke: #505050;
 		--map-room-label: #ffffff;
 		--map-stairs-icon: #ffffff;
+		--map-route: #fc4c01;
 	}
 }

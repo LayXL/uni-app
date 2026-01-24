@@ -18,4 +18,5 @@ export type MapColors = {
 	roomStroke: string
 	roomLabel: string
 	stairsIcon: string
+	route: string
 }

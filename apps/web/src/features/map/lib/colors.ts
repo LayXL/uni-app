@@ -8,6 +8,7 @@ const defaultMapColors: MapColors = {
 	roomStroke: "#94a3b8",
 	roomLabel: "#0f172a",
 	stairsIcon: "#ffffff",
+	route: "#22c55e",
 }
 
 export const getMapColors = (): MapColors => {
@@ -29,5 +30,6 @@ export const getMapColors = (): MapColors => {
 		roomStroke: getVar("--map-room-stroke", defaultMapColors.roomStroke),
 		roomLabel: getVar("--map-room-label", defaultMapColors.roomLabel),
 		stairsIcon: getVar("--map-stairs-icon", defaultMapColors.stairsIcon),
+		route: getVar("--map-route", defaultMapColors.route),
 	}
 }
