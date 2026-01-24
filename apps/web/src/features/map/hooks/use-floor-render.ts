@@ -111,6 +111,46 @@ const getRoundedPath = (points: fabric.Point[], radius = 10): string => {
 	return d
 }
 
+const getRoundedPolygonPath = (points: fabric.Point[], radius = 20): string => {
+	if (points.length < 3) return ""
+
+	let d = ""
+
+	for (let i = 0; i < points.length; i++) {
+		const p0 = points[(i - 1 + points.length) % points.length]
+		const p1 = points[i]
+		const p2 = points[(i + 1) % points.length]
+
+		const v1 = { x: p1.x - p0.x, y: p1.y - p0.y }
+		const v2 = { x: p2.x - p1.x, y: p2.y - p1.y }
+
+		const l1 = Math.sqrt(v1.x * v1.x + v1.y * v1.y)
+		const l2 = Math.sqrt(v2.x * v2.x + v2.y * v2.y)
+
+		if (l1 === 0 || l2 === 0) {
+			d += i === 0 ? `M ${p1.x} ${p1.y}` : ` L ${p1.x} ${p1.y}`
+			continue
+		}
+
+		const r = Math.min(radius, l1 / 2, l2 / 2)
+
+		if (r < 1) {
+			d += i === 0 ? `M ${p1.x} ${p1.y}` : ` L ${p1.x} ${p1.y}`
+			continue
+		}
+
+		const startX = p1.x - (v1.x / l1) * r
+		const startY = p1.y - (v1.y / l1) * r
+		const endX = p1.x + (v2.x / l2) * r
+		const endY = p1.y + (v2.y / l2) * r
+
+		d += i === 0 ? `M ${startX} ${startY}` : ` L ${startX} ${startY}`
+		d += ` Q ${p1.x} ${p1.y} ${endX} ${endY}`
+	}
+
+	return `${d} Z`
+}
+
 export const useFloorRender = ({
 	fabricRef,
 	data,
@@ -189,14 +229,17 @@ export const useFloorRender = ({
 
 		const colors = getMapColors()
 
-		const floorPolygon = new fabric.Polygon(getFloorPolygon(floor), {
-			fill: colors.floorFill,
-			stroke: colors.floorStroke,
-			strokeWidth: 2,
-			hoverCursor: "default",
-			objectCaching: false,
-			evented: false,
-		})
+		const floorPolygon = new fabric.Path(
+			getRoundedPolygonPath(getFloorPolygon(floor)),
+			{
+				fill: colors.floorFill,
+				stroke: colors.floorStroke,
+				strokeWidth: 2,
+				hoverCursor: "default",
+				objectCaching: false,
+				evented: false,
+			},
+		)
 
 		canvas.add(floorPolygon)
 
@@ -234,8 +277,8 @@ export const useFloorRender = ({
 
 		// Render rooms synchronously (polygons and text labels without icons)
 		floorRooms.forEach((room) => {
-			const roomPolygon = new fabric.Polygon(
-				getRoomPolygon(room, floor.position),
+			const roomPolygon = new fabric.Path(
+				getRoundedPolygonPath(getRoomPolygon(room, floor.position)),
 				{
 					fill: room.clickable ? colors.roomFillClickable : colors.roomFill,
 					stroke: colors.roomStroke,
@@ -324,12 +367,13 @@ export const useFloorRender = ({
 			x: number,
 			y: number,
 			extraObjects?: fabric.FabricObject[],
+			withShadow = false,
 		): fabric.Group => {
 			const img = new fabric.FabricImage(imgEl, {
 				originX: "center",
 				originY: "center",
-			objectCaching: false, // Avoid blur on rotation
-			noScaleCache: true,
+				objectCaching: false, // Avoid blur on rotation
+				noScaleCache: true,
 			})
 
 			const targetSize = 14
@@ -346,6 +390,14 @@ export const useFloorRender = ({
 					originY: "center",
 					objectCaching: false,
 					noScaleCache: true,
+					shadow: withShadow
+						? new fabric.Shadow({
+								color: "rgba(0, 0, 0, 0.25)",
+								blur: 2,
+								offsetX: 0,
+								offsetY: 1,
+							})
+						: undefined,
 				}),
 				img,
 				...(extraObjects ?? []),
@@ -371,6 +423,7 @@ export const useFloorRender = ({
 			y: number
 			extraObjects?: fabric.FabricObject[]
 			angle?: number
+			withShadow?: boolean
 		}
 
 		const iconTasks: IconTask[] = []
@@ -382,6 +435,7 @@ export const useFloorRender = ({
 				x: floor.position.x + stair.position.x,
 				y: floor.position.y + stair.position.y,
 				angle: (-viewportRef.current.rotation * 180) / Math.PI,
+				withShadow: true,
 			})
 		})
 
@@ -393,6 +447,7 @@ export const useFloorRender = ({
 				x: floor.position.x + place.position.x,
 				y: floor.position.y + place.position.y,
 				angle: (-viewportRef.current.rotation * 180) / Math.PI,
+				withShadow: true,
 			})
 		})
 
@@ -474,6 +529,7 @@ export const useFloorRender = ({
 						iconData.x,
 						iconData.y,
 						iconData.extraObjects,
+						iconData.withShadow,
 					)
 
 					if (iconData.angle !== undefined) {
