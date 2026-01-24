@@ -8,9 +8,9 @@ import { orpc } from "@repo/orpc/react"
 import { getNextTwoWeeksDates } from "@repo/shared/lessons/get-next-two-weeks-dates"
 
 import { LessonCard } from "@/entities/lesson/ui/lesson-card"
-import { useUser } from "@/entities/user/hooks/useUser"
 import { groupScheduleItems } from "@/features/schedule/lib/group-schedule-items"
 
+import { useScheduleGroup } from "../hooks/use-schedule-group"
 import { WithoutLessonsPlaceholder } from "./without-lessons-placeholder"
 
 const ScheduleViewerWithGroup = ({ group }: { group: number }) => {
@@ -44,11 +44,11 @@ const ScheduleViewerWithGroup = ({ group }: { group: number }) => {
 }
 
 export const ScheduleViewer = () => {
-	const user = useUser()
+	const { group } = useScheduleGroup()
 
-	if (!user.group) {
+	if (!group) {
 		return null
 	}
 
-	return <ScheduleViewerWithGroup group={user.group.id} />
+	return <ScheduleViewerWithGroup group={group.id} />
 }

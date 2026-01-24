@@ -19,6 +19,7 @@ export const useScheduleGroup = () => {
 	const { group, setGroup } = useScheduleGroupWithoutUser()
 
 	return {
+		currentGroupIsUserGroup: !(group && group?.id !== user.group?.id),
 		group: group ?? user.group,
 		setGroup,
 	}

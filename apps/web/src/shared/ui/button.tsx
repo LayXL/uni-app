@@ -16,6 +16,7 @@ import { Touchable } from "./touchable"
 
 type ButtonProps = {
 	variant?: "primary" | "secondary" | "accent"
+	size?: "sm" | "md" | "lg"
 
 	label?: string
 	disabled?: boolean
@@ -38,6 +39,7 @@ type ButtonProps = {
 export const Button = (props: ButtonProps) => {
 	const {
 		variant = "accent",
+		size = "md",
 		label,
 		onClick,
 		leftIcon,
@@ -51,7 +53,12 @@ export const Button = (props: ButtonProps) => {
 		"flex gap-2 items-center justify-center p-4 rounded-3xl font-medium",
 
 		variant === "accent" && "bg-accent text-accent-foreground",
+		variant === "primary" && "bg-muted text-foreground",
 		variant === "secondary" && "bg-card",
+
+		size === "sm" && "p-2 text-sm",
+		size === "md" && "p-4",
+		size === "lg" && "p-6",
 
 		props.disabled && "pointer-events-none bg-border",
 		props.className,

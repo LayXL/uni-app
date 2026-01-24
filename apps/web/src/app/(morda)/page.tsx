@@ -10,6 +10,7 @@ import { MapViewer } from "@/features/map/ui/map-viewer"
 import { ScheduleHeader } from "@/features/schedule/ui/schedule-header"
 import { ScheduleViewer } from "@/features/schedule/ui/schedule-viewer"
 import { Fetcher } from "@/shared/utils/fetcher"
+import { SaveCurrentGroupAsUser } from "@/widgets/save-current-group-as-user"
 
 import { RouteNavigation } from "../../features/map/ui/route-navigation"
 import { DebugResetUserGroupButton } from "./_ui/debug-reset-user-group-button"
@@ -47,6 +48,7 @@ export default async function () {
 							</MapBottomBarHome>
 						</div>
 						<ScheduleHeader />
+						<SaveCurrentGroupAsUser />
 						<ScheduleViewer />
 						<DebugResetUserGroupButton />
 					</div>

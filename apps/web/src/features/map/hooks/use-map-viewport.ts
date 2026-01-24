@@ -56,6 +56,7 @@ export const useMapViewport = ({
 			})
 
 			iconObjectsRef.current.forEach((icon) => {
+				icon.set("angle", rotationDeg)
 				const baseScale =
 					iconBaseScaleRef.current.get(icon) ??
 					(icon.scaleX !== undefined ? icon.scaleX : 1)
@@ -137,6 +138,7 @@ export const useMapViewport = ({
 			})
 
 			iconObjectsRef.current.forEach((icon) => {
+				icon.set("angle", rotationDeg)
 				const baseScale =
 					iconBaseScaleRef.current.get(icon) ??
 					(icon.scaleX !== undefined ? icon.scaleX : 1)

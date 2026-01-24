@@ -328,7 +328,8 @@ export const useFloorRender = ({
 			const img = new fabric.FabricImage(imgEl, {
 				originX: "center",
 				originY: "center",
-				objectCaching: true, // Enable caching for better performance
+			objectCaching: false, // Avoid blur on rotation
+			noScaleCache: true,
 			})
 
 			const targetSize = 14
@@ -343,6 +344,8 @@ export const useFloorRender = ({
 					fill: colors.roomStroke,
 					originX: "center",
 					originY: "center",
+					objectCaching: false,
+					noScaleCache: true,
 				}),
 				img,
 				...(extraObjects ?? []),
@@ -356,7 +359,8 @@ export const useFloorRender = ({
 				hoverCursor: "default",
 				selectable: false,
 				evented: false,
-				objectCaching: true, // Enable caching for better performance
+				objectCaching: false, // Avoid blur on rotation
+				noScaleCache: true,
 			})
 		}
 
@@ -377,6 +381,7 @@ export const useFloorRender = ({
 				iconSrc: "/icons/stairs.svg",
 				x: floor.position.x + stair.position.x,
 				y: floor.position.y + stair.position.y,
+				angle: (-viewportRef.current.rotation * 180) / Math.PI,
 			})
 		})
 
@@ -387,6 +392,7 @@ export const useFloorRender = ({
 				iconSrc: `/icons/${iconName}.svg`,
 				x: floor.position.x + place.position.x,
 				y: floor.position.y + place.position.y,
+				angle: (-viewportRef.current.rotation * 180) / Math.PI,
 			})
 		})
 
@@ -419,7 +425,8 @@ export const useFloorRender = ({
 					originX: "center",
 					originY: "top",
 					top: 14,
-					objectCaching: true,
+					objectCaching: false,
+					noScaleCache: true,
 				})
 
 				iconTasks.push({

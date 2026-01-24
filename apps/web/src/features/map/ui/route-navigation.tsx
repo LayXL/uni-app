@@ -177,7 +177,7 @@ export const RouteNavigation = () => {
 					animate={{ y: 0 }}
 					exit={{ y: "100%" }}
 					transition={TRANSITION}
-					className="absolute bottom-0 left-0 right-0 bg-background border-t border-border rounded-3xl p-4 flex flex-col gap-4"
+					className="absolute bottom-0 left-0 right-0 bg-background border-t border-border rounded-3xl p-4 pb-[calc(var(--safe-area-inset-bottom)+1rem)] flex flex-col gap-4"
 				>
 					{steps.length > 0 && (
 						<>
