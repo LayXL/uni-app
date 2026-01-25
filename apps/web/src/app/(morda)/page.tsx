@@ -13,9 +13,9 @@ import { Fetcher } from "@/shared/utils/fetcher"
 import { SaveCurrentGroupAsUser } from "@/widgets/save-current-group-as-user"
 
 import { RouteNavigation } from "../../features/map/ui/route-navigation"
-import { DebugResetUserGroupButton } from "./_ui/debug-reset-user-group-button"
 import { MapBottomBarHome } from "./_ui/map-bottom-bar-home"
 import { ScheduleViewerHome } from "./_ui/schedule-viewer-home"
+import { DebugResetUserGroupButton } from "./settings/_ui/debug-reset-user-group-button"
 
 export default async function () {
 	const fetcher = new Fetcher()
@@ -50,7 +50,6 @@ export default async function () {
 						<ScheduleHeader />
 						<SaveCurrentGroupAsUser />
 						<ScheduleViewer />
-						<DebugResetUserGroupButton />
 					</div>
 				</ScheduleViewerHome>
 			</div>

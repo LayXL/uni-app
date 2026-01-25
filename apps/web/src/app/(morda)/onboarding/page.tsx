@@ -41,6 +41,9 @@ const Step1 = ({ onNext }: StepProps) => {
 					<div className="p-4">
 						<h3>Карта здания</h3>
 					</div>
+					<div className="p-4">
+						<h3>Уведомления о парах на завтра</h3>
+					</div>
 				</div>
 			</div>
 			<Button label="Круто" onClick={onNext} />
