@@ -15,7 +15,6 @@ import { SaveCurrentGroupAsUser } from "@/widgets/save-current-group-as-user"
 import { RouteNavigation } from "../../features/map/ui/route-navigation"
 import { MapBottomBarHome } from "./_ui/map-bottom-bar-home"
 import { ScheduleViewerHome } from "./_ui/schedule-viewer-home"
-import { DebugResetUserGroupButton } from "./settings/_ui/debug-reset-user-group-button"
 
 export default async function () {
 	const fetcher = new Fetcher()
@@ -30,7 +29,7 @@ export default async function () {
 			group: user.group.id,
 		})
 	} else {
-		redirect("/onboarding")
+		return redirect("/onboarding")
 	}
 
 	return (

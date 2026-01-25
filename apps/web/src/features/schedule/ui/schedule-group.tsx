@@ -7,26 +7,25 @@ import { orpc } from "@repo/orpc/react"
 
 import { GroupSelector } from "@/entities/group/ui/group-selector"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
+import { usePopupClose } from "@/shared/ui/popup"
 import { Portal } from "@/shared/ui/portal"
 import { Touchable } from "@/shared/ui/touchable"
 
 import { useScheduleGroup } from "../hooks/use-schedule-group"
 
 export const ScheduleGroup = () => {
-	// const queryClient = useQueryClient()
 	const groups = useQuery(orpc.groups.getAllGroups.queryOptions({}))
+	const { group, setGroup } = useScheduleGroup()
 
 	const [isOpen, setIsOpen] = useState(false)
-	const { group, setGroup } = useScheduleGroup()
+
+	usePopupClose(isOpen, () => setIsOpen(false))
 
 	const handleChange = async (groupId: number) => {
 		const group = groups.data?.find((g) => g.id === groupId)
 		if (!group) return
 
 		setGroup(group)
-		// await orpc.users.updateUserGroup.call({ groupId })
-		// await queryClient.invalidateQueries({ queryKey: orpc.users.me.queryKey() })
-
 		setIsOpen(false)
 	}
 
