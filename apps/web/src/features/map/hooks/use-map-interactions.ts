@@ -46,6 +46,9 @@ export const useMapInteractions = ({
 	const dragLastRef = useRef<{ x: number; y: number } | null>(null)
 	const didDragRef = useRef(false)
 	const hadGestureRef = useRef(false)
+	const lastDragTimeRef = useRef<number | null>(null)
+	const velocityRef = useRef<{ x: number; y: number } | null>(null)
+	const inertiaFrameRef = useRef<number | null>(null)
 	const gestureRef = useRef<{ scale: number; rotation: number } | null>(null)
 	const nativeGestureRef = useRef<{
 		prevDistance: number
@@ -94,6 +97,12 @@ export const useMapInteractions = ({
 		const coords = getPointerCoords(event.e)
 		if (!coords) return
 
+		if (inertiaFrameRef.current !== null) {
+			cancelAnimationFrame(inertiaFrameRef.current)
+			inertiaFrameRef.current = null
+		}
+		velocityRef.current = { x: 0, y: 0 }
+		lastDragTimeRef.current = performance.now()
 		isDraggingRef.current = true
 		dragLastRef.current = coords
 		didDragRef.current = false
@@ -105,12 +114,20 @@ export const useMapInteractions = ({
 
 			const deltaX = coords.x - dragLastRef.current.x
 			const deltaY = coords.y - dragLastRef.current.y
+			const now = performance.now()
+			const lastTime = lastDragTimeRef.current ?? now
+			const dt = Math.max(1, now - lastTime)
 
 			if (Math.abs(deltaX) > 2 || Math.abs(deltaY) > 2) {
 				didDragRef.current = true
 			}
 
 			dragLastRef.current = coords
+			lastDragTimeRef.current = now
+			velocityRef.current = {
+				x: deltaX / dt,
+				y: deltaY / dt,
+			}
 
 			const current = viewportRef.current
 			applyViewport({
@@ -154,10 +171,71 @@ export const useMapInteractions = ({
 	)
 
 	const stopDrag = useCallback(() => {
+		const shouldInertia = didDragRef.current
 		isDraggingRef.current = false
 		dragLastRef.current = null
 		didDragRef.current = false
-	}, [])
+		lastDragTimeRef.current = null
+
+		if (!shouldInertia) {
+			velocityRef.current = null
+			return
+		}
+
+		if (hadGestureRef.current) {
+			velocityRef.current = null
+			return
+		}
+
+		const velocity = velocityRef.current
+		if (!velocity) return
+		if (Math.abs(velocity.x) < 0.01 && Math.abs(velocity.y) < 0.01) {
+			velocityRef.current = null
+			return
+		}
+
+		const startInertia = () => {
+			let lastTime = performance.now()
+			const decayPerFrame = 0.92
+
+			const step = (time: number) => {
+				const dt = time - lastTime
+				lastTime = time
+
+				const currentVelocity = velocityRef.current
+				if (!currentVelocity) {
+					inertiaFrameRef.current = null
+					return
+				}
+
+				const decay = Math.pow(decayPerFrame, dt / 16.67)
+				currentVelocity.x *= decay
+				currentVelocity.y *= decay
+
+				if (
+					Math.abs(currentVelocity.x) < 0.01 &&
+					Math.abs(currentVelocity.y) < 0.01
+				) {
+					velocityRef.current = null
+					inertiaFrameRef.current = null
+					return
+				}
+
+				const current = viewportRef.current
+				applyViewport({
+					...current,
+					translateX: current.translateX + currentVelocity.x * dt,
+					translateY: current.translateY + currentVelocity.y * dt,
+				})
+
+				inertiaFrameRef.current = requestAnimationFrame(step)
+			}
+
+			inertiaFrameRef.current = requestAnimationFrame(step)
+		}
+
+		startInertia()
+	}, [applyViewport, viewportRef])
 
 	const onWheel = useCallback(
 		(event: fabric.TEvent<WheelEvent>) => {
