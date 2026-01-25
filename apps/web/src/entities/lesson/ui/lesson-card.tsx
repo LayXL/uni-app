@@ -17,12 +17,14 @@ import { LessonModal } from "./lesson-modal"
 type LessonCardProps = {
 	group?: number
 	lesson: Lesson
+	isTeacherView?: boolean
 	onClassroomClick?: (classroom: string) => void
 }
 
 export const LessonCard = ({
 	lesson,
 	group,
+	isTeacherView,
 	onClassroomClick,
 }: LessonCardProps) => {
 	const [isOpen, setIsOpen] = useState(false)
@@ -57,17 +59,19 @@ export const LessonCard = ({
 							>
 								{lesson.isDistance ? "дистант" : `${lesson.classroom} ауд`}
 							</p>
-							<p className="min-w-max">
-								{lesson.groups
-									.filter((group) => group.type === "teacher")
-									.map((group) =>
-										transformFullNameToInitials(transformToGroupName(group)),
-									)
-									.join(", ")}
-							</p>
+							{!isTeacherView && (
+								<p className="min-w-max">
+									{lesson.groups
+										.filter((group) => group.type === "teacher")
+										.map((group) =>
+											transformFullNameToInitials(transformToGroupName(group)),
+										)
+										.join(", ")}
+								</p>
+							)}
 							{otherGroups.length > 0 && (
 								<p className="break-all line-clamp-1">
-									{group ? "+ " : ""}
+									{!isTeacherView && group ? "+ " : ""}
 									{otherGroups
 										.map((group) => transformToGroupName(group))
 										.join(", ")}

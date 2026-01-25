@@ -13,10 +13,15 @@ import { groupScheduleItems } from "@/features/schedule/lib/group-schedule-items
 import { useScheduleGroup } from "../hooks/use-schedule-group"
 import { WithoutLessonsPlaceholder } from "./without-lessons-placeholder"
 
-const ScheduleViewerWithGroup = ({
+export const ScheduleViewerWithGroup = ({
 	group,
+	isTeacherView,
 	onClassroomClick,
-}: { group: number; onClassroomClick?: (classroom: string) => void }) => {
+}: {
+	group: number
+	isTeacherView?: boolean
+	onClassroomClick?: (classroom: string) => void
+}) => {
 	const dates = getNextTwoWeeksDates()
 
 	const { data } = useQuery(
@@ -42,6 +47,7 @@ const ScheduleViewerWithGroup = ({
 								group={group}
 								lesson={lesson}
 								onClassroomClick={onClassroomClick}
+								isTeacherView={isTeacherView}
 							/>
 						))}
 					</div>
@@ -53,7 +59,9 @@ const ScheduleViewerWithGroup = ({
 
 export const ScheduleViewer = ({
 	onClassroomClick,
-}: { onClassroomClick?: (classroom: string) => void }) => {
+}: {
+	onClassroomClick?: (classroom: string) => void
+}) => {
 	const { group } = useScheduleGroup()
 
 	if (!group) {

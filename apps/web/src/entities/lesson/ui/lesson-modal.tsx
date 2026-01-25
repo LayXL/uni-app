@@ -1,3 +1,6 @@
+import Link from "next/link"
+
+import { getTeacherGender } from "@repo/shared/groups/get-teacher-gender"
 import { transformToGroupName } from "@repo/shared/groups/transform-to-group-name"
 import type { Lesson } from "@repo/shared/lessons/types/lesson"
 
@@ -22,13 +25,22 @@ export const LessonModal = ({ lesson, onClassroomClick }: LessonModalProps) => {
 			</p>
 			{teachers.length > 0 &&
 				teachers.map((teacher) => (
-					<div key={teacher.id} className="relative bg-card rounded-3xl p-4">
-						<LiquidBorder />
-						<p className="text-lg font-medium">
-							{transformToGroupName(teacher)}
-						</p>
-						<p className="text-muted">Преподаватель</p>
-					</div>
+					<Touchable key={teacher.id}>
+						<Link
+							href={`/schedule/${teacher.id}`}
+							className="relative bg-card rounded-3xl p-4"
+						>
+							<LiquidBorder />
+							<p className="text-lg font-medium">
+								{transformToGroupName(teacher)}
+							</p>
+							<p className="text-muted">
+								{getTeacherGender(teacher) === "female"
+									? "Преподавательница"
+									: "Преподаватель"}
+							</p>
+						</Link>
+					</Touchable>
 				))}
 			{!lesson.isDistance && (
 				<Touchable>
