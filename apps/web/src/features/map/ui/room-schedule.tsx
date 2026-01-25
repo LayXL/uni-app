@@ -55,7 +55,7 @@ export const RoomSchedule = ({ room }: RoomScheduleProps) => {
 		}
 	}
 
-	if (!room || !mayHaveSchedule) return null
+	if (!room || !mayHaveSchedule || !schedule?.length) return null
 
 	return (
 		<div className="flex flex-col gap-2">
