@@ -2,7 +2,7 @@
 
 import { skipToken, useQuery } from "@tanstack/react-query"
 import * as fabric from "fabric"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
 
@@ -56,6 +56,13 @@ export const MapViewer = () => {
 		setRotation(next.rotation)
 	}, [])
 
+	const bounds = useMemo(() => {
+		if (!mapData) return null
+		const floor = mapData.floors.find((f) => f.id === activeFloor)
+		if (!floor) return null
+		return collectBounds(floor, mapData.entities)
+	}, [mapData, activeFloor])
+
 	const {
 		viewportRef,
 		applyViewport,
@@ -69,6 +76,7 @@ export const MapViewer = () => {
 		iconObjectsRef,
 		iconBaseScaleRef,
 		onViewportChange: handleViewportChange,
+		bounds,
 	})
 
 	const handleResize = useCallback(

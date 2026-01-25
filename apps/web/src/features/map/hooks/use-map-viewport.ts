@@ -5,6 +5,8 @@ import { clamp, createViewportMatrix } from "../lib/geometry"
 import type { FabricMatrix, ViewportState } from "../types"
 import { useMapState } from "./use-map-state"
 
+type Bounds = { minX: number; maxX: number; minY: number; maxY: number }
+
 type UseMapViewportParams = {
 	fabricRef: RefObject<fabric.Canvas | null>
 	textObjectsRef: RefObject<fabric.Text[]>
@@ -12,6 +14,7 @@ type UseMapViewportParams = {
 	iconObjectsRef: RefObject<fabric.Object[]>
 	iconBaseScaleRef: RefObject<WeakMap<fabric.Object, number>>
 	onViewportChange?: (next: ViewportState) => void
+	bounds?: Bounds | null
 }
 
 export const useMapViewport = ({
@@ -21,6 +24,7 @@ export const useMapViewport = ({
 	iconObjectsRef,
 	iconBaseScaleRef,
 	onViewportChange,
+	bounds,
 }: UseMapViewportParams) => {
 	const viewportRef = useMemo<{ current: ViewportState }>(
 		() => ({
@@ -38,6 +42,44 @@ export const useMapViewport = ({
 		(next: ViewportState) => {
 			const canvas = fabricRef.current
 			if (!canvas) return
+
+			if (bounds) {
+				const width = canvas.getWidth()
+				const height = canvas.getHeight()
+				const screenCenter = new fabric.Point(width / 2, height / 2)
+
+				const inverted = fabric.util.invertTransform(
+					createViewportMatrix(next),
+				)
+				const worldCenter = fabric.util.transformPoint(screenCenter, inverted)
+
+				const padding = 200
+				const clampedX = clamp(
+					worldCenter.x,
+					bounds.minX - padding,
+					bounds.maxX + padding,
+				)
+				const clampedY = clamp(
+					worldCenter.y,
+					bounds.minY - padding,
+					bounds.maxY + padding,
+				)
+
+				if (clampedX !== worldCenter.x || clampedY !== worldCenter.y) {
+					const matrixNoTranslate = createViewportMatrix({
+						...next,
+						translateX: 0,
+						translateY: 0,
+					})
+					const pRotatedScaled = fabric.util.transformPoint(
+						new fabric.Point(clampedX, clampedY),
+						matrixNoTranslate,
+					)
+
+					next.translateX = screenCenter.x - pRotatedScaled.x
+					next.translateY = screenCenter.y - pRotatedScaled.y
+				}
+			}
 
 			viewportRef.current = next
 			canvas.setViewportTransform(createViewportMatrix(next))
@@ -82,6 +124,7 @@ export const useMapViewport = ({
 			onViewportChange,
 			textObjectsRef,
 			viewportRef,
+			bounds,
 		],
 	)
 
