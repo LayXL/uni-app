@@ -46,14 +46,20 @@ export const useMapInteractions = ({
 	const dragLastRef = useRef<{ x: number; y: number } | null>(null)
 	const didDragRef = useRef(false)
 	const hadGestureRef = useRef(false)
-	const lastDragTimeRef = useRef<number | null>(null)
-	const velocityRef = useRef<{ x: number; y: number } | null>(null)
-	const inertiaFrameRef = useRef<number | null>(null)
 	const gestureRef = useRef<{ scale: number; rotation: number } | null>(null)
 	const nativeGestureRef = useRef<{
 		prevDistance: number
 		prevAngle: number
 	} | null>(null)
+	const momentumIdRef = useRef<number | null>(null)
+	const dragHistoryRef = useRef<{ x: number; y: number; time: number }[]>([])
+
+	const stopMomentum = useCallback(() => {
+		if (momentumIdRef.current) {
+			cancelAnimationFrame(momentumIdRef.current)
+			momentumIdRef.current = null
+		}
+	}, [])
 
 	const getPointerData = useCallback(
 		(event: MouseEvent | TouchEvent | fabric.TPointerEvent) => {
@@ -93,20 +99,19 @@ export const useMapInteractions = ({
 		[getPointerData, onPointerMove],
 	)
 
-	const startDrag = useCallback((event: PointerInfo) => {
-		const coords = getPointerCoords(event.e)
-		if (!coords) return
+	const startDrag = useCallback(
+		(event: PointerInfo) => {
+			stopMomentum()
+			const coords = getPointerCoords(event.e)
+			if (!coords) return
 
-		if (inertiaFrameRef.current !== null) {
-			cancelAnimationFrame(inertiaFrameRef.current)
-			inertiaFrameRef.current = null
-		}
-		velocityRef.current = { x: 0, y: 0 }
-		lastDragTimeRef.current = performance.now()
-		isDraggingRef.current = true
-		dragLastRef.current = coords
-		didDragRef.current = false
-	}, [])
+			isDraggingRef.current = true
+			dragLastRef.current = coords
+			didDragRef.current = false
+			dragHistoryRef.current = [{ ...coords, time: performance.now() }]
+		},
+		[stopMomentum],
+	)
 
 	const applyDragDelta = useCallback(
 		(coords: { x: number; y: number }) => {
@@ -114,20 +119,19 @@ export const useMapInteractions = ({
 
 			const deltaX = coords.x - dragLastRef.current.x
 			const deltaY = coords.y - dragLastRef.current.y
-			const now = performance.now()
-			const lastTime = lastDragTimeRef.current ?? now
-			const dt = Math.max(1, now - lastTime)
 
 			if (Math.abs(deltaX) > 2 || Math.abs(deltaY) > 2) {
 				didDragRef.current = true
 			}
 
 			dragLastRef.current = coords
-			lastDragTimeRef.current = now
-			velocityRef.current = {
-				x: deltaX / dt,
-				y: deltaY / dt,
-			}
+
+			const now = performance.now()
+			dragHistoryRef.current.push({ x: coords.x, y: coords.y, time: now })
+			const timeThreshold = now - 100
+			dragHistoryRef.current = dragHistoryRef.current.filter(
+				(p) => p.time >= timeThreshold,
+			)
 
 			const current = viewportRef.current
 			applyViewport({
@@ -171,74 +175,56 @@ export const useMapInteractions = ({
 	)
 
 	const stopDrag = useCallback(() => {
-		const shouldInertia = didDragRef.current
 		isDraggingRef.current = false
 		dragLastRef.current = null
 		didDragRef.current = false
-		lastDragTimeRef.current = null
 
-		if (!shouldInertia) {
-			velocityRef.current = null
-			return
-		}
+		const history = dragHistoryRef.current
+		const now = performance.now()
 
-		if (hadGestureRef.current) {
-			velocityRef.current = null
-			return
-		}
+		if (history.length > 1) {
+			const last = history[history.length - 1]
+			if (now - last.time < 50) {
+				const first = history[0]
+				const dt = last.time - first.time
+				if (dt > 0) {
+					const vx = (last.x - first.x) / dt
+					const vy = (last.y - first.y) / dt
 
-		const velocity = velocityRef.current
-		if (!velocity) return
-		if (Math.abs(velocity.x) < 0.01 && Math.abs(velocity.y) < 0.01) {
-			velocityRef.current = null
-			return
-		}
+					let velocityX = vx * 16
+					let velocityY = vy * 16
 
-		const startInertia = () => {
-			let lastTime = performance.now()
-			const decayPerFrame = 0.92
+					if (Math.abs(velocityX) > 0.5 || Math.abs(velocityY) > 0.5) {
+						const animate = () => {
+							velocityX *= 0.95
+							velocityY *= 0.95
 
-			const step = (time: number) => {
-				const dt = time - lastTime
-				lastTime = time
+							if (Math.abs(velocityX) < 0.1 && Math.abs(velocityY) < 0.1) {
+								stopMomentum()
+								return
+							}
 
-				const currentVelocity = velocityRef.current
-				if (!currentVelocity) {
-					inertiaFrameRef.current = null
-					return
+							const current = viewportRef.current
+							applyViewport({
+								...current,
+								translateX: current.translateX + velocityX,
+								translateY: current.translateY + velocityY,
+							})
+
+							momentumIdRef.current = requestAnimationFrame(animate)
+						}
+						momentumIdRef.current = requestAnimationFrame(animate)
+					}
 				}
-
-				const decay = Math.pow(decayPerFrame, dt / 16.67)
-				currentVelocity.x *= decay
-				currentVelocity.y *= decay
-
-				if (
-					Math.abs(currentVelocity.x) < 0.01 &&
-					Math.abs(currentVelocity.y) < 0.01
-				) {
-					velocityRef.current = null
-					inertiaFrameRef.current = null
-					return
-				}
-
-				const current = viewportRef.current
-				applyViewport({
-					...current,
-					translateX: current.translateX + currentVelocity.x * dt,
-					translateY: current.translateY + currentVelocity.y * dt,
-				})
-
-				inertiaFrameRef.current = requestAnimationFrame(step)
 			}
-
-			inertiaFrameRef.current = requestAnimationFrame(step)
 		}
 
-		startInertia()
-	}, [applyViewport, viewportRef])
+		dragHistoryRef.current = []
+	}, [applyViewport, stopMomentum, viewportRef])
 
 	const onWheel = useCallback(
 		(event: fabric.TEvent<WheelEvent>) => {
+			stopMomentum()
 			event.e.preventDefault()
 
 			const screenPoint = new fabric.Point(event.e.offsetX, event.e.offsetY)
@@ -252,7 +238,7 @@ export const useMapInteractions = ({
 			const deltaZoom = event.e.deltaY > 0 ? 0.985 : 1.015
 			zoomAtPoint(screenPoint, deltaZoom)
 		},
-		[rotateAtCenter, zoomAtPoint],
+		[rotateAtCenter, zoomAtPoint, stopMomentum],
 	)
 
 	const onMouseDown = useCallback(
@@ -317,6 +303,7 @@ export const useMapInteractions = ({
 
 	const onGesture = useCallback(
 		(event: fabric.TEvent<TouchEvent>) => {
+			stopMomentum()
 			const nativeEvent = event.e as GestureNativeEvent
 			const scale = nativeEvent?.scale ?? 1
 			const rotation = nativeEvent?.rotation ?? 0
@@ -351,7 +338,7 @@ export const useMapInteractions = ({
 
 			gestureRef.current = { scale, rotation }
 		},
-		[fabricRef, rotateAtCenter, zoomAtPoint],
+		[fabricRef, rotateAtCenter, zoomAtPoint, stopMomentum],
 	)
 
 	const onGestureEnd = useCallback(() => {
@@ -514,4 +501,8 @@ export const useMapInteractions = ({
 			window.removeEventListener("touchcancel", stopDrag)
 		}
 	}, [continueDragGlobal, stopDrag])
+
+	useEffect(() => {
+		return () => stopMomentum()
+	}, [stopMomentum])
 }
