@@ -4,6 +4,8 @@ import { useQuery } from "@tanstack/react-query"
 import { useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
+import { transformFullNameToInitials } from "@repo/shared/groups/transform-full-name-to-initials"
+import { transformToGroupName } from "@repo/shared/groups/transform-to-group-name"
 
 import { GroupSelector } from "@/entities/group/ui/group-selector"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
@@ -34,11 +36,11 @@ export const ScheduleGroup = () => {
 			<Touchable>
 				<button
 					type="button"
-					className="relative w-26 bg-card rounded-3xl px-3 py-2"
+					className="relative min-w-26 bg-card rounded-3xl px-3 py-2"
 					onClick={() => setIsOpen(!isOpen)}
 				>
 					<LiquidBorder />
-					{group?.displayName}
+					{group && transformFullNameToInitials(transformToGroupName(group))}
 				</button>
 			</Touchable>
 			{isOpen && (

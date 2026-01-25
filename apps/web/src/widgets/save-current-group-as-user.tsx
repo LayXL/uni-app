@@ -4,6 +4,8 @@ import { useQueryClient } from "@tanstack/react-query"
 import { useEffect, useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
+import { transformFullNameToInitials } from "@repo/shared/groups/transform-full-name-to-initials"
+import { transformToGroupName } from "@repo/shared/groups/transform-to-group-name"
 
 import { useScheduleGroup } from "@/features/schedule/hooks/use-schedule-group"
 import { Button } from "@/shared/ui/button"
@@ -25,9 +27,14 @@ export const SaveCurrentGroupAsUser = () => {
 			<div className="relative bg-card rounded-3xl p-4 flex flex-col gap-4">
 				<LiquidBorder />
 				<p className="text-sm">
-					Ты сейчас просматриваешь расписание группы{" "}
-					<span className="font-semibold">{group?.displayName}</span>. Сохранить
-					эту группу как свою?
+					Ты сейчас смотришь расписание{" "}
+					{group && (
+						<span className="font-semibold">
+							{transformFullNameToInitials(transformToGroupName(group))}
+						</span>
+					)}
+					<br />
+					Сохранить эту группу как свою?
 				</p>
 				<div className="grid grid-cols-2 gap-1">
 					<Button
