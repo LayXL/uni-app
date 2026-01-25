@@ -17,9 +17,14 @@ import { LessonModal } from "./lesson-modal"
 type LessonCardProps = {
 	group?: number
 	lesson: Lesson
+	onClassroomClick?: (classroom: string) => void
 }
 
-export const LessonCard = ({ lesson, group }: LessonCardProps) => {
+export const LessonCard = ({
+	lesson,
+	group,
+	onClassroomClick,
+}: LessonCardProps) => {
 	const [isOpen, setIsOpen] = useState(false)
 
 	const otherGroups = lesson.groups.filter(
@@ -73,7 +78,13 @@ export const LessonCard = ({ lesson, group }: LessonCardProps) => {
 				</button>
 			</Touchable>
 			<ModalRoot isOpen={isOpen} onClose={() => setIsOpen(false)}>
-				<LessonModal lesson={lesson} />
+				<LessonModal
+					lesson={lesson}
+					onClassroomClick={(classroom) => {
+						onClassroomClick?.(classroom)
+						setIsOpen(false)
+					}}
+				/>
 			</ModalRoot>
 		</>
 	)

@@ -22,6 +22,7 @@ type ModalRootProps = {
 	className?: string
 	showCloseButton?: boolean
 	fullHeight?: boolean
+	hideBackdrop?: boolean
 }
 
 export const ModalRoot = ({
@@ -32,6 +33,7 @@ export const ModalRoot = ({
 	close,
 	showCloseButton = true,
 	fullHeight = false,
+	hideBackdrop = false,
 }: ModalRootProps) => {
 	const handleClose = onClose ?? close ?? (() => {})
 	const [shouldRender, setShouldRender] = useState(isOpen)
@@ -62,15 +64,17 @@ export const ModalRoot = ({
 	return (
 		<Portal>
 			<div className="fixed inset-0 z-50">
-				<div
-					role="button"
-					tabIndex={-1}
-					className={cn(
-						"absolute inset-0 bg-black/60 transition-opacity duration-300 ease-out",
-						isAnimating ? "opacity-100" : "opacity-0",
-					)}
-					onClick={handleClose}
-				/>
+				{!hideBackdrop && (
+					<div
+						role="button"
+						tabIndex={-1}
+						className={cn(
+							"absolute inset-0 bg-black/60 transition-opacity duration-300 ease-out",
+							isAnimating ? "opacity-100" : "opacity-0",
+						)}
+						onClick={handleClose}
+					/>
+				)}
 				<div
 					className={cn(
 						"absolute left-0 right-0 bottom-0 bg-background border-t border-border rounded-t-3xl p-4 pb-[calc(var(--safe-area-inset-bottom)+1rem)] transition-transform duration-300 ease-out",

@@ -2,12 +2,14 @@ import { transformToGroupName } from "@repo/shared/groups/transform-to-group-nam
 import type { Lesson } from "@repo/shared/lessons/types/lesson"
 
 import { LiquidBorder } from "@/shared/ui/liquid-border"
+import { Touchable } from "@/shared/ui/touchable"
 
 type LessonModalProps = {
 	lesson: Lesson
+	onClassroomClick?: (classroom: string) => void
 }
 
-export const LessonModal = ({ lesson }: LessonModalProps) => {
+export const LessonModal = ({ lesson, onClassroomClick }: LessonModalProps) => {
 	const teachers = lesson.groups.filter((group) => group.type === "teacher")
 
 	return (
@@ -29,11 +31,17 @@ export const LessonModal = ({ lesson }: LessonModalProps) => {
 					</div>
 				))}
 			{!lesson.isDistance && (
-				<div className="relative bg-card rounded-3xl p-4">
-					<LiquidBorder />
-					<p className="text-lg font-medium">{lesson.classroom}</p>
-					<p className="text-muted">Аудитория</p>
-				</div>
+				<Touchable>
+					<button
+						type="button"
+						className="relative bg-card rounded-3xl p-4 text-left"
+						onClick={() => onClassroomClick?.(lesson.classroom)}
+					>
+						<LiquidBorder />
+						<p className="text-lg font-medium">{lesson.classroom}</p>
+						<p className="text-muted">Аудитория</p>
+					</button>
+				</Touchable>
 			)}
 		</div>
 	)

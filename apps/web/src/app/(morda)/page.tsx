@@ -8,7 +8,7 @@ import { MapViewerHome } from "@/app/(morda)/_ui/map-viewer-home"
 import { MapBottomBar } from "@/features/map/ui/map-bottom-bar"
 import { MapViewer } from "@/features/map/ui/map-viewer"
 import { ScheduleHeader } from "@/features/schedule/ui/schedule-header"
-import { ScheduleViewer } from "@/features/schedule/ui/schedule-viewer"
+import { ScheduleWithMapNavigation } from "@/widgets/schedule-with-map-navigation"
 import { Fetcher } from "@/shared/utils/fetcher"
 import { SaveCurrentGroupAsUser } from "@/widgets/save-current-group-as-user"
 
@@ -48,7 +48,7 @@ export default async function () {
 						</div>
 						<ScheduleHeader />
 						<SaveCurrentGroupAsUser />
-						<ScheduleViewer />
+						<ScheduleWithMapNavigation />
 					</div>
 				</ScheduleViewerHome>
 			</div>
