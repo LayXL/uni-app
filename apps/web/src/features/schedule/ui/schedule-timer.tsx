@@ -279,13 +279,10 @@ const ScheduleTimerWithGroup = ({
 
 export const ScheduleTimer = ({
 	initialTimestamp,
-	group: propGroup,
 }: {
 	initialTimestamp?: number
-	group?: { id: number; displayName: string }
 }) => {
-	const { group: hookGroup } = useScheduleGroup()
-	const group = propGroup ?? hookGroup
+	const { group } = useScheduleGroup()
 
 	if (!group) {
 		return null

@@ -57,7 +57,6 @@ export default async function () {
 									timeZone: "Asia/Yekaterinburg",
 								}),
 							).getTime()}
-							group={user.group}
 						/>
 						<SaveCurrentGroupAsUser />
 						<ScheduleWithMapNavigation />
