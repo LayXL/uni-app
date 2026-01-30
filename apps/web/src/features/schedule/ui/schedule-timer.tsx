@@ -243,7 +243,7 @@ const ScheduleTimerWithGroup = ({
 			}
 		}
 
-		return events.slice(0, 3)
+		return events.slice(1, 4)
 	}, [schedule, timetable, now])
 
 	if (!timerState) return null

@@ -14,7 +14,7 @@ export const LiquidBorder = ({
 			className={cn(
 				"absolute inset-0 rounded-[inherit] backface-hidden pointer-events-none will-change-transform p-px",
 				variant === "primary" &&
-					"bg-linear-[var(--degree),transparent,#22222240_35%,#22222240_65%,transparent] dark:mix-blend-overlay dark:bg-linear-[var(--degree),transparent,#ffffffe6_35%,#ffffffe6_65%,transparent]",
+					"bg-[#22222240] dark:mix-blend-overlay dark:bg-linear-[var(--degree),transparent,#ffffffe6_35%,#ffffffe6_65%,transparent]",
 				variant === "accent" &&
 					"mix-blend-overlay bg-linear-[var(--degree),transparent,#ffffffe6_35%,#ffffffe6_65%,transparent]",
 			)}
