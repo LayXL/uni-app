@@ -160,7 +160,7 @@ const ScheduleTimerWithGroup = ({
 			}
 		}
 
-		return { label: "Пары на сегодня закончились" }
+		return null
 	}, [schedule, timetable, now])
 
 	const nextEvents = useMemo(() => {
