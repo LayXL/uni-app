@@ -1,11 +1,15 @@
 "use client"
 
+import { useState } from "react"
+
 import { Icon } from "@/shared/ui/icon"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { Touchable } from "@/shared/ui/touchable"
 import type { IconName } from "@/types/icon-name"
 
 import { useRouteBuilder } from "../hooks/use-route-builder"
+
+import { MapSearchModal } from "./map-search-modal"
 
 type MapBottomBarButtonProps = {
 	icon: IconName
@@ -30,15 +34,21 @@ const MapBottomBarButton = ({ icon, onClick }: MapBottomBarButtonProps) => {
 export const MapBottomBar = () => {
 	const openRouteBuilderModal = useRouteBuilder((state) => state.openModal)
 
+	const [isSearchModalOpen, setIsSearchModalOpen] = useState(false)
+
 	return (
 		<div className="flex gap-1">
 			<MapBottomBarButton
 				icon="iconify:material-symbols:search-rounded"
-				onClick={() => {}}
+				onClick={() => setIsSearchModalOpen(true)}
 			/>
 			<MapBottomBarButton
 				icon="iconify:material-symbols:route"
 				onClick={openRouteBuilderModal}
+			/>
+			<MapSearchModal
+				isOpen={isSearchModalOpen}
+				onClose={() => setIsSearchModalOpen(false)}
 			/>
 		</div>
 	)

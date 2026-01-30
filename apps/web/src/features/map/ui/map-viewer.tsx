@@ -14,6 +14,7 @@ import { useMapData } from "../hooks/use-map-data"
 import { useMapInteractions } from "../hooks/use-map-interactions"
 import { useMapViewport } from "../hooks/use-map-viewport"
 import { useRouteBuilder } from "../hooks/use-route-builder"
+import { useSelectedRoom } from "../hooks/use-selected-room"
 import { clamp, collectBounds, createViewportMatrix } from "../lib/geometry"
 import type { ViewportState } from "../types"
 import { CursorPositionDebug } from "./cursor-position-debug"
@@ -34,7 +35,7 @@ export const MapViewer = () => {
 	)
 
 	const { activeFloor, setActiveFloor } = useActiveFloor()
-	const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null)
+	const { selectedRoomId, setSelectedRoomId } = useSelectedRoom()
 	const [isDebug] = useState(process.env.NODE_ENV === "development")
 
 	const canvasRef = useRef<HTMLCanvasElement | null>(null)
