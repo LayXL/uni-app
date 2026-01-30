@@ -77,7 +77,7 @@ const ScheduleTimerWithGroup = ({
 			.sort((a, b) => a.order - b.order)
 
 		if (todayLessons.length === 0) {
-			return { label: "Сегодня пар нет" }
+			return null
 		}
 
 		const weekday = now.getDay()

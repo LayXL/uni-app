@@ -25,14 +25,12 @@ export const ScheduleViewerHome = ({ children }: ScheduleViewerHomeProps) => {
 	return (
 		<motion.div
 			className="mt-(--map-height) z-10 [&>div]:border-t [&>div]:border-(--border-color)"
-			initial={{
-				"--border-color":
-					"color-mix(in oklab, var(--border) 100%, transparent)",
-			}}
-			style={{ "--border-opacity": borderOpacity }}
-			animate={{
+			style={{
+				"--border-opacity": borderOpacity,
 				"--border-color":
 					"color-mix(in oklab, var(--border) var(--border-opacity), transparent)",
+			}}
+			animate={{
 				opacity: isActive ? 0 : 1,
 				pointerEvents: isActive ? "none" : "auto",
 			}}
