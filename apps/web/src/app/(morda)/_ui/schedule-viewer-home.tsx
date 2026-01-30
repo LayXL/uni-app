@@ -24,7 +24,7 @@ export const ScheduleViewerHome = ({ children }: ScheduleViewerHomeProps) => {
 
 	return (
 		<motion.div
-			className="mt-[80vh] z-10 [&>div]:border-t [&>div]:border-(--border-color)"
+			className="mt-(--map-height) z-10 [&>div]:border-t [&>div]:border-(--border-color)"
 			initial={{
 				"--border-color":
 					"color-mix(in oklab, var(--border) 100%, transparent)",

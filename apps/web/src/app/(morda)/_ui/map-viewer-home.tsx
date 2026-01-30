@@ -27,8 +27,10 @@ export const MapViewerHome = ({ children }: MapViewerHomeProps) => {
 	return (
 		<motion.div
 			style={{ opacity, filter, pointerEvents }}
-			initial={{ height: "80vh" }}
-			animate={{ height: isActive ? "calc(100vh - 174px)" : "80vh" }}
+			initial={{ height: "var(--map-height)" }}
+			animate={{
+				height: isActive ? "calc(100vh - 174px)" : "var(--map-height)",
+			}}
 			className="fixed w-full"
 		>
 			{children}

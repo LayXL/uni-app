@@ -45,6 +45,8 @@
 		-moz-user-select: none;
 		-ms-user-select: none;
 
+		--map-height: 70vh;
+
 		--safe-area-inset-top: calc(
 			var(--tg-viewport-safe-area-inset-top) +
 			var(--tg-viewport-content-safe-area-inset-top)

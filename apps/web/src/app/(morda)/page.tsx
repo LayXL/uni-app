@@ -8,9 +8,10 @@ import { MapViewerHome } from "@/app/(morda)/_ui/map-viewer-home"
 import { MapBottomBar } from "@/features/map/ui/map-bottom-bar"
 import { MapViewer } from "@/features/map/ui/map-viewer"
 import { ScheduleHeader } from "@/features/schedule/ui/schedule-header"
-import { ScheduleWithMapNavigation } from "@/widgets/schedule-with-map-navigation"
+import { ScheduleTimer } from "@/features/schedule/ui/schedule-timer"
 import { Fetcher } from "@/shared/utils/fetcher"
 import { SaveCurrentGroupAsUser } from "@/widgets/save-current-group-as-user"
+import { ScheduleWithMapNavigation } from "@/widgets/schedule-with-map-navigation"
 
 import { RouteNavigation } from "../../features/map/ui/route-navigation"
 import { MapBottomBarHome } from "./_ui/map-bottom-bar-home"
@@ -21,13 +22,16 @@ export default async function () {
 
 	const user = await fetcher.fetch(orpc.users.me)
 
-	await fetcher.fetch(orpc.map.getMap)
-
 	if (user.group) {
-		await fetcher.fetch(orpc.schedule.getSchedule, {
-			dates: getNextTwoWeeksDates(),
-			group: user.group.id,
-		})
+		await Promise.all([
+			fetcher.fetch(orpc.map.getMap),
+			fetcher.fetch(orpc.groups.getAllGroups),
+			fetcher.fetch(orpc.schedule.getTimetable),
+			fetcher.fetch(orpc.schedule.getSchedule, {
+				dates: getNextTwoWeeksDates(),
+				group: user.group.id,
+			}),
+		])
 	} else {
 		return redirect("/onboarding")
 	}
@@ -47,6 +51,14 @@ export default async function () {
 							</MapBottomBarHome>
 						</div>
 						<ScheduleHeader />
+						<ScheduleTimer
+							initialTimestamp={new Date(
+								new Date().toLocaleString("en-US", {
+									timeZone: "Asia/Yekaterinburg",
+								}),
+							).getTime()}
+							group={user.group}
+						/>
 						<SaveCurrentGroupAsUser />
 						<ScheduleWithMapNavigation />
 					</div>
