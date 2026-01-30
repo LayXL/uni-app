@@ -33,7 +33,7 @@ export default async function SchedulePage({ params }: SchedulePageProps) {
 
 	return (
 		<HydrationBoundary state={fetcher.dehydrate()}>
-			<div className="flex flex-col gap-4 pt-[var(--safe-area-inset-top)+1rem]">
+			<div className="flex flex-col gap-4 pt-[calc(var(--safe-area-inset-top)+1rem)]">
 				<h2 className="px-4 py-2 text-lg font-semibold">
 					Расписание{" "}
 					{group.type === "teacher"

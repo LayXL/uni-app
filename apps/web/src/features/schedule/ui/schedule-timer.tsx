@@ -40,17 +40,9 @@ const formatDuration = (diffInSeconds: number) => {
 	return `${minutes} мин`
 }
 
-const ScheduleTimerWithGroup = ({
-	group,
-	initialTimestamp,
-}: {
-	group: number
-	initialTimestamp?: number
-}) => {
+const ScheduleTimerWithGroup = ({ group }: { group: number }) => {
 	const dates = getNextTwoWeeksDates()
-	const [now, setNow] = useState<Date>(
-		initialTimestamp ? new Date(initialTimestamp) : getNowInYekaterinburg(),
-	)
+	const [now, setNow] = useState<Date>(getNowInYekaterinburg())
 
 	useEffect(() => {
 		const interval = setInterval(() => {
@@ -277,21 +269,12 @@ const ScheduleTimerWithGroup = ({
 	)
 }
 
-export const ScheduleTimer = ({
-	initialTimestamp,
-}: {
-	initialTimestamp?: number
-}) => {
+export const ScheduleTimer = () => {
 	const { group } = useScheduleGroup()
 
 	if (!group) {
 		return null
 	}
 
-	return (
-		<ScheduleTimerWithGroup
-			group={group.id}
-			initialTimestamp={initialTimestamp}
-		/>
-	)
+	return <ScheduleTimerWithGroup group={group.id} />
 }

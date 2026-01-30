@@ -51,13 +51,7 @@ export default async function () {
 							</MapBottomBarHome>
 						</div>
 						<ScheduleHeader />
-						<ScheduleTimer
-							initialTimestamp={new Date(
-								new Date().toLocaleString("en-US", {
-									timeZone: "Asia/Yekaterinburg",
-								}),
-							).getTime()}
-						/>
+						<ScheduleTimer />
 						<SaveCurrentGroupAsUser />
 						<ScheduleWithMapNavigation />
 					</div>
