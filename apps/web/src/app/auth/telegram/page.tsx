@@ -81,7 +81,7 @@ export default function Page() {
 			cookie.set("session", `tma ${hash}`, { expires: 7 })
 			router.replace("/")
 		}
-	}, [router])
+	}, [router.replace])
 
 	return null
 }

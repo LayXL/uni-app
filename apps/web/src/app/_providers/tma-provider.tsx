@@ -6,7 +6,9 @@ import { type ReactNode, useEffect } from "react"
 export const TmaProvider = ({ children }: { children: ReactNode }) => {
 	useEffect(() => {
 		try {
-			init()
+			try {
+				init()
+			} catch {}
 			setDebug(process.env.NODE_ENV === "development")
 		} catch (error) {
 			// biome-ignore lint/suspicious/noConsole: tma sdk error

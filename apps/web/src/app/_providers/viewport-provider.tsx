@@ -15,13 +15,13 @@ export const ViewportProvider = ({ children }: ViewportProviderProps) => {
 	)
 
 	const isMobile = useMemo(() => {
-		if (typeof window === "undefined") {
+		if (typeof window === "undefined" || !isAvailable) {
 			return false
 		}
 
 		const { tgWebAppPlatform } = retrieveLaunchParams()
 		return tgWebAppPlatform === "android" || tgWebAppPlatform === "ios"
-	}, [])
+	}, [isAvailable])
 
 	useEffect(() => {
 		if (!isAvailable) {

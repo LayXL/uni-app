@@ -1,3 +1,4 @@
+import { createHmac } from "node:crypto"
 import { ORPCError } from "@orpc/client"
 import { parse, validate } from "@tma.js/init-data-node"
 
@@ -77,18 +78,51 @@ export const authMiddleware = base.middleware(async ({ context, next }) => {
 				})
 				.returning()
 
-			return next({
-				context: {
-					user,
-				},
-			})
+			return next({ context: { user } })
 		}
 
-		return next({
-			context: {
-				user,
-			},
-		})
+		return next({ context: { user } })
+	} else if (authType === "vkma") {
+		if (!authToken) throw new ORPCError("UNAUTHORIZED")
+
+		const searchParams = authTokenStringToSearchParams(authToken)
+
+		if (process.env.NODE_ENV === "production") {
+			const sign = searchParams.get("sign")
+			if (!sign) throw new ORPCError("UNAUTHORIZED")
+
+			const vkParams = [...searchParams.entries()]
+				.filter(([key]) => key.startsWith("vk_"))
+				.sort(([a], [b]) => a.localeCompare(b))
+				.map(([key, value]) => `${key}=${value}`)
+				.join("&")
+
+			const hmac = createHmac("sha256", env.vkClientSecret)
+				.update(vkParams)
+				.digest("base64url")
+
+			if (hmac !== sign) throw new ORPCError("UNAUTHORIZED")
+		}
+
+		const vkUserId = Number(searchParams.get("vk_user_id"))
+		if (!vkUserId || Number.isNaN(vkUserId)) throw new ORPCError("UNAUTHORIZED")
+
+		const [user] = await db
+			.select()
+			.from(usersTable)
+			.where(eq(usersTable.vkId, vkUserId))
+			.limit(1)
+
+		if (!user) {
+			const [newUser] = await db
+				.insert(usersTable)
+				.values({ vkId: vkUserId })
+				.returning()
+
+			return next({ context: { user: newUser } })
+		}
+
+		return next({ context: { user } })
 	}
 
 	throw new ORPCError("UNAUTHORIZED")

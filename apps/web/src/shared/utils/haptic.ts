@@ -11,18 +11,20 @@ export type HapticType =
 	| "warning"
 
 export const haptic = (type: HapticType) => {
-	switch (type) {
-		case "light":
-		case "medium":
-		case "heavy":
-			hapticFeedback.impactOccurred(type)
-			break
-		case "selection":
-			hapticFeedback.selectionChanged()
-			break
-		case "error":
-		case "success":
-			hapticFeedback.notificationOccurred(type)
-			break
-	}
+	try {
+		switch (type) {
+			case "light":
+			case "medium":
+			case "heavy":
+				hapticFeedback.impactOccurred(type)
+				break
+			case "selection":
+				hapticFeedback.selectionChanged()
+				break
+			case "error":
+			case "success":
+				hapticFeedback.notificationOccurred(type)
+				break
+		}
+	} catch {}
 }

@@ -12,8 +12,6 @@ export const getAuthHeaders = async () => {
 
 	headers.set("cookie", cookiesMap.toString())
 
-	// console.log(cookiesMap.toString())
-
 	return headers
 }
 

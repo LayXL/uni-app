@@ -10,12 +10,14 @@ import { SettingsButtonProvider } from "./settings-button-provider"
 import { ThemeProviderComponent } from "./theme-provider"
 import { TmaProvider } from "./tma-provider"
 import { ViewportProvider } from "./viewport-provider"
+import { VkmaProvider } from "./vkma-provider"
 
 export default nestProviders()
 	.push(NuqsAdapter)
 	.push(ThemeProvider, { attribute: "class" })
 	.push(QueryClientProvider)
 	.push(TmaProvider)
+	.push(VkmaProvider)
 	.push(ThemeProviderComponent)
 	.push(PopupProvider)
 	.push(BackButtonProvider)
