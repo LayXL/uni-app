@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from "next/server"
 export async function GET(request: NextRequest) {
 	const queryString = request.nextUrl.searchParams.toString()
 
-	const host = request.headers.get("host") ?? "localhost:3000"
+	const host = request.headers.get("host") ?? "127.0.0.1:3000"
 	const protocol = request.headers.get("x-forwarded-proto") ?? "http"
 	const response = NextResponse.redirect(new URL("/", `${protocol}://${host}`))
 
