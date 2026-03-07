@@ -26,6 +26,8 @@ export const usersTable = pgTable("users", {
 	group: integer().references(() => groupsTable.id),
 	isAdmin: boolean().notNull().default(false),
 	isEnabledNotifications: boolean().notNull().default(true),
+	firstName: varchar({ length: 255 }),
+	lastName: varchar({ length: 255 }),
 })
 
 export const groupTypeEnum = pgEnum("group_type", ["teacher", "studentsGroup"])
@@ -92,3 +94,9 @@ export const homeworkCompletionsTable = pgTable(
 	},
 	(table) => [primaryKey({ columns: [table.userId, table.homeworkId] })],
 )
+
+export const eventsTable = pgTable("events", {
+	id: serial().primaryKey(),
+	createdAt: timestamp().notNull().default(sql`now()`),
+	author: integer().references(() => usersTable.id),
+})

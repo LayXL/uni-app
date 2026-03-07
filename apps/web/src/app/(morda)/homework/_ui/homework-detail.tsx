@@ -4,11 +4,13 @@ import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query"
 import { format } from "date-fns"
 import { ru } from "date-fns/locale"
 import { useRouter } from "next/navigation"
+import type React from "react"
 import { useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
 
 import type { HomeworkFile } from "@/entities/homework/types"
+import type { IconName } from "@/types/icon-name"
 import { FileList } from "@/entities/homework/ui/file-list"
 import { useUser } from "@/entities/user/hooks/useUser"
 import {
@@ -21,6 +23,22 @@ import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { PageTitle } from "@/shared/ui/page-title"
 import { Touchable } from "@/shared/ui/touchable"
 import { cn } from "@/shared/utils/cn"
+
+type MetaBadgeProps = {
+	icon: IconName
+	iconClassName?: string
+	children: React.ReactNode
+}
+
+function MetaBadge({ icon, iconClassName, children }: MetaBadgeProps) {
+	return (
+		<div className="relative bg-card rounded-2xl px-3 py-1.5 flex items-center gap-1.5">
+			<LiquidBorder />
+			<Icon name={icon} size={16} className={iconClassName} />
+			<span className="text-sm">{children}</span>
+		</div>
+	)
+}
 
 type HomeworkDetailProps = {
 	id: string
@@ -122,6 +140,10 @@ export function HomeworkDetail({ id }: HomeworkDetailProps) {
 
 	const files = hw.files as HomeworkFile[]
 	const deadline = new Date(hw.deadline)
+	const authorName = !isAuthor
+		? [hw.authorFirstName, hw.authorLastName].filter(Boolean).join(" ") ||
+			null
+		: null
 
 	return (
 		<div className="flex flex-col gap-4 pt-[calc(var(--safe-area-inset-top)+1rem)] pb-[calc(var(--safe-area-inset-bottom)+1rem)] px-4">
@@ -157,33 +179,22 @@ export function HomeworkDetail({ id }: HomeworkDetailProps) {
 
 			<div className="flex flex-wrap gap-2">
 				{hw.subject?.name && (
-					<div className="relative bg-card rounded-2xl px-3 py-1.5 flex items-center gap-1.5">
-						<LiquidBorder />
-						<Icon
-							name="iconify:material-symbols:book-2-outline"
-							size={16}
-							className="text-muted"
-						/>
-						<span className="text-sm">{hw.subject.name}</span>
-					</div>
+					<MetaBadge icon="iconify:material-symbols:book-2-outline" iconClassName="text-muted">
+						{hw.subject.name}
+					</MetaBadge>
 				)}
-				<div className="relative bg-card rounded-2xl px-3 py-1.5 flex items-center gap-1.5">
-					<LiquidBorder />
-					<Icon
-						name="iconify:material-symbols:calendar-today"
-						size={16}
-						className="text-muted"
-					/>
-					<span className="text-sm">
-						до {format(deadline, "d MMMM", { locale: ru })}
-					</span>
-				</div>
+				<MetaBadge icon="iconify:material-symbols:calendar-today" iconClassName="text-muted">
+					до {format(deadline, "d MMMM", { locale: ru })}
+				</MetaBadge>
 				{hw.isSharedWithWholeGroup && (
-					<div className="relative bg-card rounded-2xl px-3 py-1.5 flex items-center gap-1.5">
-						<LiquidBorder />
-						<Icon name="iconify:material-symbols:group" size={16} />
-						<span className="text-sm">Вся группа</span>
-					</div>
+					<MetaBadge icon="iconify:material-symbols:group">
+						Вся группа
+					</MetaBadge>
+				)}
+				{authorName && (
+					<MetaBadge icon="iconify:material-symbols:person-outline">
+						{authorName}
+					</MetaBadge>
 				)}
 			</div>
 

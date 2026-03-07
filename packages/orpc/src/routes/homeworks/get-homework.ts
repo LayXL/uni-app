@@ -10,6 +10,7 @@ import {
 	or,
 	sql,
 	subjectsTable,
+	usersTable,
 } from "@repo/drizzle"
 
 import { privateProcedure } from "../../procedures/private"
@@ -40,6 +41,8 @@ export const getHomework = privateProcedure
 				createdAt: homeworksTable.createdAt,
 				deadline: homeworksTable.deadline,
 				author: homeworksTable.author,
+				authorFirstName: usersTable.firstName,
+				authorLastName: usersTable.lastName,
 				group: homeworksTable.group,
 				title: homeworksTable.title,
 				description: homeworksTable.description,
@@ -49,6 +52,7 @@ export const getHomework = privateProcedure
 			})
 			.from(homeworksTable)
 			.leftJoin(subjectsTable, eq(homeworksTable.subject, subjectsTable.id))
+			.leftJoin(usersTable, eq(homeworksTable.author, usersTable.id))
 			.leftJoin(
 				homeworkCompletionsTable,
 				and(

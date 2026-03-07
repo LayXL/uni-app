@@ -64,16 +64,20 @@ export const authMiddleware = base.middleware(async ({ context, next }) => {
 
 		if (!initData.user?.id) throw new ORPCError("UNAUTHORIZED")
 
+		const tgUser = initData.user
+		const firstName = (tgUser.firstName as string | undefined) ?? null
+		const lastName = (tgUser.lastName as string | undefined) ?? null
+
 		const [user] = await db
 			.select()
 			.from(usersTable)
-			.where(eq(usersTable.telegramId, initData.user.id))
+			.where(eq(usersTable.telegramId, tgUser.id))
 			.limit(1)
 
 		if (!user) {
 			const [newUser] = await db
 				.insert(usersTable)
-				.values({ telegramId: initData.user.id })
+				.values({ telegramId: tgUser.id, firstName, lastName })
 				.onConflictDoNothing({ target: usersTable.telegramId })
 				.returning()
 
@@ -84,12 +88,22 @@ export const authMiddleware = base.middleware(async ({ context, next }) => {
 			const [existingUser] = await db
 				.select()
 				.from(usersTable)
-				.where(eq(usersTable.telegramId, initData.user.id))
+				.where(eq(usersTable.telegramId, tgUser.id))
 				.limit(1)
 
 			if (!existingUser) throw new ORPCError("INTERNAL_SERVER_ERROR")
 
 			return next({ context: { user: existingUser } })
+		}
+
+		if (user.firstName !== firstName || user.lastName !== lastName) {
+			const [updatedUser] = await db
+				.update(usersTable)
+				.set({ firstName, lastName })
+				.where(eq(usersTable.id, user.id))
+				.returning()
+
+			return next({ context: { user: updatedUser ?? user } })
 		}
 
 		return next({ context: { user } })

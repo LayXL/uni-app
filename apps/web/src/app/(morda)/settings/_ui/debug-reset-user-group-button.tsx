@@ -5,6 +5,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import { orpc } from "@repo/orpc/react"
 
 import { Button } from "@/shared/ui/button"
+import { PageTitle } from "@/shared/ui/page-title"
 
 export const DebugResetUserGroupButton = () => {
 	const queryClient = useQueryClient()
