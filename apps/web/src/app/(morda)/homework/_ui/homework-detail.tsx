@@ -18,6 +18,7 @@ import {
 import { Button } from "@/shared/ui/button"
 import { Icon } from "@/shared/ui/icon"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
+import { PageTitle } from "@/shared/ui/page-title"
 import { Touchable } from "@/shared/ui/touchable"
 import { cn } from "@/shared/utils/cn"
 
@@ -99,7 +100,7 @@ export function HomeworkDetail({ id }: HomeworkDetailProps) {
 
 		return (
 			<div className="p-4 pt-[calc(var(--safe-area-inset-top)+1rem)] pb-[calc(var(--safe-area-inset-bottom)+1rem)]">
-				<h1 className="text-xl font-bold mb-4">Редактирование</h1>
+				<PageTitle title="Редактирование" />
 				<HomeworkForm
 					defaultValues={{
 						subject: hw.subject?.id ?? undefined,

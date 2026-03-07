@@ -11,6 +11,7 @@ import {
 	HomeworkForm,
 	type HomeworkFormValues,
 } from "@/features/homework/ui/homework-form"
+import { PageTitle } from "@/shared/ui/page-title"
 
 export default function AddHomeworkPage() {
 	const router = useRouter()
@@ -43,7 +44,7 @@ export default function AddHomeworkPage() {
 
 	return (
 		<div className="p-4 pt-[calc(var(--safe-area-inset-top)+1rem)] pb-[calc(var(--safe-area-inset-bottom)+1rem)]">
-			<h1 className="text-xl font-bold mb-4">Новое домашнее задание</h1>
+			<PageTitle title="Новое домашнее задание" />
 			<HomeworkForm
 				onSubmit={handleSubmit}
 				submitLabel="Создать"

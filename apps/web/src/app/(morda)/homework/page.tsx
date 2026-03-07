@@ -2,6 +2,7 @@ import { HydrationBoundary } from "@tanstack/react-query"
 
 import { orpc } from "@repo/orpc/react"
 
+import { PageTitle } from "@/shared/ui/page-title"
 import { Fetcher } from "@/shared/utils/fetcher"
 
 import { AddHomeworkButton } from "./_ui/add-homework-button"
@@ -15,7 +16,9 @@ export default async function HomeworkPage() {
 	return (
 		<HydrationBoundary state={fetcher.dehydrate()}>
 			<div className="flex flex-col pt-[calc(var(--safe-area-inset-top)+1rem)] pb-[calc(var(--safe-area-inset-bottom)+5rem)] min-h-screen">
-				<h1 className="px-4 text-xl font-bold">Домашние задания</h1>
+				<div className="px-4">
+					<PageTitle title="Домашние задания" />
+				</div>
 				<HomeworkList />
 			</div>
 			<AddHomeworkButton />

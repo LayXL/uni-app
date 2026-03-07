@@ -8,6 +8,7 @@ import { transformToGroupName } from "@repo/shared/groups/transform-to-group-nam
 import { getNextTwoWeeksDates } from "@repo/shared/lessons/get-next-two-weeks-dates"
 
 import { ScheduleViewerWithGroup } from "@/features/schedule/ui/schedule-viewer"
+import { PageTitle } from "@/shared/ui/page-title"
 import { Fetcher } from "@/shared/utils/fetcher"
 
 type SchedulePageProps = {
@@ -31,15 +32,17 @@ export default async function SchedulePage({ params }: SchedulePageProps) {
 		group: Number(groupId),
 	})
 
+	const title =
+		group.type === "teacher"
+			? `Расписание ${getTeacherGender(group) === "female" ? "преподавательницы" : "преподавателя"} ${inclineTeacherName(group, "genitive")}`
+			: `Расписание группы ${transformToGroupName(group)}`
+
 	return (
 		<HydrationBoundary state={fetcher.dehydrate()}>
-			<div className="flex flex-col gap-4 pt-[calc(var(--safe-area-inset-top)+1rem)]">
-				<h2 className="px-4 py-2 text-lg font-semibold">
-					Расписание{" "}
-					{group.type === "teacher"
-						? `${getTeacherGender(group) === "female" ? "преподавательницы" : "преподавателя"} ${inclineTeacherName(group, "genitive")}`
-						: `группы ${transformToGroupName(group)}`}
-				</h2>
+			<div className="flex flex-col pt-[calc(var(--safe-area-inset-top)+1rem)]">
+				<div className="px-4">
+					<PageTitle title={title} />
+				</div>
 				<ScheduleViewerWithGroup
 					group={Number(groupId)}
 					isTeacherView={group.type === "teacher"}
