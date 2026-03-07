@@ -73,7 +73,7 @@ export const useCloudStorage = <T>(
 
 	const { data } = useQuery({
 		queryKey,
-		enabled: isTelegram,
+		enabled: isTelegram(),
 		queryFn: async () => {
 			const raw = await getCloudItem(key)
 			if (!raw) return defaultValue
