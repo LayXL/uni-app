@@ -39,7 +39,7 @@ export default function NewEventPage() {
 	}
 
 	return (
-		<div className="p-4 pt-[calc(var(--safe-area-inset-top)+1rem)] pb-[calc(var(--safe-area-inset-bottom)+1rem)]">
+		<div className="p-4 pt-[calc(var(--safe-area-inset-top)+1rem)]">
 			<PageTitle title="Новое событие" />
 			<EventForm
 				onSubmit={handleSubmit}

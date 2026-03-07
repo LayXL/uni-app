@@ -16,7 +16,7 @@ export default async function EventsPage() {
 
 	return (
 		<HydrationBoundary state={fetcher.dehydrate()}>
-			<div className="flex flex-col pt-[calc(var(--safe-area-inset-top)+1rem)] pb-[calc(var(--safe-area-inset-bottom)+5rem)] min-h-screen">
+			<div className="flex flex-col pt-[calc(var(--safe-area-inset-top)+1rem)] min-h-screen">
 				<div className="px-4">
 					<PageTitle title="События" />
 				</div>
