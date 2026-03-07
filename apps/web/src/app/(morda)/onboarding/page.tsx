@@ -87,7 +87,7 @@ export default function OnboardingPage() {
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
 				exit={{ opacity: 0 }}
-				className="absolute inset-0 p-4 pt-(--tg-viewport-safe-area-inset-top)"
+				className="absolute inset-0 p-4 pt-(--safe-area-inset-top)"
 			>
 				<Step
 					onNext={() => {
