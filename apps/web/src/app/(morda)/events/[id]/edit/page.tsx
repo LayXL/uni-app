@@ -1,0 +1,85 @@
+"use client"
+
+import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query"
+import { format } from "date-fns"
+import { useParams, useRouter } from "next/navigation"
+import { useState } from "react"
+
+import { orpc } from "@repo/orpc/react"
+
+import { PageTitle } from "@/shared/ui/page-title"
+
+import { EventForm, type EventFormValues } from "../../_ui/event-form"
+
+export default function EditEventPage() {
+	const { id } = useParams<{ id: string }>()
+	const eventId = Number(id)
+	const router = useRouter()
+	const queryClient = useQueryClient()
+	const [error, setError] = useState<string | null>(null)
+
+	const { data: events } = useSuspenseQuery(
+		orpc.events.getAllEvents.queryOptions({}),
+	)
+
+	const event = events.find((e) => e.id === eventId)
+
+	if (!event) {
+		return (
+			<div className="p-4 pt-[calc(var(--safe-area-inset-top)+1rem)]">
+				<PageTitle title="Событие не найдено" />
+			</div>
+		)
+	}
+
+	const eventDate = new Date(event.date)
+
+	const handleSubmit = async (data: EventFormValues) => {
+		setError(null)
+		try {
+			await orpc.events.updateEvent.call({
+				id: eventId,
+				title: data.title,
+				description: data.description || null,
+				coverImage: data.coverImage || null,
+				groupsRegex: data.groupsRegex || null,
+				date: new Date(`${data.date}T${data.time}`).toISOString(),
+				buttonUrl: data.buttonUrl || null,
+				buttonText: data.buttonText || null,
+			})
+
+			queryClient.invalidateQueries({
+				queryKey: orpc.events.getAllEvents.queryKey(),
+			})
+
+			router.replace("/events")
+		} catch {
+			setError("Не удалось обновить событие")
+		}
+	}
+
+	return (
+		<div className="p-4 pt-[calc(var(--safe-area-inset-top)+1rem)] pb-[calc(var(--safe-area-inset-bottom)+1rem)]">
+			<PageTitle title="Редактирование" />
+			<EventForm
+				defaultValues={{
+					title: event.title,
+					description: event.description ?? "",
+					coverImage: event.coverImage ?? "",
+					groupsRegex: event.groupsRegex ?? "",
+					date: format(eventDate, "yyyy-MM-dd"),
+					time: format(eventDate, "HH:mm"),
+					buttonUrl: event.buttonUrl ?? "",
+					buttonText: event.buttonText ?? "",
+				}}
+				onSubmit={handleSubmit}
+				submitLabel="Сохранить"
+				submittingLabel="Сохранение..."
+				onCancel={() => router.back()}
+			/>
+			{error && (
+				<div className="text-sm text-destructive text-center mt-2">{error}</div>
+			)}
+		</div>
+	)
+}

@@ -4,12 +4,9 @@ import { nestProviders } from "react-nest-providers"
 
 import { PopupProvider } from "@/shared/ui/popup"
 
-import { BackButtonProvider } from "./back-button-provider"
 import { QueryClientProvider } from "./query-client-provider"
-import { SettingsButtonProvider } from "./settings-button-provider"
-import { ThemeProviderComponent } from "./theme-provider"
+import { TelegramUiProvider } from "./telegram-ui-provider"
 import { TmaProvider } from "./tma-provider"
-import { ViewportProvider } from "./viewport-provider"
 import { VkmaProvider } from "./vkma-provider"
 
 export default nestProviders()
@@ -18,9 +15,6 @@ export default nestProviders()
 	.push(QueryClientProvider)
 	.push(TmaProvider)
 	.push(VkmaProvider)
-	.push(ThemeProviderComponent)
 	.push(PopupProvider)
-	.push(BackButtonProvider)
-	.push(SettingsButtonProvider)
-	.push(ViewportProvider)
+	.push(TelegramUiProvider)
 	.build()

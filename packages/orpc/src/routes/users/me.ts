@@ -15,6 +15,7 @@ export const me = privateProcedure.handler(async ({ context }) => {
 	return {
 		id: context.user.id,
 		telegramId: context.user.telegramId,
+		isAdmin: context.user.isAdmin ? true : undefined,
 		group,
 	}
 })

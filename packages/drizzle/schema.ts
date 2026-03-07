@@ -99,4 +99,11 @@ export const eventsTable = pgTable("events", {
 	id: serial().primaryKey(),
 	createdAt: timestamp().notNull().default(sql`now()`),
 	author: integer().references(() => usersTable.id),
+	title: varchar({ length: 255 }).notNull(),
+	description: text(),
+	coverImage: text(),
+	groupsRegex: text(),
+	date: timestamp().notNull(),
+	buttonUrl: text(),
+	buttonText: varchar({ length: 255 }),
 })

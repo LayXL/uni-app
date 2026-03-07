@@ -1,3 +1,3 @@
 import { isTelegram } from "./is-telegram"
 
-export const isVK = () => !isTelegram()
+export const isVK = () => typeof window !== "undefined" && !isTelegram()

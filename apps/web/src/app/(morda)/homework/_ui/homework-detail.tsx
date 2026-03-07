@@ -10,7 +10,6 @@ import { useState } from "react"
 import { orpc } from "@repo/orpc/react"
 
 import type { HomeworkFile } from "@/entities/homework/types"
-import type { IconName } from "@/types/icon-name"
 import { FileList } from "@/entities/homework/ui/file-list"
 import { useUser } from "@/entities/user/hooks/useUser"
 import {
@@ -23,6 +22,7 @@ import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { PageTitle } from "@/shared/ui/page-title"
 import { Touchable } from "@/shared/ui/touchable"
 import { cn } from "@/shared/utils/cn"
+import type { IconName } from "@/types/icon-name"
 
 type MetaBadgeProps = {
 	icon: IconName
@@ -141,89 +141,93 @@ export function HomeworkDetail({ id }: HomeworkDetailProps) {
 	const files = hw.files as HomeworkFile[]
 	const deadline = new Date(hw.deadline)
 	const authorName = !isAuthor
-		? [hw.authorFirstName, hw.authorLastName].filter(Boolean).join(" ") ||
-			null
+		? [hw.authorFirstName, hw.authorLastName].filter(Boolean).join(" ") || null
 		: null
 
 	return (
-		<div className="flex flex-col gap-4 pt-[calc(var(--safe-area-inset-top)+1rem)] pb-[calc(var(--safe-area-inset-bottom)+1rem)] px-4">
+		<div className="flex flex-col pt-[calc(var(--safe-area-inset-top)+1rem)] pb-[calc(var(--safe-area-inset-bottom)+1rem)] px-4">
 			<PageTitle
 				title={hw.title}
 				titleClassName={isCompleted && "line-through opacity-60"}
 			/>
 
-			<Touchable>
-				<button
-					type="button"
-					onClick={handleToggleComplete}
-					className={cn(
-						"relative bg-card rounded-3xl p-4 flex items-center gap-3",
-						isCompleted && "opacity-80",
-					)}
-				>
-					<LiquidBorder />
-					<Icon
-						name={
-							isCompleted
-								? "iconify:material-symbols:check-circle"
-								: "iconify:material-symbols:circle-outline"
-						}
-						size={24}
-						className={isCompleted ? "text-accent" : "text-muted"}
-					/>
-					<span className="text-sm">
-						{isCompleted ? "Выполнено" : "Отметить как выполненное"}
-					</span>
-				</button>
-			</Touchable>
+			<div className="flex flex-col gap-4">
+				{hw.description && (
+					<p className="text-sm whitespace-pre-wrap">{hw.description}</p>
+				)}
 
-			<div className="flex flex-wrap gap-2">
-				{hw.subject?.name && (
-					<MetaBadge icon="iconify:material-symbols:book-2-outline" iconClassName="text-muted">
-						{hw.subject.name}
+				<Touchable>
+					<button
+						type="button"
+						onClick={handleToggleComplete}
+						className={cn(
+							"relative bg-card rounded-3xl p-4 flex items-center gap-3",
+							isCompleted && "opacity-80",
+						)}
+					>
+						<LiquidBorder />
+						<Icon
+							name={
+								isCompleted
+									? "iconify:material-symbols:check-circle"
+									: "iconify:material-symbols:circle-outline"
+							}
+							size={24}
+							className={isCompleted ? "text-accent" : "text-muted"}
+						/>
+						<span className="text-sm">
+							{isCompleted ? "Выполнено" : "Отметить как выполненное"}
+						</span>
+					</button>
+				</Touchable>
+
+				<div className="flex flex-wrap gap-2">
+					{hw.subject?.name && (
+						<MetaBadge
+							icon="iconify:material-symbols:book-2-outline"
+							iconClassName="text-muted"
+						>
+							{hw.subject.name}
+						</MetaBadge>
+					)}
+					<MetaBadge
+						icon="iconify:material-symbols:calendar-today"
+						iconClassName="text-muted"
+					>
+						до {format(deadline, "d MMMM", { locale: ru })}
 					</MetaBadge>
-				)}
-				<MetaBadge icon="iconify:material-symbols:calendar-today" iconClassName="text-muted">
-					до {format(deadline, "d MMMM", { locale: ru })}
-				</MetaBadge>
-				{hw.isSharedWithWholeGroup && (
-					<MetaBadge icon="iconify:material-symbols:group">
-						Вся группа
-					</MetaBadge>
-				)}
-				{authorName && (
-					<MetaBadge icon="iconify:material-symbols:person-outline">
-						{authorName}
-					</MetaBadge>
+					{hw.isSharedWithWholeGroup && (
+						<MetaBadge icon="iconify:material-symbols:group">
+							Вся группа
+						</MetaBadge>
+					)}
+					{authorName && (
+						<MetaBadge icon="iconify:material-symbols:person-outline">
+							{authorName}
+						</MetaBadge>
+					)}
+				</div>
+
+				<FileList files={files} />
+
+				{isAuthor && (
+					<div className="flex gap-2">
+						<Button
+							variant="secondary"
+							label="Редактировать"
+							onClick={() => setIsEditing(true)}
+							className="flex-1"
+						/>
+						<Button
+							variant="secondary"
+							label={isDeleting ? "Удаление..." : "Удалить"}
+							disabled={isDeleting}
+							onClick={handleDelete}
+							className="flex-1 text-destructive"
+						/>
+					</div>
 				)}
 			</div>
-
-			{hw.description && (
-				<div className="relative bg-card rounded-3xl p-4">
-					<LiquidBorder />
-					<p className="text-sm whitespace-pre-wrap">{hw.description}</p>
-				</div>
-			)}
-
-			<FileList files={files} />
-
-			{isAuthor && (
-				<div className="flex gap-2">
-					<Button
-						variant="secondary"
-						label="Редактировать"
-						onClick={() => setIsEditing(true)}
-						className="flex-1"
-					/>
-					<Button
-						variant="secondary"
-						label={isDeleting ? "Удаление..." : "Удалить"}
-						disabled={isDeleting}
-						onClick={handleDelete}
-						className="flex-1 text-destructive"
-					/>
-				</div>
-			)}
 		</div>
 	)
 }
