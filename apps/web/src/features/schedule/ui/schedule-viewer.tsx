@@ -66,6 +66,7 @@ export const ScheduleViewerWithGroup = ({
 							{dayEvents.map((event) => (
 								<EventCard
 									key={`event-${event.id}`}
+									id={event.id}
 									title={event.title}
 									description={event.description}
 									coverImage={event.coverImage}

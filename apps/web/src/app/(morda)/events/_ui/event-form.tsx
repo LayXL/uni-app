@@ -253,7 +253,7 @@ export function EventForm({
 							<input
 								type="text"
 								placeholder="^ИСП-.*"
-								className="bg-card rounded-3xl p-3 w-full outline-none placeholder:text-muted font-mono text-sm"
+								className="bg-card rounded-3xl p-3 w-full outline-none placeholder:text-muted text-sm"
 								{...field}
 							/>
 						</FormField>

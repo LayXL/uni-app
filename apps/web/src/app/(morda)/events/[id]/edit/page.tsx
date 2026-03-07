@@ -1,85 +1,35 @@
-"use client"
-
-import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query"
-import { format } from "date-fns"
-import { useParams, useRouter } from "next/navigation"
-import { useState } from "react"
+import { HydrationBoundary } from "@tanstack/react-query"
+import { notFound } from "next/navigation"
 
 import { orpc } from "@repo/orpc/react"
 
-import { PageTitle } from "@/shared/ui/page-title"
+import { Fetcher } from "@/shared/utils/fetcher"
 
-import { EventForm, type EventFormValues } from "../../_ui/event-form"
+import EditEventClient from "./_ui/edit-event-client"
 
-export default function EditEventPage() {
-	const { id } = useParams<{ id: string }>()
-	const eventId = Number(id)
-	const router = useRouter()
-	const queryClient = useQueryClient()
-	const [error, setError] = useState<string | null>(null)
+type EditEventPageProps = {
+	params: Promise<{ id: string }>
+}
 
-	const { data: events } = useSuspenseQuery(
-		orpc.events.getAllEvents.queryOptions({}),
-	)
+export default async function EditEventPage({ params }: EditEventPageProps) {
+	const { id } = await params
+	const numericId = Number(id)
 
-	const event = events.find((e) => e.id === eventId)
-
-	if (!event) {
-		return (
-			<div className="p-4 pt-[calc(var(--safe-area-inset-top)+1rem)]">
-				<PageTitle title="Событие не найдено" />
-			</div>
-		)
+	if (!Number.isFinite(numericId)) {
+		notFound()
 	}
 
-	const eventDate = new Date(event.date)
+	const fetcher = new Fetcher()
 
-	const handleSubmit = async (data: EventFormValues) => {
-		setError(null)
-		try {
-			await orpc.events.updateEvent.call({
-				id: eventId,
-				title: data.title,
-				description: data.description || null,
-				coverImage: data.coverImage || null,
-				groupsRegex: data.groupsRegex || null,
-				date: new Date(`${data.date}T${data.time}`).toISOString(),
-				buttonUrl: data.buttonUrl || null,
-				buttonText: data.buttonText || null,
-			})
-
-			queryClient.invalidateQueries({
-				queryKey: orpc.events.getAllEvents.queryKey(),
-			})
-
-			router.replace("/events")
-		} catch {
-			setError("Не удалось обновить событие")
-		}
+	try {
+		await fetcher.fetch(orpc.events.getAllEvents)
+	} catch {
+		notFound()
 	}
 
 	return (
-		<div className="p-4 pt-[calc(var(--safe-area-inset-top)+1rem)] pb-[calc(var(--safe-area-inset-bottom)+1rem)]">
-			<PageTitle title="Редактирование" />
-			<EventForm
-				defaultValues={{
-					title: event.title,
-					description: event.description ?? "",
-					coverImage: event.coverImage ?? "",
-					groupsRegex: event.groupsRegex ?? "",
-					date: format(eventDate, "yyyy-MM-dd"),
-					time: format(eventDate, "HH:mm"),
-					buttonUrl: event.buttonUrl ?? "",
-					buttonText: event.buttonText ?? "",
-				}}
-				onSubmit={handleSubmit}
-				submitLabel="Сохранить"
-				submittingLabel="Сохранение..."
-				onCancel={() => router.back()}
-			/>
-			{error && (
-				<div className="text-sm text-destructive text-center mt-2">{error}</div>
-			)}
-		</div>
+		<HydrationBoundary state={fetcher.dehydrate()}>
+			<EditEventClient id={numericId} />
+		</HydrationBoundary>
 	)
 }
