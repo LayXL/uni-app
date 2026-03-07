@@ -17,11 +17,28 @@ export const userMiddleware = async (ctx: Context, next: NextFunction) => {
 		.then(([user]) => user)
 
 	if (!user) {
-		ctx.user = await db
+		const newUser = await db
 			.insert(usersTable)
 			.values({ telegramId: ctx.from.id })
+			.onConflictDoNothing({ target: usersTable.telegramId })
 			.returning()
 			.then(([user]) => user)
+
+		if (newUser) {
+			ctx.user = newUser
+			return next()
+		}
+
+		ctx.user = await db
+			.select()
+			.from(usersTable)
+			.where(eq(usersTable.telegramId, ctx.from.id))
+			.limit(1)
+			.then(([user]) => user)
+
+		if (!ctx.user) {
+			throw new Error("Failed to load user after conflict insert")
+		}
 
 		return next()
 	}

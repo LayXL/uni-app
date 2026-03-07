@@ -71,14 +71,25 @@ export const authMiddleware = base.middleware(async ({ context, next }) => {
 			.limit(1)
 
 		if (!user) {
-			await db
+			const [newUser] = await db
 				.insert(usersTable)
-				.values({
-					telegramId: initData.user.id,
-				})
+				.values({ telegramId: initData.user.id })
+				.onConflictDoNothing({ target: usersTable.telegramId })
 				.returning()
 
-			return next({ context: { user } })
+			if (newUser) {
+				return next({ context: { user: newUser } })
+			}
+
+			const [existingUser] = await db
+				.select()
+				.from(usersTable)
+				.where(eq(usersTable.telegramId, initData.user.id))
+				.limit(1)
+
+			if (!existingUser) throw new ORPCError("INTERNAL_SERVER_ERROR")
+
+			return next({ context: { user: existingUser } })
 		}
 
 		return next({ context: { user } })
@@ -117,7 +128,20 @@ export const authMiddleware = base.middleware(async ({ context, next }) => {
 			const [newUser] = await db
 				.insert(usersTable)
 				.values({ vkId: vkUserId })
+				.onConflictDoNothing({ target: usersTable.vkId })
 				.returning()
+
+			if (!newUser) {
+				const [existingUser] = await db
+					.select()
+					.from(usersTable)
+					.where(eq(usersTable.vkId, vkUserId))
+					.limit(1)
+
+				if (!existingUser) throw new ORPCError("INTERNAL_SERVER_ERROR")
+
+				return next({ context: { user: existingUser } })
+			}
 
 			return next({ context: { user: newUser } })
 		}

@@ -21,8 +21,8 @@ export const configTable = pgTable("config", {
 
 export const usersTable = pgTable("users", {
 	id: serial().primaryKey(),
-	telegramId: bigint({ mode: "number" }),
-	vkId: integer(),
+	telegramId: bigint({ mode: "number" }).unique(),
+	vkId: integer().unique(),
 	group: integer().references(() => groupsTable.id),
 	isAdmin: boolean().notNull().default(false),
 	isEnabledNotifications: boolean().notNull().default(true),
