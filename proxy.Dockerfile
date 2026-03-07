@@ -11,8 +11,8 @@ WORKDIR /app/apps/proxy
 RUN bun install --frozen-lockfile
 
 # Переменные окружения по умолчанию
-# ENV PROXY_TARGET=https://portal.midis.info
-# ENV PORT=3000
+ENV PROXY_TARGET=https://portal.midis.info
+ENV PORT=3000
 
 # Открываем порт
 EXPOSE 3000

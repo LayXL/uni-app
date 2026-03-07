@@ -1,0 +1,9 @@
+services:
+  proxy:
+    restart: always
+    env_file: .env
+    build:
+      context: .
+      dockerfile: proxy.Dockerfile
+    ports:
+      - "${PROXY_PORT:-3000}:3000"
