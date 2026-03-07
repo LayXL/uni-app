@@ -13,7 +13,7 @@ import {
 } from "drizzle-orm/pg-core"
 
 export const configTable = pgTable("config", {
-	id: text().primaryKey().notNull().unique(),
+	id: text().primaryKey().notNull(),
 	json: json().notNull(),
 })
 
@@ -23,6 +23,7 @@ export const usersTable = pgTable("users", {
 	vkId: integer(),
 	group: integer().references(() => groupsTable.id),
 	isAdmin: boolean().notNull().default(false),
+	isEnabledNotifications: boolean().notNull().default(true),
 })
 
 export const groupTypeEnum = pgEnum("group_type", ["teacher", "studentsGroup"])

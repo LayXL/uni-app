@@ -6,6 +6,10 @@ import { classesTable, db, groupsTable, gte } from "@repo/drizzle"
 import { env } from "@repo/env"
 import { getSubjectIdByName } from "@repo/shared/get-subject-id-by-name"
 
+const REQUEST_DELAY_MS = 100
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
 export const updateScheduleInDatabase = async () => {
 	console.info("Updating schedule in database")
 
@@ -18,6 +22,10 @@ export const updateScheduleInDatabase = async () => {
 	let i = 0
 
 	for (const group of groups) {
+		if (i > 0) {
+			await sleep(REQUEST_DELAY_MS)
+		}
+
 		console.info(
 			`[${i + 1}/${groups.length}] Parsing ${group.id} — ${group.displayName}`,
 		)

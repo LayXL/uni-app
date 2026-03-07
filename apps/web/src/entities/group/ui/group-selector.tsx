@@ -9,9 +9,14 @@ import { SearchInput, type SearchInputItem } from "@/shared/ui/search-input"
 type GroupSelectorProps = {
 	onChange: (groupId: number) => void
 	onBlur?: () => void
+	noAbsolutePosition?: boolean
 }
 
-export const GroupSelector = ({ onChange, onBlur }: GroupSelectorProps) => {
+export const GroupSelector = ({
+	onChange,
+	onBlur,
+	noAbsolutePosition,
+}: GroupSelectorProps) => {
 	const groups = useQuery(orpc.groups.getAllGroups.queryOptions({}))
 
 	const searchItems = useMemo<SearchInputItem<number>[]>(() => {
@@ -31,6 +36,7 @@ export const GroupSelector = ({ onChange, onBlur }: GroupSelectorProps) => {
 			maxSuggestions={searchItems.length}
 			onBlur={onBlur}
 			autoFocus
+			noAbsolutePosition={noAbsolutePosition}
 		/>
 	)
 }

@@ -57,6 +57,13 @@
       "when": 1769771203699,
       "tag": "0007_aberrant_white_tiger",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1772869673555,
+      "tag": "0008_lovely_plazm",
+      "breakpoints": true
     }
   ]
 }

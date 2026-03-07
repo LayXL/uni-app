@@ -34,6 +34,7 @@ type SearchInputProps<T> = Omit<
 	maxSuggestions?: number
 	emptyMessage?: string
 	ref?: ForwardedRef<HTMLInputElement>
+	noAbsolutePosition?: boolean
 }
 
 const defaultFilter = <T,>(item: SearchInputItem<T>, q: string) =>
@@ -50,6 +51,7 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 		emptyMessage = "Ничего не найдено",
 		className,
 		ref,
+		noAbsolutePosition,
 		...inputProps
 	} = props
 
@@ -170,51 +172,54 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 	}
 
 	return (
-		<div ref={containerRef} className="relative w-full rounded-3xl">
-			<LiquidBorder />
-			<input
-				ref={inputRef}
-				type="text"
-				value={query}
-				onChange={(e) => {
-					setQuery(e.target.value)
-					onInputChange?.(e.target.value)
-					if (!isOpen) setIsOpen(true)
-				}}
-				onFocus={() => setIsOpen(true)}
-				onKeyDown={handleKeyDown}
-				className={cn(
-					"bg-card rounded-3xl p-3 w-full outline-none placeholder:text-muted",
-					"focus:ring-2 focus:ring-accent transition-shadow",
-					className,
-				)}
-				autoComplete="off"
-				{...inputProps}
-			/>
-			<AnimatePresence>
-				{query && (
-					<Touchable>
-						<motion.button
-							initial={{ scale: 0 }}
-							animate={{ scale: 1 }}
-							exit={{ scale: 0 }}
-							transition={{ duration: 0.2, ease: "easeInOut" }}
-							type="button"
-							onMouseDown={(e) => e.preventDefault()}
-							onClick={handleClear}
-							className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-muted hover:text-foreground transition-colors"
-							aria-label="Очистить"
-						>
-							<Icon name="iconify:material-symbols:close-rounded" size={24} />
-						</motion.button>
-					</Touchable>
-				)}
-			</AnimatePresence>
+		<div ref={containerRef} className="relative">
+			<div className="relative w-full rounded-3xl">
+				<LiquidBorder />
+				<input
+					ref={inputRef}
+					type="text"
+					value={query}
+					onChange={(e) => {
+						setQuery(e.target.value)
+						onInputChange?.(e.target.value)
+						if (!isOpen) setIsOpen(true)
+					}}
+					onFocus={() => setIsOpen(true)}
+					onKeyDown={handleKeyDown}
+					className={cn(
+						"bg-card rounded-3xl p-3 w-full outline-none placeholder:text-muted",
+						"focus:ring-2 focus:ring-accent transition-shadow",
+						className,
+					)}
+					autoComplete="off"
+					{...inputProps}
+				/>
+				<AnimatePresence>
+					{query && (
+						<Touchable>
+							<motion.button
+								initial={{ scale: 0 }}
+								animate={{ scale: 1 }}
+								exit={{ scale: 0 }}
+								transition={{ duration: 0.2, ease: "easeInOut" }}
+								type="button"
+								onMouseDown={(e) => e.preventDefault()}
+								onClick={handleClear}
+								className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-muted hover:text-foreground transition-colors"
+								aria-label="Очистить"
+							>
+								<Icon name="iconify:material-symbols:close-rounded" size={24} />
+							</motion.button>
+						</Touchable>
+					)}
+				</AnimatePresence>
+			</div>
 
-			{isOpen && (
+			{(isOpen || noAbsolutePosition) && (
 				<div
 					className={cn(
-						"absolute z-50 w-full mt-1",
+						noAbsolutePosition ? "relative" : "absolute",
+						"z-50 w-full mt-1",
 						"bg-card border border-border rounded-3xl shadow-lg",
 						"max-h-60 overflow-y-auto",
 					)}
