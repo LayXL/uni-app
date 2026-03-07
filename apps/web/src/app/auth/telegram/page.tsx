@@ -45,34 +45,12 @@ const launchParams = {
 	tgWebAppPlatform: "tdesktop",
 } as const
 
-type OnEvent = NonNullable<Parameters<typeof mockTelegramEnv>[0]>["onEvent"]
-
-const onEvent: OnEvent = (event) => {
-	if (event.name === "web_app_request_theme") {
-		return emitEvent("theme_changed", { theme_params: themeParams })
-	}
-	if (event.name === "web_app_request_viewport") {
-		return emitEvent("viewport_changed", {
-			height: window.innerHeight,
-			width: window.innerWidth,
-			is_expanded: true,
-			is_state_stable: true,
-		})
-	}
-	if (event.name === "web_app_request_content_safe_area") {
-		return emitEvent("content_safe_area_changed", noInsets)
-	}
-	if (event.name === "web_app_request_safe_area") {
-		return emitEvent("safe_area_changed", noInsets)
-	}
-}
-
 export default function Page() {
 	const router = useRouter()
 
 	useEffect(() => {
 		if (process.env.NODE_ENV === "development") {
-			mockTelegramEnv({ launchParams, onEvent })
+			mockTelegramEnv({ launchParams })
 		}
 
 		const hash = retrieveRawInitData()

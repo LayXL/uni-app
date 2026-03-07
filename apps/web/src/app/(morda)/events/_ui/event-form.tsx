@@ -4,15 +4,17 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm } from "react-hook-form"
 import z from "zod"
 
+import { useCoverUpload } from "@/features/events/hooks/use-cover-upload"
 import { Button } from "@/shared/ui/button"
 import { FormField } from "@/shared/ui/form-field"
+import { Icon } from "@/shared/ui/icon"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { Toggle } from "@/shared/ui/toggle"
+import { Touchable } from "@/shared/ui/touchable"
 
 const formSchema = z.object({
 	title: z.string().min(1, "Введите название").max(255),
 	description: z.string().optional(),
-	coverImage: z.string().optional(),
 	groupsRegex: z.string().optional(),
 	date: z.string().min(1, "Выберите дату"),
 	time: z.string().min(1, "Выберите время"),
@@ -23,7 +25,9 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>
 
-export type EventFormValues = Omit<FormValues, "allGroups">
+export type EventFormValues = Omit<FormValues, "allGroups"> & {
+	coverImage?: string
+}
 
 type EventFormProps = {
 	defaultValues?: Partial<EventFormValues>
@@ -41,6 +45,16 @@ export function EventForm({
 	onCancel,
 }: EventFormProps) {
 	const {
+		coverUrl,
+		fileInputRef,
+		isUploading,
+		uploadError,
+		selectFile,
+		removeCover,
+		openFilePicker,
+	} = useCoverUpload(defaultValues?.coverImage)
+
+	const {
 		control,
 		handleSubmit,
 		watch,
@@ -50,7 +64,6 @@ export function EventForm({
 		defaultValues: {
 			title: defaultValues?.title ?? "",
 			description: defaultValues?.description ?? "",
-			coverImage: defaultValues?.coverImage ?? "",
 			groupsRegex: defaultValues?.groupsRegex ?? "",
 			date: defaultValues?.date ?? "",
 			time: defaultValues?.time ?? "",
@@ -66,11 +79,15 @@ export function EventForm({
 		const { allGroups: _, ...rest } = data
 		await onSubmit({
 			...rest,
+			coverImage: coverUrl ?? undefined,
 			groupsRegex: allGroups ? undefined : rest.groupsRegex,
 		})
 	})
 
+	const isLoading = isSubmitting || isUploading
+
 	const formError =
+		uploadError ||
 		errors.title?.message ||
 		errors.date?.message ||
 		errors.time?.message ||
@@ -109,20 +126,82 @@ export function EventForm({
 				)}
 			/>
 
-			<Controller
-				control={control}
-				name="coverImage"
-				render={({ field }) => (
-					<FormField label="Обложка (URL)" card>
-						<input
-							type="url"
-							placeholder="https://example.com/image.jpg"
-							className="bg-card rounded-3xl p-3 w-full outline-none placeholder:text-muted"
-							{...field}
+			<FormField label="Обложка">
+				{coverUrl ? (
+					<div className="relative rounded-3xl overflow-hidden">
+						<LiquidBorder />
+						<img
+							src={coverUrl}
+							alt="Обложка события"
+							className="w-full aspect-2/1 object-cover"
 						/>
-					</FormField>
+						<div className="absolute top-2 right-2 flex gap-1">
+							<Touchable>
+								<button
+									type="button"
+									onClick={openFilePicker}
+									className="bg-black/50 backdrop-blur-sm text-white rounded-full p-2"
+								>
+									<Icon
+										name="iconify:material-symbols:edit-outline"
+										size={18}
+									/>
+								</button>
+							</Touchable>
+							<Touchable>
+								<button
+									type="button"
+									onClick={removeCover}
+									className="bg-black/50 backdrop-blur-sm text-white rounded-full p-2"
+								>
+									<Icon
+										name="iconify:material-symbols:close-rounded"
+										size={18}
+									/>
+								</button>
+							</Touchable>
+						</div>
+					</div>
+				) : (
+					<Touchable>
+						<button
+							type="button"
+							onClick={openFilePicker}
+							disabled={isUploading}
+							className="border-2 border-dashed border-border rounded-3xl p-6 flex flex-col items-center gap-2 text-muted w-full"
+						>
+							{isUploading ? (
+								<>
+									<Icon
+										name="iconify:material-symbols:progress-activity"
+										size={32}
+										className="animate-spin"
+									/>
+									<span className="text-sm">Загрузка...</span>
+								</>
+							) : (
+								<>
+									<Icon
+										name="iconify:material-symbols:add-photo-alternate-outline"
+										size={32}
+									/>
+									<span className="text-sm">
+										Нажмите, чтобы загрузить обложку
+									</span>
+									<span className="text-xs">JPEG, PNG, GIF, WebP до 10 МБ</span>
+								</>
+							)}
+						</button>
+					</Touchable>
 				)}
-			/>
+				<input
+					ref={fileInputRef}
+					type="file"
+					accept="image/jpeg,image/png,image/gif,image/webp,image/avif"
+					onChange={(e) => selectFile(e.target.files)}
+					className="hidden"
+				/>
+			</FormField>
 
 			<div className="flex gap-3">
 				<Controller
@@ -227,7 +306,7 @@ export function EventForm({
 					/>
 					<Button
 						label={isSubmitting ? submittingLabel : submitLabel}
-						disabled={isSubmitting}
+						disabled={isLoading}
 						onClick={onFormSubmit}
 						className="flex-1"
 					/>
@@ -235,7 +314,7 @@ export function EventForm({
 			) : (
 				<Button
 					label={isSubmitting ? submittingLabel : submitLabel}
-					disabled={isSubmitting}
+					disabled={isLoading}
 					onClick={onFormSubmit}
 				/>
 			)}
