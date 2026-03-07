@@ -17,7 +17,7 @@ function formatDeadline(deadline: Date | string) {
 	const d = new Date(deadline)
 	if (isToday(d)) return "Сегодня"
 	if (isTomorrow(d)) return "Завтра"
-	return format(d, "d MMM", { locale: ru })
+	return format(d, "d MMMM", { locale: ru })
 }
 
 type Urgency = "overdue" | "urgent" | "soon" | "normal"

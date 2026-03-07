@@ -1,18 +1,15 @@
 "use client"
 
-import { useQuery } from "@tanstack/react-query"
 import { AnimatePresence, motion } from "motion/react"
 import { useRouter } from "next/navigation"
-import { useMemo, useState } from "react"
+import { useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
-import { isInsensitiveMatch } from "@repo/shared/is-insensitive-match"
 
 import { GroupSelector } from "@/entities/group/ui/group-selector"
 import { Button } from "@/shared/ui/button"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { LottiePlayer } from "@/shared/ui/lottie"
-import { SearchInput, type SearchInputItem } from "@/shared/ui/search-input"
 
 type StepProps = {
 	onNext: () => void
