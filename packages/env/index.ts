@@ -18,6 +18,7 @@ const envSchema = z.object({
 	s3Endpoint: z.string().optional(),
 	s3AccessKeyId: z.string().optional(),
 	s3SecretAccessKey: z.string().optional(),
+	proxyTarget: z.string().default("https://portal.midis.info"),
 })
 
 export const env = envSchema.parse({
@@ -34,4 +35,5 @@ export const env = envSchema.parse({
 	s3Endpoint: processEnv.S3_ENDPOINT,
 	s3AccessKeyId: processEnv.S3_ACCESS_KEY_ID,
 	s3SecretAccessKey: processEnv.S3_SECRET_ACCESS_KEY,
+	proxyTarget: processEnv.PROXY_TARGET,
 })
