@@ -1,3 +1,5 @@
+"use client"
+
 import { isVK } from "../utils/is-vk"
 import { BackButton } from "./back-button"
 

@@ -34,15 +34,16 @@ export default async function SchedulePage({ params }: SchedulePageProps) {
 
 	const title =
 		group.type === "teacher"
-			? `Расписание ${getTeacherGender(group) === "female" ? "преподавательницы" : "преподавателя"} ${inclineTeacherName(group, "genitive")}`
-			: `Расписание группы ${transformToGroupName(group)}`
+			? `${getTeacherGender(group) === "female" ? "Преподавательницы" : "Преподавателя"} ${inclineTeacherName(group, "genitive")}`
+			: `Группы ${transformToGroupName(group)}`
 
 	return (
 		<HydrationBoundary state={fetcher.dehydrate()}>
 			<div className="flex flex-col pt-[calc(var(--safe-area-inset-top)+1rem)]">
 				<div className="px-4">
-					<PageTitle title={title} />
+					<PageTitle title="Расписание" />
 				</div>
+				<p className="text-sm px-4 mb-4">{title}</p>
 				<ScheduleViewerWithGroup
 					group={Number(groupId)}
 					isTeacherView={group.type === "teacher"}
