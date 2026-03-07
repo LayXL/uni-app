@@ -23,7 +23,7 @@ export function HomeworkList() {
 
 	return (
 		<>
-			<div className="flex items-center justify-between px-4 pt-3 pb-1">
+			<div className="flex items-center justify-between px-4 pb-1">
 				<span className="text-sm text-muted">Только мои задания</span>
 				<Toggle value={onlyMine} onChange={setOnlyMine} />
 			</div>

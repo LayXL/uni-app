@@ -1,5 +1,7 @@
 import { hapticFeedback } from "@tma.js/sdk-react"
-// import bridge from "@vkontakte/vk-bridge"
+import bridge from "@vkontakte/vk-bridge"
+
+import { isTelegram } from "./is-telegram"
 
 export type HapticType =
 	| "light"
@@ -11,19 +13,33 @@ export type HapticType =
 	| "warning"
 
 export const haptic = (type: HapticType) => {
+	const platform = isTelegram() ? "telegram" : "vk"
+
 	try {
 		switch (type) {
 			case "light":
 			case "medium":
 			case "heavy":
-				hapticFeedback.impactOccurred(type)
+				if (platform === "telegram") {
+					hapticFeedback.impactOccurred(type)
+				} else {
+					bridge.send("VKWebAppTapticImpactOccurred", { style: type })
+				}
 				break
 			case "selection":
-				hapticFeedback.selectionChanged()
+				if (platform === "telegram") {
+					hapticFeedback.selectionChanged()
+				} else {
+					bridge.send("VKWebAppTapticSelectionChanged")
+				}
 				break
 			case "error":
 			case "success":
-				hapticFeedback.notificationOccurred(type)
+				if (platform === "telegram") {
+					hapticFeedback.notificationOccurred(type)
+				} else {
+					bridge.send("VKWebAppTapticNotificationOccurred", { type })
+				}
 				break
 		}
 	} catch {}
