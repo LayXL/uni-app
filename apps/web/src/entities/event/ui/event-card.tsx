@@ -55,6 +55,16 @@ export const EventCard = ({
 			)}
 			<div className="p-3 flex flex-col gap-1.5">
 				<p className="font-medium">{title}</p>
+				{!coverImage && (
+					<div className="flex items-center gap-1">
+						<Icon
+							name="iconify:material-symbols:event-outline"
+							size={18}
+							className="shrink-0"
+						/>
+						<span className="text-sm">{time}</span>
+					</div>
+				)}
 				{description && (
 					<p className="text-sm text-muted line-clamp-2">{description}</p>
 				)}
