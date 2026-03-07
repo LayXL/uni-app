@@ -144,7 +144,7 @@ const formatScheduleMessage = async (
 		})
 		.join("\n\n")
 
-	return `<b>Расписание на ${formatHumanDate(date)}</b>\n\n${lessons}`
+	return `<b>Расписание на ${formatHumanDate(date)}</b>\n\n${lessons}\n\nОтписаться от уведомлений — /unsubscribe`
 }
 
 const sendDailySchedules = async (options?: {

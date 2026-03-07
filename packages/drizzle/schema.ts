@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm"
 import {
 	bigint,
 	boolean,
@@ -9,6 +10,7 @@ import {
 	primaryKey,
 	serial,
 	text,
+	timestamp,
 	varchar,
 } from "drizzle-orm/pg-core"
 
@@ -62,3 +64,18 @@ export const classesTable = pgTable(
 		}),
 	],
 )
+
+export const homeworksTable = pgTable("homeworks", {
+	id: text().primaryKey().notNull(),
+	date: date().notNull(),
+	subject: integer()
+		.notNull()
+		.references(() => subjectsTable.id),
+	createdAt: timestamp().notNull().default(sql`now()`),
+	author: integer().references(() => usersTable.id),
+	group: integer().references(() => groupsTable.id),
+	title: varchar({ length: 255 }).notNull(),
+	description: text().notNull(),
+	files: json().notNull().default([]),
+	isSharedWithWholeGroup: boolean().notNull().default(false),
+})
