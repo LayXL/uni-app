@@ -71,6 +71,27 @@
       "when": 1772873554791,
       "tag": "0009_brief_victor_mancha",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1772873648619,
+      "tag": "0010_vengeful_kabuki",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1772875415491,
+      "tag": "0011_legal_namora",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1772878060424,
+      "tag": "0012_rare_proudstar",
+      "breakpoints": true
     }
   ]
 }

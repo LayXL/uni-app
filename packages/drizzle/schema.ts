@@ -68,10 +68,9 @@ export const classesTable = pgTable(
 export const homeworksTable = pgTable("homeworks", {
 	id: text().primaryKey().notNull(),
 	date: date().notNull(),
-	subject: integer()
-		.notNull()
-		.references(() => subjectsTable.id),
+	subject: integer().references(() => subjectsTable.id),
 	createdAt: timestamp().notNull().default(sql`now()`),
+	deadline: timestamp().notNull(),
 	author: integer().references(() => usersTable.id),
 	group: integer().references(() => groupsTable.id),
 	title: varchar({ length: 255 }).notNull(),
@@ -79,3 +78,17 @@ export const homeworksTable = pgTable("homeworks", {
 	files: json().notNull().default([]),
 	isSharedWithWholeGroup: boolean().notNull().default(false),
 })
+
+export const homeworkCompletionsTable = pgTable(
+	"homework_completions",
+	{
+		userId: integer()
+			.notNull()
+			.references(() => usersTable.id),
+		homeworkId: text()
+			.notNull()
+			.references(() => homeworksTable.id),
+		completedAt: timestamp().notNull().default(sql`now()`),
+	},
+	(table) => [primaryKey({ columns: [table.userId, table.homeworkId] })],
+)

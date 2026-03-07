@@ -14,6 +14,7 @@ import { SaveCurrentGroupAsUser } from "@/widgets/save-current-group-as-user"
 import { ScheduleWithMapNavigation } from "@/widgets/schedule-with-map-navigation"
 
 import { RouteNavigation } from "../../features/map/ui/route-navigation"
+import { HomeworkButton } from "./_ui/homework-button"
 import { MapBottomBarHome } from "./_ui/map-bottom-bar-home"
 import { ScheduleViewerHome } from "./_ui/schedule-viewer-home"
 
@@ -57,6 +58,7 @@ export default async function () {
 					</div>
 				</ScheduleViewerHome>
 			</div>
+			<HomeworkButton />
 			<RouteNavigation />
 		</HydrationBoundary>
 	)

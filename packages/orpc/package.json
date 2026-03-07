@@ -12,14 +12,15 @@
 		"./routes/*": "./src/routes/*.ts"
 	},
 	"dependencies": {
+		"@aws-sdk/client-s3": "^3.1004.0",
 		"@langchain/core": "^1.0.1",
 		"@langchain/google-genai": "^1.0.0",
 		"@orpc/client": "^1.10.0",
 		"@orpc/server": "^1.10.0",
 		"@orpc/tanstack-query": "^1.10.0",
-		"@repo/shared": "workspace:*",
 		"@repo/drizzle": "workspace:*",
 		"@repo/env": "workspace:*",
+		"@repo/shared": "workspace:*",
 		"@tma.js/init-data-node": "^2.0.4",
 		"@vkontakte/vk-bridge": "^2.15.9",
 		"blurhash": "^2.0.5",

@@ -14,6 +14,10 @@ const envSchema = z.object({
 		.string()
 		.default("postgresql://postgres:postgres@localhost:5432/schedule"),
 	vkClientSecret: z.string(),
+	s3Bucket: z.string().optional(),
+	s3Endpoint: z.string().optional(),
+	s3AccessKeyId: z.string().optional(),
+	s3SecretAccessKey: z.string().optional(),
 })
 
 export const env = envSchema.parse({
@@ -26,4 +30,8 @@ export const env = envSchema.parse({
 	bitrixPassword: processEnv.BITRIX_PASSWORD,
 	databaseUrl: processEnv.DATABASE_URL,
 	vkClientSecret: processEnv.VK_CLIENT_SECRET,
+	s3Bucket: processEnv.S3_BUCKET,
+	s3Endpoint: processEnv.S3_ENDPOINT,
+	s3AccessKeyId: processEnv.S3_ACCESS_KEY_ID,
+	s3SecretAccessKey: processEnv.S3_SECRET_ACCESS_KEY,
 })
