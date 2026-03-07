@@ -14,7 +14,7 @@ export default async function HomeworkPage() {
 
 	return (
 		<HydrationBoundary state={fetcher.dehydrate()}>
-			<div className="flex flex-col pt-[calc(var(--safe-area-inset-top)+1rem)] pb-[calc(var(--safe-area-inset-bottom)+5rem)]">
+			<div className="flex flex-col pt-[calc(var(--safe-area-inset-top)+1rem)] pb-[calc(var(--safe-area-inset-bottom)+5rem)] min-h-screen">
 				<h1 className="px-4 text-xl font-bold">Домашние задания</h1>
 				<HomeworkList />
 			</div>
