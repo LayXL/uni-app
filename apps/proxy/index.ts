@@ -1,8 +1,7 @@
 /** biome-ignore-all lint/suspicious/noConsole: cause why not */
-import { env } from "@repo/env"
 
-const TARGET_URL = env.proxyTarget || "https://portal.midis.info"
-const PORT = 3000
+const TARGET_URL = process.env.PROXY_TARGET || "https://portal.midis.info"
+const PORT = process.env.PORT || 3000
 
 const server = Bun.serve({
 	port: PORT,

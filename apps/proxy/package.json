@@ -8,8 +8,7 @@
 		"start": "bun run index.ts"
 	},
 	"dependencies": {
-		"bun-types": "latest",
-		"@repo/env": "workspace:*"
+		"bun-types": "latest"
 	},
 	"devDependencies": {
 		"@types/bun": "^1.3.3",
