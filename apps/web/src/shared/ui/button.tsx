@@ -1,7 +1,6 @@
 import type { ClassValue } from "clsx"
 import {
 	cloneElement,
-	type HTMLAttributes,
 	isValidElement,
 	type ReactElement,
 	type ReactNode,
@@ -80,12 +79,20 @@ export const Button = (props: ButtonProps) => {
 			throw new Error("Button with asChild requires a single element")
 		}
 
-		const child = props.children as ReactElement<HTMLAttributes<HTMLDivElement>>
+		const child = props.children as ReactElement<{
+			className?: ClassValue
+			onClick: (e?: React.MouseEvent) => void
+			children?: ReactNode
+		}>
 
-		return cloneElement(child, {
-			...child.props,
-			...childProps,
-		})
+		return (
+			<Touchable>
+				{cloneElement(child, {
+					...child.props,
+					...childProps,
+				})}
+			</Touchable>
+		)
 	}
 
 	return (
