@@ -24,14 +24,14 @@ export default async function () {
 	const user = await fetcher.fetch(orpc.users.me)
 
 	if (user.group) {
+		const dates = getNextTwoWeeksDates()
+
 		await Promise.all([
 			fetcher.fetch(orpc.map.getMap),
 			fetcher.fetch(orpc.groups.getAllGroups),
 			fetcher.fetch(orpc.schedule.getTimetable),
-			fetcher.fetch(orpc.schedule.getSchedule, {
-				dates: getNextTwoWeeksDates(),
-				group: user.group.id,
-			}),
+			fetcher.fetch(orpc.schedule.getSchedule, { dates, group: user.group.id }),
+			fetcher.fetch(orpc.events.getEvents, { dates }),
 		])
 	} else {
 		return redirect("/onboarding")
