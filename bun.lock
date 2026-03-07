@@ -34,7 +34,6 @@
       "name": "@repo/proxy",
       "version": "1.0.0",
       "dependencies": {
-        "@repo/env": "workspace:*",
         "bun-types": "latest",
       },
       "devDependencies": {
