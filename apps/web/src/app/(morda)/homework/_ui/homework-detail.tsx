@@ -127,7 +127,7 @@ export function HomeworkDetail({ id }: HomeworkDetailProps) {
 		<div className="flex flex-col gap-4 pt-[calc(var(--safe-area-inset-top)+1rem)] pb-[calc(var(--safe-area-inset-bottom)+1rem)] px-4">
 			<PageTitle
 				title={hw.title}
-				titleClassName={isCompleted ? "line-through opacity-60" : undefined}
+				titleClassName={isCompleted && "line-through opacity-60"}
 			/>
 
 			<Touchable>
