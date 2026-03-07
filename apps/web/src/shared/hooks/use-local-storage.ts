@@ -7,27 +7,21 @@ const isBrowser = () => typeof window !== "undefined"
 
 export interface LocalStorageKeyMap {
 	viewedGroups: number[]
+	onlyMyHomeworks: boolean
 }
 
-const localStorageDefaultValues: LocalStorageDefaultValueMap = {
+const localStorageDefaultValues: LocalStorageKeyMap = {
 	viewedGroups: [],
+	onlyMyHomeworks: false,
 }
 
-type KnownLocalStorageKey = Extract<keyof LocalStorageKeyMap, string>
-export interface LocalStorageDefaultValueMap
-	extends Partial<LocalStorageKeyMap> {
-	viewedGroups: number[]
-}
+type LocalStorageKey = Extract<keyof LocalStorageKeyMap, string>
 
-type KeyWithDefault = Extract<
-	Extract<keyof LocalStorageDefaultValueMap, string>,
-	KnownLocalStorageKey
->
-const getDefaultValue = <K extends KeyWithDefault>(
+const getDefaultValue = <K extends LocalStorageKey>(
 	key: K,
-): LocalStorageDefaultValueMap[K] => localStorageDefaultValues[key]
+): LocalStorageKeyMap[K] => localStorageDefaultValues[key]
 
-export function useLocalStorage<K extends KeyWithDefault>(
+export function useLocalStorage<K extends LocalStorageKey>(
 	key: K,
 ): [LocalStorageKeyMap[K], Dispatch<SetStateAction<LocalStorageKeyMap[K]>>] {
 	const [storedValue, setStoredValue] = useState<LocalStorageKeyMap[K]>(() => {
