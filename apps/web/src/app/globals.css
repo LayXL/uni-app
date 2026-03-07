@@ -48,24 +48,24 @@
 		--map-height: 70vh;
 
 		--safe-area-inset-top: calc(
-			var(--tg-viewport-safe-area-inset-top) +
-			var(--tg-viewport-content-safe-area-inset-top) +
-			env(safe-area-inset-top)
+			var(--tg-viewport-safe-area-inset-top, 0px) +
+			var(--tg-viewport-content-safe-area-inset-top, 0px) +
+			env(safe-area-inset-top, 0px)
 		);
 		--safe-area-inset-right: calc(
-			var(--tg-viewport-safe-area-inset-right) +
-			var(--tg-viewport-content-safe-area-inset-right) +
-			env(safe-area-inset-right)
+			var(--tg-viewport-safe-area-inset-right, 0px) +
+			var(--tg-viewport-content-safe-area-inset-right, 0px) +
+			env(safe-area-inset-right, 0px)
 		);
 		--safe-area-inset-bottom: calc(
-			var(--tg-viewport-safe-area-inset-bottom) +
-			var(--tg-viewport-content-safe-area-inset-bottom) +
-			env(safe-area-inset-bottom)
+			var(--tg-viewport-safe-area-inset-bottom, 0px) +
+			var(--tg-viewport-content-safe-area-inset-bottom, 0px) +
+			env(safe-area-inset-bottom, 0px)
 		);
 		--safe-area-inset-left: calc(
-			var(--tg-viewport-safe-area-inset-left) +
-			var(--tg-viewport-content-safe-area-inset-left) +
-			env(safe-area-inset-left)
+			var(--tg-viewport-safe-area-inset-left, 0px) +
+			var(--tg-viewport-content-safe-area-inset-left, 0px) +
+			env(safe-area-inset-left, 0px)
 		);
 
 		--background: #ffffff;
