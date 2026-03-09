@@ -9,7 +9,6 @@ import { getSubjectIdByName } from "@repo/shared/get-subject-id-by-name"
 const REQUEST_DELAY_MS = 100
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
-const normalizeClassroom = (value: string) => value.trim()
 
 export const updateScheduleInDatabase = async () => {
 	console.info("Updating schedule in database")
@@ -18,8 +17,7 @@ export const updateScheduleInDatabase = async () => {
 
 	const groups = await getGroups(cookie)
 
-	const newClasses: (typeof classesTable.$inferInsert)[] = []
-	const classesByUniqueKey = new Map<string, number>()
+	const newClasses: (typeof classesTable.$inferSelect)[] = []
 
 	let i = 0
 
@@ -41,47 +39,40 @@ export const updateScheduleInDatabase = async () => {
 
 		for (const scheduleItem of data) {
 			const subjectId = await getSubjectIdByName(scheduleItem.subject)
-			const normalizedClassroom = normalizeClassroom(scheduleItem.classroom)
-			const classKey = [
-				scheduleItem.date,
-				scheduleItem.order,
-				subjectId,
-				normalizedClassroom,
-			].join("|")
 
-			const existingClassIndex = classesByUniqueKey.get(classKey) ?? -1
+			const existingClassIndex = newClasses.findIndex(
+				(x) =>
+					x.date === scheduleItem.date &&
+					x.order === scheduleItem.order &&
+					x.subject === subjectId &&
+					x.classroom === scheduleItem.classroom,
+			)
 
 			if (existingClassIndex !== -1) {
-				const existingClass = newClasses[existingClassIndex]
-
-				if (existingClass) {
-					existingClass.groups ??= []
-					if (!existingClass.groups.includes(group.id))
-						existingClass.groups.push(group.id)
-				}
+				if (!newClasses[existingClassIndex].groups.includes(group.id))
+					newClasses[existingClassIndex].groups.push(group.id)
 			} else {
-				const newClassIndex = newClasses.length
-
 				newClasses.push({
 					date: scheduleItem.date,
 					order: scheduleItem.order,
 					subject: subjectId,
-					classroom: normalizedClassroom,
+					classroom: scheduleItem.classroom,
 					groups: [group.id],
 					isCancelled: scheduleItem.isCancelled,
 					isDistance: scheduleItem.isDistance,
 					isChanged: scheduleItem.isChanged,
 					original: scheduleItem.original,
 				})
-
-				classesByUniqueKey.set(classKey, newClassIndex)
 			}
 		}
 
 		i++
 	}
 
-	const minDate = newClasses[0]?.date
+	const minDate = newClasses.reduce<string | null>((min, item) => {
+		if (!min) return item.date
+		return item.date < min ? item.date : min
+	}, null)
 
 	if (!minDate) {
 		console.info("No classes found in database, skipping update")
