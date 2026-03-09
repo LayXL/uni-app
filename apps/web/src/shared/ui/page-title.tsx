@@ -50,7 +50,7 @@ export function PageTitle({ title, titleClassName }: PageTitleProps) {
 
 			<div
 				className={cn(
-					"fixed left-0 right-0 top-0 z-50 px-4 pt-[calc(var(--safe-area-inset-top)+1rem)] pb-4 bg-linear-to-b [--tw-gradient-from-position:var(--safe-area-inset-top)] from-background to-transparent transition-all duration-300",
+					"fixed left-0 right-0 top-0 z-50 px-4 pt-[calc(var(--tg-viewport-safe-area-inset-top,0px)+1rem)] pb-4 bg-linear-to-b [--tw-gradient-from-position:var(--tg-viewport-safe-area-inset-top,0px)] from-background to-transparent transition-all duration-300",
 					isStickyVisible
 						? "opacity-100 translate-y-0 pointer-events-auto"
 						: "opacity-0 -translate-y-full pointer-events-none",
