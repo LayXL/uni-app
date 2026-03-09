@@ -5,6 +5,12 @@ import { db, eq, eventsTable } from "@repo/drizzle"
 
 import { privateProcedure } from "../../procedures/private"
 
+const colorSchema = z
+	.string()
+	.regex(/^#(?:[0-9a-fA-F]{3}){1,2}$/, "Неверный формат цвета")
+	.nullable()
+	.optional()
+
 export const updateEvent = privateProcedure
 	.input(
 		z.object({
@@ -12,6 +18,9 @@ export const updateEvent = privateProcedure
 			title: z.string().max(255).optional(),
 			description: z.string().nullable().optional(),
 			coverImage: z.string().nullable().optional(),
+			backgroundColor: colorSchema,
+			borderColor: colorSchema,
+			textColor: colorSchema,
 			groupsRegex: z.string().nullable().optional(),
 			date: z.iso.datetime().optional(),
 			buttonUrl: z.string().nullable().optional(),
@@ -45,6 +54,15 @@ export const updateEvent = privateProcedure
 				}),
 				...(input.coverImage !== undefined && {
 					coverImage: input.coverImage,
+				}),
+				...(input.backgroundColor !== undefined && {
+					backgroundColor: input.backgroundColor,
+				}),
+				...(input.borderColor !== undefined && {
+					borderColor: input.borderColor,
+				}),
+				...(input.textColor !== undefined && {
+					textColor: input.textColor,
 				}),
 				...(input.groupsRegex !== undefined && {
 					groupsRegex: input.groupsRegex,

@@ -2,6 +2,7 @@
 
 import { format } from "date-fns"
 import Link from "next/link"
+import type { CSSProperties } from "react"
 
 import { useUser } from "@/entities/user/hooks/useUser"
 import { Icon } from "@/shared/ui/icon"
@@ -13,9 +14,13 @@ type EventCardProps = {
 	title: string
 	description?: string | null
 	coverImage?: string | null
+	backgroundColor?: string | null
+	borderColor?: string | null
+	textColor?: string | null
 	date: string | Date
 	buttonUrl?: string | null
 	buttonText?: string | null
+	hideEditButton?: boolean
 }
 
 export const EventCard = ({
@@ -23,21 +28,43 @@ export const EventCard = ({
 	title,
 	description,
 	coverImage,
+	backgroundColor,
+	borderColor,
+	textColor,
 	date,
 	buttonUrl,
 	buttonText,
+	hideEditButton = false,
 }: EventCardProps) => {
 	const user = useUser()
 	const eventDate = new Date(date)
 	const time = format(eventDate, "HH:mm")
+	const hasCustomTextColor = Boolean(textColor)
+
+	const containerStyle: CSSProperties = {
+		...(backgroundColor ? { backgroundColor } : {}),
+		...(borderColor ? { borderColor } : {}),
+		...(textColor ? { color: textColor } : {}),
+	}
+	const textStyle = hasCustomTextColor
+		? ({ color: textColor } as CSSProperties)
+		: undefined
+	const secondaryTextStyle = hasCustomTextColor
+		? ({ color: textColor, opacity: 0.8 } as CSSProperties)
+		: undefined
 
 	const content = (
-		<div className="relative bg-card rounded-3xl overflow-hidden">
-			<LiquidBorder variant="accent" />
+		<div
+			className="relative bg-card rounded-3xl overflow-hidden border border-transparent"
+			style={containerStyle}
+		>
+			{!borderColor && <LiquidBorder />}
 			{coverImage && (
 				<div className="p-px relative">
-					<div className="flex items-center gap-1 absolute top-4 left-4 bg-card px-2 py-1 rounded-full">
-						<LiquidBorder />
+					<div
+						className="flex items-center gap-1 absolute top-4 left-4 bg-card px-2 py-1 rounded-full"
+						style={textStyle}
+					>
 						<Icon
 							name="iconify:material-symbols:event-outline"
 							size={18}
@@ -54,7 +81,9 @@ export const EventCard = ({
 				</div>
 			)}
 			<div className="p-3 flex flex-col gap-1.5">
-				<p className="font-medium">{title}</p>
+				<p className="font-medium" style={textStyle}>
+					{title}
+				</p>
 				{!coverImage && (
 					<div className="flex items-center gap-1">
 						<Icon
@@ -62,13 +91,20 @@ export const EventCard = ({
 							size={18}
 							className="shrink-0"
 						/>
-						<span className="text-sm">{time}</span>
+						<span className="text-sm" style={textStyle}>
+							{time}
+						</span>
 					</div>
 				)}
 				{description && (
-					<p className="text-sm text-muted line-clamp-2">{description}</p>
+					<p
+						className="text-sm text-muted line-clamp-2"
+						style={secondaryTextStyle}
+					>
+						{description}
+					</p>
 				)}
-				{(buttonUrl && buttonText) || user.isAdmin ? (
+				{(buttonUrl && buttonText) || (user.isAdmin && !hideEditButton) ? (
 					<div className="mt-1 flex items-center gap-3">
 						{buttonUrl && buttonText && (
 							<Touchable>
@@ -77,6 +113,7 @@ export const EventCard = ({
 									target="_blank"
 									rel="noopener noreferrer"
 									className="inline-flex items-center gap-1.5 text-sm text-accent font-medium"
+									style={textStyle}
 								>
 									{buttonText}
 									<Icon
@@ -86,11 +123,12 @@ export const EventCard = ({
 								</a>
 							</Touchable>
 						)}
-						{user.isAdmin && (
+						{user.isAdmin && !hideEditButton && (
 							<Touchable>
 								<Link
 									href={`/events/${id}/edit`}
 									className="inline-flex items-center gap-1.5 text-sm text-muted font-medium"
+									style={secondaryTextStyle}
 								>
 									<Icon
 										name="iconify:material-symbols:edit-outline"

@@ -1,7 +1,8 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Controller, useForm } from "react-hook-form"
+import { useEffect, useRef } from "react"
+import { Controller, useForm, useWatch } from "react-hook-form"
 import z from "zod"
 
 import { useCoverUpload } from "@/features/events/hooks/use-cover-upload"
@@ -12,10 +13,26 @@ import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { Toggle } from "@/shared/ui/toggle"
 import { Touchable } from "@/shared/ui/touchable"
 
+const colorHexRegex = /^#(?:[0-9a-fA-F]{3}){1,2}$/
+const optionalColorSchema = z
+	.string()
+	.refine((value) => value.length === 0 || colorHexRegex.test(value), {
+		message: "Введите HEX-цвет, например #A1B2C3",
+	})
+
+const normalizeHexColor = (value: string) => {
+	if (!value) return ""
+	if (colorHexRegex.test(value)) return value.toUpperCase()
+	return value
+}
+
 const formSchema = z.object({
 	title: z.string().min(1, "Введите название").max(255),
 	description: z.string().optional(),
 	groupsRegex: z.string().optional(),
+	backgroundColor: optionalColorSchema,
+	borderColor: optionalColorSchema,
+	textColor: optionalColorSchema,
 	date: z.string().min(1, "Выберите дату"),
 	time: z.string().min(1, "Выберите время"),
 	buttonUrl: z.string().optional(),
@@ -32,6 +49,7 @@ export type EventFormValues = Omit<FormValues, "allGroups"> & {
 type EventFormProps = {
 	defaultValues?: Partial<EventFormValues>
 	onSubmit: (data: EventFormValues) => Promise<void>
+	onValuesChange?: (data: EventFormValues) => void
 	submitLabel: string
 	submittingLabel: string
 	onCancel?: () => void
@@ -40,6 +58,7 @@ type EventFormProps = {
 export function EventForm({
 	defaultValues,
 	onSubmit,
+	onValuesChange,
 	submitLabel,
 	submittingLabel,
 	onCancel,
@@ -65,6 +84,9 @@ export function EventForm({
 			title: defaultValues?.title ?? "",
 			description: defaultValues?.description ?? "",
 			groupsRegex: defaultValues?.groupsRegex ?? "",
+			backgroundColor: defaultValues?.backgroundColor ?? "",
+			borderColor: defaultValues?.borderColor ?? "",
+			textColor: defaultValues?.textColor ?? "",
 			date: defaultValues?.date ?? "",
 			time: defaultValues?.time ?? "",
 			buttonUrl: defaultValues?.buttonUrl ?? "",
@@ -74,6 +96,30 @@ export function EventForm({
 	})
 
 	const allGroups = watch("allGroups")
+	const liveValues = useWatch({ control })
+	const lastPreviewPayloadRef = useRef<string>("")
+
+	useEffect(() => {
+		if (!onValuesChange || !liveValues) return
+		const { allGroups: _, ...rest } = liveValues
+		const payload: EventFormValues = {
+			title: rest.title ?? "",
+			description: rest.description ?? "",
+			groupsRegex: liveValues.allGroups ? undefined : (rest.groupsRegex ?? ""),
+			backgroundColor: rest.backgroundColor ?? "",
+			borderColor: rest.borderColor ?? "",
+			textColor: rest.textColor ?? "",
+			date: rest.date ?? "",
+			time: rest.time ?? "",
+			buttonUrl: rest.buttonUrl ?? "",
+			buttonText: rest.buttonText ?? "",
+			coverImage: coverUrl ?? undefined,
+		}
+		const serialized = JSON.stringify(payload)
+		if (serialized === lastPreviewPayloadRef.current) return
+		lastPreviewPayloadRef.current = serialized
+		onValuesChange(payload)
+	}, [liveValues, coverUrl, onValuesChange])
 
 	const onFormSubmit = handleSubmit(async (data) => {
 		const { allGroups: _, ...rest } = data
@@ -89,6 +135,9 @@ export function EventForm({
 	const formError =
 		uploadError ||
 		errors.title?.message ||
+		errors.backgroundColor?.message ||
+		errors.borderColor?.message ||
+		errors.textColor?.message ||
 		errors.date?.message ||
 		errors.time?.message ||
 		null
@@ -260,6 +309,93 @@ export function EventForm({
 					)}
 				/>
 			)}
+
+			<div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+				<Controller
+					control={control}
+					name="backgroundColor"
+					render={({ field }) => (
+						<FormField label="Цвет карточки" card>
+							<div className="flex items-center gap-2 bg-card rounded-3xl p-2">
+								<input
+									type="color"
+									value={field.value || "#000000"}
+									onChange={(e) =>
+										field.onChange(normalizeHexColor(e.target.value))
+									}
+									className="h-9 w-9 cursor-pointer rounded-full border border-border bg-transparent p-0"
+								/>
+								<input
+									type="text"
+									placeholder="#1F2937"
+									className="bg-transparent rounded-3xl px-2 py-1 w-full outline-none placeholder:text-muted"
+									value={field.value}
+									onChange={(e) => field.onChange(e.target.value)}
+									onBlur={(e) =>
+										field.onChange(normalizeHexColor(e.target.value.trim()))
+									}
+								/>
+							</div>
+						</FormField>
+					)}
+				/>
+				<Controller
+					control={control}
+					name="borderColor"
+					render={({ field }) => (
+						<FormField label="Цвет обводки" card>
+							<div className="flex items-center gap-2 bg-card rounded-3xl p-2">
+								<input
+									type="color"
+									value={field.value || "#000000"}
+									onChange={(e) =>
+										field.onChange(normalizeHexColor(e.target.value))
+									}
+									className="h-9 w-9 cursor-pointer rounded-full border border-border bg-transparent p-0"
+								/>
+								<input
+									type="text"
+									placeholder="#3B82F6"
+									className="bg-transparent rounded-3xl px-2 py-1 w-full outline-none placeholder:text-muted"
+									value={field.value}
+									onChange={(e) => field.onChange(e.target.value)}
+									onBlur={(e) =>
+										field.onChange(normalizeHexColor(e.target.value.trim()))
+									}
+								/>
+							</div>
+						</FormField>
+					)}
+				/>
+				<Controller
+					control={control}
+					name="textColor"
+					render={({ field }) => (
+						<FormField label="Цвет текста" card>
+							<div className="flex items-center gap-2 bg-card rounded-3xl p-2">
+								<input
+									type="color"
+									value={field.value || "#000000"}
+									onChange={(e) =>
+										field.onChange(normalizeHexColor(e.target.value))
+									}
+									className="h-9 w-9 cursor-pointer rounded-full border border-border bg-transparent p-0"
+								/>
+								<input
+									type="text"
+									placeholder="#F9FAFB"
+									className="bg-transparent rounded-3xl px-2 py-1 w-full outline-none placeholder:text-muted"
+									value={field.value}
+									onChange={(e) => field.onChange(e.target.value)}
+									onBlur={(e) =>
+										field.onChange(normalizeHexColor(e.target.value.trim()))
+									}
+								/>
+							</div>
+						</FormField>
+					)}
+				/>
+			</div>
 
 			<Controller
 				control={control}

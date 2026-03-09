@@ -1,4 +1,5 @@
 import { cn } from "../utils/cn"
+import { LiquidBorder } from "./liquid-border"
 import { Touchable } from "./touchable"
 
 type ToggleProps = {
@@ -19,6 +20,7 @@ export function Toggle({ value, onChange, className }: ToggleProps) {
 					className,
 				)}
 			>
+				<LiquidBorder />
 				<div
 					className={cn(
 						"absolute top-0.5 w-6 h-6 rounded-full bg-white transition-transform shadow-sm",
