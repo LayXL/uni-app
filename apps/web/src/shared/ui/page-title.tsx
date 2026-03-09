@@ -15,6 +15,7 @@ type PageTitleProps = {
 export function PageTitle({ title, titleClassName }: PageTitleProps) {
 	const titleRef = useRef<HTMLDivElement | null>(null)
 	const [isStickyVisible, setIsStickyVisible] = useState(false)
+	const showBackButton = isVK()
 
 	useEffect(() => {
 		const titleElement = titleRef.current
@@ -34,9 +35,17 @@ export function PageTitle({ title, titleClassName }: PageTitleProps) {
 
 	return (
 		<>
-			<div ref={titleRef} className="flex items-center gap-2 mb-4">
-				{isVK() && <BackButton />}
-				<h1 className={cn("text-xl font-bold", titleClassName)}>{title}</h1>
+			<div ref={titleRef} className="relative mb-4">
+				{showBackButton && (
+					<div className="absolute left-0 top-1/2 -translate-y-1/2 z-10">
+						<BackButton />
+					</div>
+				)}
+				<div className="flex min-h-8 items-center justify-center">
+					<h1 className={cn("text-xl font-bold text-center", titleClassName)}>
+						{title}
+					</h1>
+				</div>
 			</div>
 
 			<div
@@ -47,9 +56,17 @@ export function PageTitle({ title, titleClassName }: PageTitleProps) {
 						: "opacity-0 -translate-y-full pointer-events-none",
 				)}
 			>
-				<div className="flex items-center gap-2">
-					{isVK() && <BackButton />}
-					<h1 className={cn("text-xl font-bold", titleClassName)}>{title}</h1>
+				<div className="relative">
+					{showBackButton && (
+						<div className="absolute left-0 top-1/2 -translate-y-1/2 z-10">
+							<BackButton />
+						</div>
+					)}
+					<div className="flex min-h-8 items-center justify-center">
+						<h1 className={cn("text-xl font-bold text-center", titleClassName)}>
+							{title}
+						</h1>
+					</div>
 				</div>
 			</div>
 		</>
