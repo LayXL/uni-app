@@ -73,6 +73,7 @@ export const ScheduleViewerWithGroup = ({
 									backgroundColor={event.backgroundColor}
 									borderColor={event.borderColor}
 									textColor={event.textColor}
+									buttonColor={event.buttonColor}
 									date={event.date}
 									buttonUrl={event.buttonUrl}
 									buttonText={event.buttonText}

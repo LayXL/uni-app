@@ -17,6 +17,7 @@ type EventCardProps = {
 	backgroundColor?: string | null
 	borderColor?: string | null
 	textColor?: string | null
+	buttonColor?: string | null
 	date: string | Date
 	buttonUrl?: string | null
 	buttonText?: string | null
@@ -31,6 +32,7 @@ export const EventCard = ({
 	backgroundColor,
 	borderColor,
 	textColor,
+	buttonColor,
 	date,
 	buttonUrl,
 	buttonText,
@@ -52,6 +54,9 @@ export const EventCard = ({
 	const secondaryTextStyle = hasCustomTextColor
 		? ({ color: textColor, opacity: 0.8 } as CSSProperties)
 		: undefined
+	const buttonStyle = buttonColor
+		? ({ color: buttonColor } as CSSProperties)
+		: textStyle
 
 	const content = (
 		<div
@@ -113,7 +118,7 @@ export const EventCard = ({
 									target="_blank"
 									rel="noopener noreferrer"
 									className="inline-flex items-center gap-1.5 text-sm text-accent font-medium"
-									style={textStyle}
+									style={buttonStyle}
 								>
 									{buttonText}
 									<Icon

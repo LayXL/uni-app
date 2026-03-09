@@ -24,6 +24,7 @@ export const getAllEvents = privateProcedure.handler(async ({ context }) => {
 			backgroundColor: eventsTable.backgroundColor,
 			borderColor: eventsTable.borderColor,
 			textColor: eventsTable.textColor,
+			buttonColor: eventsTable.buttonColor,
 			groupsRegex: eventsTable.groupsRegex,
 			date: eventsTable.date,
 			buttonUrl: eventsTable.buttonUrl,

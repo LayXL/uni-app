@@ -105,6 +105,7 @@ export const eventsTable = pgTable("events", {
 	backgroundColor: varchar({ length: 32 }),
 	borderColor: varchar({ length: 32 }),
 	textColor: varchar({ length: 32 }),
+	buttonColor: varchar({ length: 32 }),
 	groupsRegex: text(),
 	date: timestamp().notNull(),
 	buttonUrl: text(),

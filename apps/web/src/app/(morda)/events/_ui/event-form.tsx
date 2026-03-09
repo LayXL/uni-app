@@ -33,6 +33,7 @@ const formSchema = z.object({
 	backgroundColor: optionalColorSchema,
 	borderColor: optionalColorSchema,
 	textColor: optionalColorSchema,
+	buttonColor: optionalColorSchema,
 	date: z.string().min(1, "Выберите дату"),
 	time: z.string().min(1, "Выберите время"),
 	buttonUrl: z.string().optional(),
@@ -87,6 +88,7 @@ export function EventForm({
 			backgroundColor: defaultValues?.backgroundColor ?? "",
 			borderColor: defaultValues?.borderColor ?? "",
 			textColor: defaultValues?.textColor ?? "",
+			buttonColor: defaultValues?.buttonColor ?? "",
 			date: defaultValues?.date ?? "",
 			time: defaultValues?.time ?? "",
 			buttonUrl: defaultValues?.buttonUrl ?? "",
@@ -109,6 +111,7 @@ export function EventForm({
 			backgroundColor: rest.backgroundColor ?? "",
 			borderColor: rest.borderColor ?? "",
 			textColor: rest.textColor ?? "",
+			buttonColor: rest.buttonColor ?? "",
 			date: rest.date ?? "",
 			time: rest.time ?? "",
 			buttonUrl: rest.buttonUrl ?? "",
@@ -138,6 +141,7 @@ export function EventForm({
 		errors.backgroundColor?.message ||
 		errors.borderColor?.message ||
 		errors.textColor?.message ||
+		errors.buttonColor?.message ||
 		errors.date?.message ||
 		errors.time?.message ||
 		null
@@ -310,7 +314,7 @@ export function EventForm({
 				/>
 			)}
 
-			<div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+			<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
 				<Controller
 					control={control}
 					name="backgroundColor"
@@ -384,6 +388,34 @@ export function EventForm({
 								<input
 									type="text"
 									placeholder="#F9FAFB"
+									className="bg-transparent rounded-3xl px-2 py-1 w-full outline-none placeholder:text-muted"
+									value={field.value}
+									onChange={(e) => field.onChange(e.target.value)}
+									onBlur={(e) =>
+										field.onChange(normalizeHexColor(e.target.value.trim()))
+									}
+								/>
+							</div>
+						</FormField>
+					)}
+				/>
+				<Controller
+					control={control}
+					name="buttonColor"
+					render={({ field }) => (
+						<FormField label="Цвет кнопки" card>
+							<div className="flex items-center gap-2 bg-card rounded-3xl p-2">
+								<input
+									type="color"
+									value={field.value || "#000000"}
+									onChange={(e) =>
+										field.onChange(normalizeHexColor(e.target.value))
+									}
+									className="h-9 w-9 cursor-pointer rounded-full border border-border bg-transparent p-0"
+								/>
+								<input
+									type="text"
+									placeholder="#60A5FA"
 									className="bg-transparent rounded-3xl px-2 py-1 w-full outline-none placeholder:text-muted"
 									value={field.value}
 									onChange={(e) => field.onChange(e.target.value)}

@@ -24,6 +24,7 @@ type EventPreview = {
 	backgroundColor?: string | null
 	borderColor?: string | null
 	textColor?: string | null
+	buttonColor?: string | null
 	date: string | Date
 	buttonUrl?: string | null
 	buttonText?: string | null
@@ -51,6 +52,7 @@ export default function EditEventClient({ id }: EditEventClientProps) {
 			backgroundColor: event.backgroundColor,
 			borderColor: event.borderColor,
 			textColor: event.textColor,
+			buttonColor: event.buttonColor,
 			date: event.date,
 			buttonUrl: event.buttonUrl,
 			buttonText: event.buttonText,
@@ -69,6 +71,7 @@ export default function EditEventClient({ id }: EditEventClientProps) {
 				backgroundColor: data.backgroundColor || null,
 				borderColor: data.borderColor || null,
 				textColor: data.textColor || null,
+				buttonColor: data.buttonColor || null,
 				date: Number.isNaN(date.getTime()) ? event.date : date.toISOString(),
 				buttonUrl: data.buttonUrl || null,
 				buttonText: data.buttonText || null,
@@ -104,6 +107,7 @@ export default function EditEventClient({ id }: EditEventClientProps) {
 				backgroundColor: data.backgroundColor || null,
 				borderColor: data.borderColor || null,
 				textColor: data.textColor || null,
+				buttonColor: data.buttonColor || null,
 				groupsRegex: data.groupsRegex || null,
 				date: new Date(`${data.date}T${data.time}`).toISOString(),
 				buttonUrl: data.buttonUrl || null,
@@ -132,6 +136,7 @@ export default function EditEventClient({ id }: EditEventClientProps) {
 					backgroundColor={preview?.backgroundColor ?? event.backgroundColor}
 					borderColor={preview?.borderColor ?? event.borderColor}
 					textColor={preview?.textColor ?? event.textColor}
+					buttonColor={preview?.buttonColor ?? event.buttonColor}
 					date={preview?.date ?? event.date}
 					buttonUrl={preview?.buttonUrl ?? event.buttonUrl}
 					buttonText={preview?.buttonText ?? event.buttonText}
@@ -146,6 +151,7 @@ export default function EditEventClient({ id }: EditEventClientProps) {
 					backgroundColor: event.backgroundColor ?? "",
 					borderColor: event.borderColor ?? "",
 					textColor: event.textColor ?? "",
+					buttonColor: event.buttonColor ?? "",
 					groupsRegex: event.groupsRegex ?? "",
 					date: format(eventDate, "yyyy-MM-dd"),
 					time: format(eventDate, "HH:mm"),

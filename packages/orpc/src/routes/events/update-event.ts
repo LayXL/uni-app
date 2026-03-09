@@ -21,6 +21,7 @@ export const updateEvent = privateProcedure
 			backgroundColor: colorSchema,
 			borderColor: colorSchema,
 			textColor: colorSchema,
+			buttonColor: colorSchema,
 			groupsRegex: z.string().nullable().optional(),
 			date: z.iso.datetime().optional(),
 			buttonUrl: z.string().nullable().optional(),
@@ -63,6 +64,9 @@ export const updateEvent = privateProcedure
 				}),
 				...(input.textColor !== undefined && {
 					textColor: input.textColor,
+				}),
+				...(input.buttonColor !== undefined && {
+					buttonColor: input.buttonColor,
 				}),
 				...(input.groupsRegex !== undefined && {
 					groupsRegex: input.groupsRegex,

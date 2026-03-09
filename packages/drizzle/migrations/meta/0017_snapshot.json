@@ -1,6 +1,6 @@
 {
-  "id": "a9d931e1-b8a7-463a-9272-c1c6186c557e",
-  "prevId": "6afbd286-eb84-46a9-aa3d-f0f925274250",
+  "id": "76f598dd-7c58-49eb-9525-de72d791861e",
+  "prevId": "a9d931e1-b8a7-463a-9272-c1c6186c557e",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -179,6 +179,12 @@
         },
         "textColor": {
           "name": "textColor",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "buttonColor": {
+          "name": "buttonColor",
           "type": "varchar(32)",
           "primaryKey": false,
           "notNull": false

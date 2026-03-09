@@ -62,6 +62,7 @@ export const getEvents = privateProcedure
 				backgroundColor: eventsTable.backgroundColor,
 				borderColor: eventsTable.borderColor,
 				textColor: eventsTable.textColor,
+				buttonColor: eventsTable.buttonColor,
 				date: eventsTable.date,
 				buttonUrl: eventsTable.buttonUrl,
 				buttonText: eventsTable.buttonText,

@@ -25,6 +25,7 @@ export default function NewEventPage() {
 				backgroundColor: data.backgroundColor || null,
 				borderColor: data.borderColor || null,
 				textColor: data.textColor || null,
+				buttonColor: data.buttonColor || null,
 				groupsRegex: data.groupsRegex || null,
 				date: new Date(`${data.date}T${data.time}`).toISOString(),
 				buttonUrl: data.buttonUrl || null,
