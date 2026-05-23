@@ -2,6 +2,8 @@ import { ORPCError } from "@orpc/client"
 import z from "zod"
 
 import { db, eq, groupsTable } from "@repo/drizzle"
+import { env } from "@repo/env"
+import { testingGroup } from "@repo/shared/testing-group"
 
 import { publicProcedure } from "../../procedures/public"
 
@@ -12,6 +14,10 @@ export const getGroup = publicProcedure
 		}),
 	)
 	.handler(async ({ input }) => {
+		if (env.testingGroupEnabled && input.id === testingGroup.id) {
+			return testingGroup
+		}
+
 		const group = await db
 			.select()
 			.from(groupsTable)

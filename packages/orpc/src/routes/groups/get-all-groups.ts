@@ -1,4 +1,6 @@
 import { db, eq, groupsTable } from "@repo/drizzle"
+import { env } from "@repo/env"
+import { testingGroup } from "@repo/shared/testing-group"
 
 import { publicProcedure } from "../../procedures/public"
 
@@ -8,5 +10,5 @@ export const getAllGroups = publicProcedure.handler(async () => {
 		.from(groupsTable)
 		.where(eq(groupsTable.isDeleted, false))
 
-	return groups
+	return env.testingGroupEnabled ? [...groups, testingGroup] : groups
 })

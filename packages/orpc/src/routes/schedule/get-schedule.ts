@@ -14,8 +14,11 @@ import {
 	sql,
 	subjectsTable,
 } from "@repo/drizzle"
+import { env } from "@repo/env"
 import { getConfig } from "@repo/shared/config/get-config"
+import { getTestingLessons } from "@repo/shared/lessons/get-testing-lessons"
 import { lessonSchema } from "@repo/shared/lessons/types/lesson"
+import { isTestingGroupId } from "@repo/shared/testing-group"
 
 import { publicProcedure } from "../../procedures/public"
 
@@ -76,25 +79,31 @@ export const getSchedule = publicProcedure
 
 		const timetable = await getConfig("timetable")
 
-		const schedule = await getScheduleFromDb(dates, { group, classrooms })
+		const shouldUseTestingSchedule =
+			env.testingGroupEnabled && isTestingGroupId(group)
+		const schedule = shouldUseTestingSchedule
+			? getTestingLessons(dates, { classrooms })
+			: await getScheduleFromDb(dates, { group, classrooms })
 
 		const daysWithoutClasses = dates.filter(
 			(date) => !schedule.some((lesson) => lesson.date === date),
 		)
 
-		const predictedSchedules = await Promise.all(
-			daysWithoutClasses.map(async (date) => {
-				const parsedDate = parseISO(date)
-				const predictedSchedule = await getScheduleFromDb(
-					[format(subDays(parsedDate, 14), "yyyy-MM-dd")],
-					{ group, classrooms },
-				)
+		if (!shouldUseTestingSchedule) {
+			const predictedSchedules = await Promise.all(
+				daysWithoutClasses.map(async (date) => {
+					const parsedDate = parseISO(date)
+					const predictedSchedule = await getScheduleFromDb(
+						[format(subDays(parsedDate, 14), "yyyy-MM-dd")],
+						{ group, classrooms },
+					)
 
-				return predictedSchedule.map((lesson) => ({ ...lesson, date }))
-			}),
-		)
+					return predictedSchedule.map((lesson) => ({ ...lesson, date }))
+				}),
+			)
 
-		schedule.push(...predictedSchedules.flat())
+			schedule.push(...predictedSchedules.flat())
+		}
 
 		return schedule.map((lesson) => {
 			const weekday = new Date(lesson.date).getDay()

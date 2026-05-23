@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
+import { isTestingGroupId } from "@repo/shared/testing-group"
 
 import { GroupSelector } from "@/entities/group/ui/group-selector"
 import { Button } from "@/shared/ui/button"
@@ -49,7 +50,14 @@ const Step1 = ({ onNext }: StepProps) => {
 }
 
 const Step2 = ({ onNext }: StepProps) => {
+	const router = useRouter()
+
 	const handleGroupClick = async (groupId: number) => {
+		if (isTestingGroupId(groupId)) {
+			router.replace(`/schedule/${groupId}`)
+			return
+		}
+
 		await orpc.users.updateUserGroup.call({ groupId })
 		onNext()
 	}
