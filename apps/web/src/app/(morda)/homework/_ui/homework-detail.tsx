@@ -17,6 +17,7 @@ import {
 	type HomeworkFormValues,
 } from "@/features/homework/ui/homework-form"
 import { Button } from "@/shared/ui/button"
+import { useConfirmDialog } from "@/shared/ui/confirm-dialog"
 import { Icon } from "@/shared/ui/icon"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { PageTitle } from "@/shared/ui/page-title"
@@ -57,6 +58,7 @@ export function HomeworkDetail({ id }: HomeworkDetailProps) {
 	const [isEditing, setIsEditing] = useState(false)
 	const [isDeleting, setIsDeleting] = useState(false)
 	const [isCompleted, setIsCompleted] = useState(hw.isCompleted)
+	const confirm = useConfirmDialog()
 
 	const handleToggleComplete = async () => {
 		const next = !isCompleted
@@ -73,7 +75,14 @@ export function HomeworkDetail({ id }: HomeworkDetailProps) {
 	}
 
 	const handleDelete = async () => {
-		if (!confirm("Удалить домашнее задание?")) return
+		const confirmed = await confirm({
+			title: "Удалить домашнее задание?",
+			confirmLabel: "Удалить",
+			destructive: true,
+		})
+
+		if (!confirmed) return
+
 		setIsDeleting(true)
 		try {
 			await orpc.homeworks.deleteHomework.call({ id })

@@ -8,6 +8,7 @@ import { useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
 
+import { useConfirmDialog } from "@/shared/ui/confirm-dialog"
 import { Icon } from "@/shared/ui/icon"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { Touchable } from "@/shared/ui/touchable"
@@ -19,9 +20,17 @@ export function EventsList() {
 	)
 
 	const [deletingId, setDeletingId] = useState<number | null>(null)
+	const confirm = useConfirmDialog()
 
 	const handleDelete = async (id: number) => {
-		if (!confirm("Удалить событие?")) return
+		const confirmed = await confirm({
+			title: "Удалить событие?",
+			confirmLabel: "Удалить",
+			destructive: true,
+		})
+
+		if (!confirmed) return
+
 		setDeletingId(id)
 		try {
 			await orpc.events.deleteEvent.call({ id })
