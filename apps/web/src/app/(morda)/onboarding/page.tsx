@@ -40,11 +40,13 @@ const Step1 = ({ onNext }: StepProps) => {
 						<h3>Карта здания</h3>
 					</div>
 					<div className="p-4">
-						<h3>Уведомления о парах на завтра</h3>
+						<h3>Домашние задания</h3>
 					</div>
 				</div>
 			</div>
-			<Button label="Круто" onClick={onNext} />
+			<div className="fixed bottom-0 left-0 right-0 p-4 mb-(--safe-area-inset-bottom) grid">
+				<Button label="Хорошо" onClick={onNext} />
+			</div>
 		</div>
 	)
 }
