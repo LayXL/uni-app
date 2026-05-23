@@ -3,7 +3,7 @@ import z from "zod"
 
 import { db, eq, groupsTable } from "@repo/drizzle"
 import { env } from "@repo/env"
-import { testingGroup } from "@repo/shared/testing-group"
+import { testingGroup, testingTeacherGroups } from "@repo/shared/testing-group"
 
 import { publicProcedure } from "../../procedures/public"
 
@@ -14,8 +14,12 @@ export const getGroup = publicProcedure
 		}),
 	)
 	.handler(async ({ input }) => {
-		if (env.testingGroupEnabled && input.id === testingGroup.id) {
-			return testingGroup
+		const testingGroupOrTeacher = [testingGroup, ...testingTeacherGroups].find(
+			(group) => group.id === input.id,
+		)
+
+		if (env.testingGroupEnabled && testingGroupOrTeacher) {
+			return testingGroupOrTeacher
 		}
 
 		const group = await db

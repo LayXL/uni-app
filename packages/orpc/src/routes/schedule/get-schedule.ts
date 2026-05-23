@@ -18,7 +18,7 @@ import { env } from "@repo/env"
 import { getConfig } from "@repo/shared/config/get-config"
 import { getTestingLessons } from "@repo/shared/lessons/get-testing-lessons"
 import { lessonSchema } from "@repo/shared/lessons/types/lesson"
-import { isTestingGroupId } from "@repo/shared/testing-group"
+import { isTestingScheduleGroupId } from "@repo/shared/testing-group"
 
 import { publicProcedure } from "../../procedures/public"
 
@@ -77,13 +77,16 @@ export const getSchedule = publicProcedure
 	.handler(async ({ input }) => {
 		const { dates, group, classrooms } = input
 
-		const timetable = await getConfig("timetable")
-
 		const shouldUseTestingSchedule =
-			env.testingGroupEnabled && isTestingGroupId(group)
-		const schedule = shouldUseTestingSchedule
-			? getTestingLessons(dates, { classrooms })
-			: await getScheduleFromDb(dates, { group, classrooms })
+			env.testingGroupEnabled && isTestingScheduleGroupId(group)
+		const [timetable, buildingScheme] = await Promise.all([
+			getConfig("timetable"),
+			shouldUseTestingSchedule ? getConfig("buildingScheme") : null,
+		])
+		const schedule =
+			shouldUseTestingSchedule && buildingScheme
+				? getTestingLessons(dates, { buildingScheme, group, classrooms })
+				: await getScheduleFromDb(dates, { group, classrooms })
 
 		const daysWithoutClasses = dates.filter(
 			(date) => !schedule.some((lesson) => lesson.date === date),

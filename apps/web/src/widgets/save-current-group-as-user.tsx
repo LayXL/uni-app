@@ -6,7 +6,7 @@ import { useEffect, useState } from "react"
 import { orpc } from "@repo/orpc/react"
 import { transformFullNameToInitials } from "@repo/shared/groups/transform-full-name-to-initials"
 import { transformToGroupName } from "@repo/shared/groups/transform-to-group-name"
-import { isTestingGroupId } from "@repo/shared/testing-group"
+import { isTestingScheduleGroupId } from "@repo/shared/testing-group"
 
 import { useScheduleGroup } from "@/features/schedule/hooks/use-schedule-group"
 import { Button } from "@/shared/ui/button"
@@ -21,7 +21,7 @@ export const SaveCurrentGroupAsUser = () => {
 		setIsOpen(
 			!currentGroupIsUserGroup &&
 				Boolean(group) &&
-				!isTestingGroupId(group?.id),
+				!isTestingScheduleGroupId(group?.id),
 		)
 	}, [currentGroupIsUserGroup, group])
 

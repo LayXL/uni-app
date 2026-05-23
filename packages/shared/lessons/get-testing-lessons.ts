@@ -1,9 +1,21 @@
 import { differenceInCalendarDays, parseISO } from "date-fns"
 
-import { TESTING_GROUP_DISPLAY_NAME, TESTING_GROUP_ID } from "../testing-group"
+import type { BuildingScheme } from "../building-scheme"
+import { isRoom } from "../building-scheme"
+import {
+	TESTING_GROUP_DISPLAY_NAME,
+	TESTING_GROUP_ID,
+	testingTeacherGroups,
+} from "../testing-group"
 import type { Lesson } from "./types/lesson"
 
 type TestingLessonTemplate = Omit<Lesson, "date" | "startTime" | "endTime">
+type TestingLessonSeed = {
+	order: number
+	subject: { id: number; name: string }
+	roomIndex: number
+	teacherIndex: number
+}
 
 const ANCHOR_DATE = "2026-01-05"
 
@@ -13,86 +25,142 @@ const testingGroup = {
 	type: "studentsGroup" as const,
 }
 
-const createTestingLesson = (
-	order: number,
-	subject: { id: number; name: string },
-	classroom: string,
-): TestingLessonTemplate => ({
-	order,
-	classroom,
-	isCancelled: false,
-	isDistance: false,
-	isChanged: false,
-	original: null,
-	subject,
-	groups: [testingGroup],
-})
-
-const testingScheduleByDay: TestingLessonTemplate[][] = [
+const testingScheduleByDay: TestingLessonSeed[][] = [
 	[
-		createTestingLesson(
-			1,
-			{ id: -101, name: "Тестирование интерфейсов" },
-			"201",
-		),
-		createTestingLesson(2, { id: -102, name: "Основы аналитики" }, "305"),
+		{
+			order: 1,
+			subject: { id: -101, name: "Тестирование интерфейсов" },
+			roomIndex: 0,
+			teacherIndex: 0,
+		},
+		{
+			order: 2,
+			subject: { id: -102, name: "Основы аналитики" },
+			roomIndex: 1,
+			teacherIndex: 1,
+		},
 	],
 	[
-		createTestingLesson(2, { id: -103, name: "Проектный практикум" }, "410"),
-		createTestingLesson(3, { id: -104, name: "Командная разработка" }, "408"),
+		{
+			order: 2,
+			subject: { id: -103, name: "Проектный практикум" },
+			roomIndex: 2,
+			teacherIndex: 2,
+		},
+		{
+			order: 3,
+			subject: { id: -104, name: "Командная разработка" },
+			roomIndex: 3,
+			teacherIndex: 3,
+		},
 	],
 	[
-		createTestingLesson(
-			1,
-			{ id: -105, name: "Дизайн цифровых сервисов" },
-			"214",
-		),
-		createTestingLesson(4, { id: -106, name: "Базы данных" }, "312"),
+		{
+			order: 1,
+			subject: { id: -105, name: "Дизайн цифровых сервисов" },
+			roomIndex: 4,
+			teacherIndex: 0,
+		},
+		{
+			order: 4,
+			subject: { id: -106, name: "Базы данных" },
+			roomIndex: 5,
+			teacherIndex: 1,
+		},
 	],
 	[
-		createTestingLesson(2, { id: -107, name: "Frontend-разработка" }, "508"),
-		createTestingLesson(3, { id: -108, name: "Backend-разработка" }, "509"),
+		{
+			order: 2,
+			subject: { id: -107, name: "Frontend-разработка" },
+			roomIndex: 6,
+			teacherIndex: 2,
+		},
+		{
+			order: 3,
+			subject: { id: -108, name: "Backend-разработка" },
+			roomIndex: 7,
+			teacherIndex: 3,
+		},
 	],
 	[
-		createTestingLesson(1, { id: -109, name: "Архитектура приложений" }, "401"),
-		createTestingLesson(
-			2,
-			{ id: -110, name: "Защита тестового проекта" },
-			"Актовый зал",
-		),
+		{
+			order: 1,
+			subject: { id: -109, name: "Архитектура приложений" },
+			roomIndex: 8,
+			teacherIndex: 0,
+		},
+		{
+			order: 2,
+			subject: { id: -110, name: "Защита тестового проекта" },
+			roomIndex: 9,
+			teacherIndex: 1,
+		},
 	],
 	[],
 	[],
 	[
-		createTestingLesson(2, { id: -111, name: "Мобильная разработка" }, "307"),
-		createTestingLesson(3, { id: -112, name: "Практика тестирования" }, "307"),
+		{
+			order: 2,
+			subject: { id: -111, name: "Мобильная разработка" },
+			roomIndex: 10,
+			teacherIndex: 2,
+		},
+		{
+			order: 3,
+			subject: { id: -112, name: "Практика тестирования" },
+			roomIndex: 10,
+			teacherIndex: 3,
+		},
 	],
 	[
-		createTestingLesson(1, { id: -113, name: "Алгоритмы" }, "202"),
-		createTestingLesson(4, { id: -114, name: "UX-исследования" }, "215"),
+		{
+			order: 1,
+			subject: { id: -113, name: "Алгоритмы" },
+			roomIndex: 11,
+			teacherIndex: 0,
+		},
+		{
+			order: 4,
+			subject: { id: -114, name: "UX-исследования" },
+			roomIndex: 12,
+			teacherIndex: 1,
+		},
 	],
 	[
-		createTestingLesson(
-			2,
-			{ id: -115, name: "Интеграционные сценарии" },
-			"406",
-		),
-		createTestingLesson(3, { id: -116, name: "Документирование API" }, "406"),
+		{
+			order: 2,
+			subject: { id: -115, name: "Интеграционные сценарии" },
+			roomIndex: 13,
+			teacherIndex: 2,
+		},
+		{
+			order: 3,
+			subject: { id: -116, name: "Документирование API" },
+			roomIndex: 13,
+			teacherIndex: 3,
+		},
 	],
 	[
-		createTestingLesson(1, { id: -117, name: "DevOps-практикум" }, "512"),
-		createTestingLesson(
-			2,
-			{ id: -118, name: "Информационная безопасность" },
-			"514",
-		),
+		{
+			order: 1,
+			subject: { id: -117, name: "DevOps-практикум" },
+			roomIndex: 14,
+			teacherIndex: 0,
+		},
+		{
+			order: 2,
+			subject: { id: -118, name: "Информационная безопасность" },
+			roomIndex: 15,
+			teacherIndex: 1,
+		},
 	],
 	[
-		createTestingLesson(
-			3,
-			{ id: -119, name: "Демонстрационный экзамен" },
-			"Большой зал",
-		),
+		{
+			order: 3,
+			subject: { id: -119, name: "Демонстрационный экзамен" },
+			roomIndex: 16,
+			teacherIndex: 2,
+		},
 	],
 	[],
 	[],
@@ -106,16 +174,59 @@ const getTestingDayIndex = (date: string) => {
 	return ((daysFromAnchor % 14) + 14) % 14
 }
 
+const getSchedulableClassrooms = (buildingScheme: BuildingScheme) =>
+	buildingScheme.entities
+		.filter(isRoom)
+		.map((room) => room.name)
+		.filter((name) => /^\d{3}[А-ЯA-Z]?$/.test(name))
+
+const createTestingLesson = (
+	seed: TestingLessonSeed,
+	classrooms: string[],
+): TestingLessonTemplate => {
+	const teacher = testingTeacherGroups[seed.teacherIndex]
+
+	return {
+		order: seed.order,
+		classroom: classrooms[seed.roomIndex % classrooms.length] ?? "219",
+		isCancelled: false,
+		isDistance: false,
+		isChanged: false,
+		original: null,
+		subject: seed.subject,
+		groups: [
+			testingGroup,
+			{
+				id: teacher.id,
+				displayName: teacher.displayName,
+				type: teacher.type,
+			},
+		],
+	}
+}
+
 export const getTestingLessons = (
 	dates: string[],
-	options: { classrooms?: string[] } = {},
+	options: {
+		buildingScheme: BuildingScheme
+		group?: number
+		classrooms?: string[]
+	},
 ): Lesson[] =>
 	dates.flatMap((date) => {
-		const lessons = testingScheduleByDay[getTestingDayIndex(date)].filter(
-			(lesson) =>
-				!options.classrooms?.length ||
-				options.classrooms.includes(lesson.classroom),
-		)
+		const scheduleClassrooms = getSchedulableClassrooms(options.buildingScheme)
+		const lessons = testingScheduleByDay[getTestingDayIndex(date)]
+			.map((seed) => createTestingLesson(seed, scheduleClassrooms))
+			.filter(
+				(lesson) =>
+					options.group === undefined ||
+					lesson.groups.some((group) => group.id === options.group),
+			)
+			.filter(
+				(lesson) =>
+					!options.classrooms?.length ||
+					options.classrooms.includes(lesson.classroom),
+			)
 
 		return lessons.map((lesson) => ({
 			...lesson,
