@@ -4,10 +4,15 @@ import z from "zod"
 import { and, db, eq, homeworksTable } from "@repo/drizzle"
 
 import { privateProcedure } from "../../procedures/private"
+import { deleteTestingHomework, isTestingHomeworkId } from "./testing-homeworks"
 
 export const deleteHomework = privateProcedure
 	.input(z.object({ id: z.string() }))
 	.handler(async ({ input, context }) => {
+		if (isTestingHomeworkId(input.id)) {
+			return deleteTestingHomework(input.id, context.user)
+		}
+
 		const deleted = await db
 			.delete(homeworksTable)
 			.where(

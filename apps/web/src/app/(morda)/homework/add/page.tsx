@@ -6,17 +6,21 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
+import { isTestingGroupId } from "@repo/shared/testing-group"
 
 import {
 	HomeworkForm,
 	type HomeworkFormValues,
 } from "@/features/homework/ui/homework-form"
+import { useScheduleGroup } from "@/features/schedule/hooks/use-schedule-group"
 import { PageTitle } from "@/shared/ui/page-title"
 
 export default function AddHomeworkPage() {
 	const router = useRouter()
 	const queryClient = useQueryClient()
+	const { group } = useScheduleGroup()
 	const [error, setError] = useState<string | null>(null)
+	const testingGroupId = isTestingGroupId(group?.id) ? group.id : undefined
 
 	const handleSubmit = async (data: HomeworkFormValues) => {
 		setError(null)
@@ -29,10 +33,15 @@ export default function AddHomeworkPage() {
 				description: data.description,
 				files: data.files,
 				isSharedWithWholeGroup: data.isSharedWithWholeGroup,
+				...(testingGroupId !== undefined && { group: testingGroupId }),
 			})
 
 			queryClient.invalidateQueries({
-				queryKey: orpc.homeworks.getHomeworks.queryKey(),
+				queryKey: orpc.homeworks.getHomeworks.queryKey(
+					testingGroupId !== undefined
+						? { input: { group: testingGroupId } }
+						: {},
+				),
 			})
 
 			router.replace(`/homework/${created.id}`)

@@ -14,10 +14,21 @@ import {
 } from "@repo/drizzle"
 
 import { privateProcedure } from "../../procedures/private"
+import { getTestingHomework, isTestingHomeworkId } from "./testing-homeworks"
 
 export const getHomework = privateProcedure
 	.input(z.object({ id: z.string() }))
 	.handler(async ({ input, context }) => {
+		if (isTestingHomeworkId(input.id)) {
+			const homework = getTestingHomework(input.id, context.user)
+
+			if (!homework) {
+				throw new ORPCError("NOT_FOUND")
+			}
+
+			return homework
+		}
+
 		const userId = context.user.id
 		const userGroup = context.user.group
 

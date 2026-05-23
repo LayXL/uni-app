@@ -166,6 +166,18 @@ const testingScheduleByDay: TestingLessonSeed[][] = [
 	[],
 ]
 
+export const getTestingSubjects = () => {
+	const subjects = new Map<number, string>()
+
+	for (const daySchedule of testingScheduleByDay) {
+		for (const lesson of daySchedule) {
+			subjects.set(lesson.subject.id, lesson.subject.name)
+		}
+	}
+
+	return Array.from(subjects, ([id, name]) => ({ id, name }))
+}
+
 const getTestingDayIndex = (date: string) => {
 	const daysFromAnchor = differenceInCalendarDays(
 		parseISO(date),

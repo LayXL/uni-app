@@ -3,18 +3,24 @@
 import { useSuspenseQuery } from "@tanstack/react-query"
 
 import { orpc } from "@repo/orpc/react"
+import { isTestingGroupId } from "@repo/shared/testing-group"
 
 import { HomeworkCard } from "@/entities/homework/ui/homework-card"
 import { useUser } from "@/entities/user/hooks/useUser"
+import { useScheduleGroup } from "@/features/schedule/hooks/use-schedule-group"
 import { useLocalStorage } from "@/shared/hooks/use-local-storage"
 import { LottiePlayer } from "@/shared/ui/lottie"
 import { Toggle } from "@/shared/ui/toggle"
 
 export function HomeworkList() {
-	const { data: homeworks } = useSuspenseQuery(
-		orpc.homeworks.getHomeworks.queryOptions({}),
-	)
 	const user = useUser()
+	const { group } = useScheduleGroup()
+	const testingGroupId = isTestingGroupId(group?.id) ? group.id : undefined
+	const { data: homeworks } = useSuspenseQuery(
+		orpc.homeworks.getHomeworks.queryOptions(
+			testingGroupId ? { input: { group: testingGroupId } } : {},
+		),
+	)
 	const [onlyMine, setOnlyMine] = useLocalStorage("onlyMyHomeworks")
 
 	const visibleHomeworks = onlyMine

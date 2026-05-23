@@ -3,6 +3,10 @@ import z from "zod"
 import { and, db, eq, homeworkCompletionsTable } from "@repo/drizzle"
 
 import { privateProcedure } from "../../procedures/private"
+import {
+	isTestingHomeworkId,
+	toggleTestingHomeworkCompletion,
+} from "./testing-homeworks"
 
 export const toggleCompletion = privateProcedure
 	.input(
@@ -13,6 +17,14 @@ export const toggleCompletion = privateProcedure
 	)
 	.handler(async ({ input, context }) => {
 		const userId = context.user.id
+
+		if (isTestingHomeworkId(input.homeworkId)) {
+			return toggleTestingHomeworkCompletion(
+				input.homeworkId,
+				input.completed,
+				context.user,
+			)
+		}
 
 		if (input.completed) {
 			await db

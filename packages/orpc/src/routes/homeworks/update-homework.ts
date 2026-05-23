@@ -4,6 +4,7 @@ import z from "zod"
 import { and, db, eq, homeworksTable } from "@repo/drizzle"
 
 import { privateProcedure } from "../../procedures/private"
+import { isTestingHomeworkId, updateTestingHomework } from "./testing-homeworks"
 
 const homeworkFileSchema = z.object({
 	key: z.string(),
@@ -30,6 +31,10 @@ export const updateHomework = privateProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
+		if (isTestingHomeworkId(input.id)) {
+			return updateTestingHomework(input.id, input, context.user)
+		}
+
 		const existing = await db
 			.select()
 			.from(homeworksTable)

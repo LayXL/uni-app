@@ -3,21 +3,25 @@ import { useMemo } from "react"
 
 import { orpc } from "@repo/orpc/react"
 import { getNextTwoWeeksDates } from "@repo/shared/lessons/get-next-two-weeks-dates"
+import { isTestingGroupId } from "@repo/shared/testing-group"
 
 import { useUser } from "@/entities/user/hooks/useUser"
+import { useScheduleGroup } from "@/features/schedule/hooks/use-schedule-group"
 import type { SearchInputItem } from "@/shared/ui/search-input"
 
 type ExtraSubject = { id: number; name: string }
 
 export function useSubjectItems(extraSubjects?: ExtraSubject[]) {
 	const user = useUser()
+	const { group } = useScheduleGroup()
 	const dates = useMemo(() => getNextTwoWeeksDates(), [])
+	const scheduleGroup = isTestingGroupId(group?.id) ? group?.id : user.group?.id
 
 	const schedule = useQuery({
 		...orpc.schedule.getSchedule.queryOptions({
-			input: { dates, group: user.group?.id },
+			input: { dates, group: scheduleGroup },
 		}),
-		enabled: !!user.group,
+		enabled: !!scheduleGroup,
 	})
 
 	return useMemo<SearchInputItem<number>[]>(() => {

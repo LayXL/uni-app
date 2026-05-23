@@ -5,6 +5,10 @@ import z from "zod"
 import { db, eq, homeworksTable, subjectsTable } from "@repo/drizzle"
 
 import { privateProcedure } from "../../procedures/private"
+import {
+	createTestingHomework,
+	isTestingHomeworksRequest,
+} from "./testing-homeworks"
 
 const homeworkFileSchema = z.object({
 	key: z.string(),
@@ -24,9 +28,14 @@ export const createHomework = privateProcedure
 			description: z.string(),
 			files: homeworkFileSchema.array().default([]),
 			isSharedWithWholeGroup: z.boolean().default(false),
+			group: z.number().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
+		if (isTestingHomeworksRequest(input.group)) {
+			return createTestingHomework(input, context.user)
+		}
+
 		if (input.subject !== undefined) {
 			const subject = await db
 				.select()

@@ -1,4 +1,6 @@
 import { db, eq, groupsTable } from "@repo/drizzle"
+import { env } from "@repo/env"
+import { isTestingGroupId } from "@repo/shared/testing-group"
 
 import { privateProcedure } from "../../procedures/private"
 
@@ -11,11 +13,15 @@ export const me = privateProcedure.handler(async ({ context }) => {
 				.limit(1)
 				.then(([group]) => group)
 		: null
+	const visibleGroup =
+		group && (!isTestingGroupId(group.id) || env.testingGroupEnabled)
+			? group
+			: null
 
 	return {
 		id: context.user.id,
 		telegramId: context.user.telegramId,
 		isAdmin: context.user.isAdmin ? true : undefined,
-		group,
+		group: visibleGroup,
 	}
 })
