@@ -20,7 +20,7 @@ export const Icon = (props: IconProps) => {
 		: [null, props.name]
 
 	const url = isIconify
-		? `https://api.iconify.design/${namespace}/${icon}.svg`
+		? `/icons/iconify/${namespace}/${icon}.svg`
 		: `/icons/${props.name}.svg`
 
 	return (
