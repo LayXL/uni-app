@@ -10,6 +10,7 @@ import { MapViewer } from "@/features/map/ui/map-viewer"
 import { ScheduleHeader } from "@/features/schedule/ui/schedule-header"
 import { ScheduleTimer } from "@/features/schedule/ui/schedule-timer"
 import { Fetcher } from "@/shared/utils/fetcher"
+import { getServerTestNow } from "@/shared/utils/server-test-time"
 import { SaveCurrentGroupAsUser } from "@/widgets/save-current-group-as-user"
 import { ScheduleWithMapNavigation } from "@/widgets/schedule-with-map-navigation"
 
@@ -24,7 +25,7 @@ export default async function () {
 	const user = await fetcher.fetch(orpc.users.me)
 
 	if (user.group) {
-		const dates = getNextTwoWeeksDates()
+		const dates = getNextTwoWeeksDates({ now: await getServerTestNow() })
 
 		await Promise.all([
 			fetcher.fetch(orpc.map.getMap),

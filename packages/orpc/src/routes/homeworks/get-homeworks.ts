@@ -13,6 +13,7 @@ import {
 	subjectsTable,
 } from "@repo/drizzle"
 
+import { getContextTestNow } from "../../lib/test-time"
 import { privateProcedure } from "../../procedures/private"
 import {
 	getTestingHomeworks,
@@ -24,9 +25,10 @@ export const getHomeworks = privateProcedure
 	.handler(async ({ input, context }) => {
 		const userId = context.user.id
 		const userGroup = context.user.group
+		const now = getContextTestNow(context)
 
 		if (isTestingHomeworksRequest(input?.group)) {
-			return getTestingHomeworks(context.user)
+			return getTestingHomeworks(context.user, now)
 		}
 
 		const isAuthor = eq(homeworksTable.author, userId)
@@ -65,6 +67,6 @@ export const getHomeworks = privateProcedure
 					eq(homeworkCompletionsTable.userId, userId),
 				),
 			)
-			.where(and(gte(homeworksTable.deadline, sql`now()`), accessCondition))
+			.where(and(gte(homeworksTable.deadline, now), accessCondition))
 			.orderBy(asc(homeworksTable.deadline))
 	})

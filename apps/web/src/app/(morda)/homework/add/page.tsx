@@ -14,6 +14,7 @@ import {
 } from "@/features/homework/ui/homework-form"
 import { useScheduleGroup } from "@/features/schedule/hooks/use-schedule-group"
 import { PageTitle } from "@/shared/ui/page-title"
+import { getClientTestNow } from "@/shared/utils/test-time"
 
 export default function AddHomeworkPage() {
 	const router = useRouter()
@@ -26,7 +27,7 @@ export default function AddHomeworkPage() {
 		setError(null)
 		try {
 			const created = await orpc.homeworks.createHomework.call({
-				date: format(new Date(), "yyyy-MM-dd"),
+				date: format(getClientTestNow(), "yyyy-MM-dd"),
 				...(data.subject !== undefined && { subject: data.subject }),
 				deadline: new Date(`${data.deadline}T23:59:59`).toISOString(),
 				title: data.title,

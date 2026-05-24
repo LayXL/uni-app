@@ -1,7 +1,7 @@
 "use client"
 
 import { useQueryClient } from "@tanstack/react-query"
-import { format, isBefore, isToday, isTomorrow } from "date-fns"
+import { addDays, format, isBefore, isSameDay } from "date-fns"
 import { ru } from "date-fns/locale"
 import Link from "next/link"
 import { useState } from "react"
@@ -12,11 +12,14 @@ import { Icon } from "@/shared/ui/icon"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { Touchable } from "@/shared/ui/touchable"
 import { cn } from "@/shared/utils/cn"
+import { getClientTestNow } from "@/shared/utils/test-time"
 
 function formatDeadline(deadline: Date | string) {
 	const d = new Date(deadline)
-	if (isToday(d)) return "Сегодня"
-	if (isTomorrow(d)) return "Завтра"
+	const now = getClientTestNow()
+
+	if (isSameDay(d, now)) return "Сегодня"
+	if (isSameDay(d, addDays(now, 1))) return "Завтра"
 	return format(d, "d MMMM", { locale: ru })
 }
 
@@ -24,7 +27,7 @@ type Urgency = "overdue" | "urgent" | "soon" | "normal"
 
 function getUrgency(deadline: Date | string): Urgency {
 	const d = new Date(deadline)
-	const now = new Date()
+	const now = getClientTestNow()
 	const daysLeft = (d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
 	if (isBefore(d, now)) return "overdue"
 	if (daysLeft <= 1) return "urgent"

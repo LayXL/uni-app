@@ -123,9 +123,7 @@ const withCompletion = (homework: TestingHomework, userId: number) => ({
 	),
 })
 
-export const getTestingHomeworks = (user: TestingUser) => {
-	const now = new Date()
-
+export const getTestingHomeworks = (user: TestingUser, now = new Date()) => {
 	return [
 		...createDefaultTestingHomeworks(user.id),
 		...Array.from(testingHomeworkStore.values()).map((homework) =>

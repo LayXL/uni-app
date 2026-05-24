@@ -10,6 +10,7 @@ import { getNextTwoWeeksDates } from "@repo/shared/lessons/get-next-two-weeks-da
 import { ScheduleViewerWithGroup } from "@/features/schedule/ui/schedule-viewer"
 import { PageTitle } from "@/shared/ui/page-title"
 import { Fetcher } from "@/shared/utils/fetcher"
+import { getServerTestNow } from "@/shared/utils/server-test-time"
 
 type SchedulePageProps = {
 	params: Promise<{ groupId: string }>
@@ -28,7 +29,7 @@ export default async function SchedulePage({ params }: SchedulePageProps) {
 	}
 
 	await fetcher.fetch(orpc.schedule.getSchedule, {
-		dates: getNextTwoWeeksDates(),
+		dates: getNextTwoWeeksDates({ now: await getServerTestNow() }),
 		group: Number(groupId),
 	})
 

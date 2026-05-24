@@ -23,6 +23,13 @@ const envSchema = z.object({
 		.enum(["true", "false"])
 		.default("false")
 		.transform((value) => value === "true"),
+	testTimeOffsetHours: z.coerce
+		.number()
+		.int()
+		.min(-366 * 24)
+		.max(366 * 24)
+		.default(0),
+	testTimeOffsetDays: z.coerce.number().int().min(-366).max(366).default(0),
 })
 
 export const env = envSchema.parse({
@@ -41,4 +48,6 @@ export const env = envSchema.parse({
 	s3SecretAccessKey: processEnv.S3_SECRET_ACCESS_KEY,
 	proxyTarget: processEnv.PROXY_TARGET,
 	testingGroupEnabled: processEnv.TESTING_GROUP_ENABLED,
+	testTimeOffsetHours: processEnv.TEST_TIME_OFFSET_HOURS,
+	testTimeOffsetDays: processEnv.TEST_TIME_OFFSET_DAYS,
 })

@@ -82,7 +82,7 @@ export const authMiddleware = base.middleware(async ({ context, next }) => {
 				.returning()
 
 			if (newUser) {
-				return next({ context: { user: newUser } })
+				return next({ context: { ...context, user: newUser } })
 			}
 
 			const [existingUser] = await db
@@ -93,7 +93,7 @@ export const authMiddleware = base.middleware(async ({ context, next }) => {
 
 			if (!existingUser) throw new ORPCError("INTERNAL_SERVER_ERROR")
 
-			return next({ context: { user: existingUser } })
+			return next({ context: { ...context, user: existingUser } })
 		}
 
 		if (user.firstName !== firstName || user.lastName !== lastName) {
@@ -103,10 +103,10 @@ export const authMiddleware = base.middleware(async ({ context, next }) => {
 				.where(eq(usersTable.id, user.id))
 				.returning()
 
-			return next({ context: { user: updatedUser ?? user } })
+			return next({ context: { ...context, user: updatedUser ?? user } })
 		}
 
-		return next({ context: { user } })
+		return next({ context: { ...context, user } })
 	} else if (authType === "vkma") {
 		if (!authToken) throw new ORPCError("UNAUTHORIZED")
 
@@ -154,13 +154,13 @@ export const authMiddleware = base.middleware(async ({ context, next }) => {
 
 				if (!existingUser) throw new ORPCError("INTERNAL_SERVER_ERROR")
 
-				return next({ context: { user: existingUser } })
+				return next({ context: { ...context, user: existingUser } })
 			}
 
-			return next({ context: { user: newUser } })
+			return next({ context: { ...context, user: newUser } })
 		}
 
-		return next({ context: { user } })
+		return next({ context: { ...context, user } })
 	}
 
 	throw new ORPCError("UNAUTHORIZED")

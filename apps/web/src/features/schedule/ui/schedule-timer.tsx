@@ -8,6 +8,7 @@ import { orpc } from "@repo/orpc/react"
 import { getNextTwoWeeksDates } from "@repo/shared/lessons/get-next-two-weeks-dates"
 
 import { LiquidBorder } from "@/shared/ui/liquid-border"
+import { getClientTestNow } from "@/shared/utils/test-time"
 
 import { useScheduleGroup } from "../hooks/use-schedule-group"
 
@@ -26,7 +27,9 @@ const formatTimeDiff = (diff: number) => {
 
 const getNowInYekaterinburg = () => {
 	return new Date(
-		new Date().toLocaleString("en-US", { timeZone: "Asia/Yekaterinburg" }),
+		getClientTestNow().toLocaleString("en-US", {
+			timeZone: "Asia/Yekaterinburg",
+		}),
 	)
 }
 

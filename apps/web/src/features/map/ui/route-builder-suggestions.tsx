@@ -1,5 +1,5 @@
 import { skipToken, useQuery } from "@tanstack/react-query"
-import { formatISO } from "date-fns"
+import { format } from "date-fns"
 import { Fragment, useMemo } from "react"
 
 import { orpc } from "@repo/orpc/react"
@@ -9,6 +9,7 @@ import { useUser } from "@/entities/user/hooks/useUser"
 import { Icon } from "@/shared/ui/icon"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { Touchable } from "@/shared/ui/touchable"
+import { getClientTestNow } from "@/shared/utils/test-time"
 
 import { useMapData } from "../hooks/use-map-data"
 import type { CreateEntitySelectHandler } from "./route-builder-modal"
@@ -38,7 +39,7 @@ export const RouteBuilderSuggestions = ({
 		orpc.schedule.getSchedule.queryOptions({
 			input: user.group
 				? {
-						dates: [formatISO(new Date(), { representation: "date" })],
+						dates: [format(getClientTestNow(), "yyyy-MM-dd")],
 						group: user.group.id,
 					}
 				: skipToken,
