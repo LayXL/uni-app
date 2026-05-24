@@ -34,7 +34,7 @@ export const ScheduleViewerWithGroup = ({
 
 	const { data: events } = useQuery(
 		orpc.events.getEvents.queryOptions({
-			input: { dates },
+			input: { dates, group },
 		}),
 	)
 

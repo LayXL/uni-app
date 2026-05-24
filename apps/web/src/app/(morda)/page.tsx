@@ -31,7 +31,7 @@ export default async function () {
 			fetcher.fetch(orpc.groups.getAllGroups),
 			fetcher.fetch(orpc.schedule.getTimetable),
 			fetcher.fetch(orpc.schedule.getSchedule, { dates, group: user.group.id }),
-			fetcher.fetch(orpc.events.getEvents, { dates }),
+			fetcher.fetch(orpc.events.getEvents, { dates, group: user.group.id }),
 		])
 	} else {
 		return redirect("/onboarding")
