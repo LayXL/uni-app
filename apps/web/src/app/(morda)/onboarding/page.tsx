@@ -26,7 +26,7 @@ const FeatureCard = ({
 }: OnboardingFeatureCardProps) => (
 	<div className="flex gap-2 bg-card relative rounded-3xl p-3">
 		<LiquidBorder />
-		<div className="grid place-items-center aspect-square shrink-0 rounded-2xl bg-accent h-10">
+		<div className="grid place-items-center aspect-square shrink-0 rounded-2xl bg-accent text-accent-foreground h-10">
 			<Icon name={icon} size={20} />
 		</div>
 		<div className="flex flex-col gap-0.5">
