@@ -67,7 +67,7 @@ const Step2 = ({ onNext }: StepProps) => {
 				/>
 				<h2 className="text-center text-xl font-bold">Давай знакомиться!</h2>
 				<p className="text-center text-sm text-muted text-balance">
-					Выбери группу, чтобы расписание всегда было под крылом!
+					Выбери группу, чтобы расписание всегда было под рукой
 				</p>
 			</div>
 			<GroupSelector onChange={handleGroupClick} />
