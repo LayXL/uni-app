@@ -11,15 +11,26 @@ import {
 	TEST_TIME_OFFSET_HOURS_STORAGE_KEY,
 } from "@repo/shared/time/test-time"
 
-export const getClientTestTimeOffsetHours = () =>
-	parseTestTimeOffsetHours(
-		window.localStorage.getItem(TEST_TIME_OFFSET_HOURS_STORAGE_KEY),
-	) ||
-	parseTestTimeOffsetDaysAsHours(
-		window.localStorage.getItem(LEGACY_TEST_TIME_OFFSET_DAYS_STORAGE_KEY),
+export const getClientTestTimeOffsetHours = () => {
+	if (typeof window === "undefined") {
+		return 0
+	}
+
+	return (
+		parseTestTimeOffsetHours(
+			window.localStorage.getItem(TEST_TIME_OFFSET_HOURS_STORAGE_KEY),
+		) ||
+		parseTestTimeOffsetDaysAsHours(
+			window.localStorage.getItem(LEGACY_TEST_TIME_OFFSET_DAYS_STORAGE_KEY),
+		)
 	)
+}
 
 export const setClientTestTimeOffsetHours = (offsetHours: number) => {
+	if (typeof window === "undefined") {
+		return
+	}
+
 	const normalizedOffsetHours = parseTestTimeOffsetHours(offsetHours)
 
 	window.localStorage.removeItem(LEGACY_TEST_TIME_OFFSET_DAYS_STORAGE_KEY)
