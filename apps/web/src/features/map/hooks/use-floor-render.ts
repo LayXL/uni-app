@@ -9,6 +9,14 @@ import { clamp, getFloorPolygon, getRoomPolygon } from "../lib/geometry"
 import type { ViewportState } from "../types"
 
 const iconImageCache = new Map<string, Promise<HTMLImageElement>>()
+const TOILET_ROOM_NAME = "туалет"
+const TOILET_ROOM_ICON = "toilet"
+
+const isToiletRoom = (room: Room) =>
+	room.name.trim().toLowerCase() === TOILET_ROOM_NAME
+
+const getRoomMapIcon = (room: Room) =>
+	isToiletRoom(room) ? TOILET_ROOM_ICON : room.icon
 
 const getCachedIcon = (src: string) => {
 	if (!iconImageCache.has(src)) {
@@ -178,8 +186,11 @@ export const useFloorRender = ({
 
 		// Collect all room icons
 		data.entities.forEach((entity) => {
-			if (isRoom(entity) && entity.icon) {
-				iconsToPreload.add(`/icons/${entity.icon}.svg`)
+			if (isRoom(entity)) {
+				const roomIcon = getRoomMapIcon(entity)
+				if (roomIcon) {
+					iconsToPreload.add(`/icons/${roomIcon}.svg`)
+				}
 			}
 			if (isPlace(entity)) {
 				const iconName = entity.icon || entity.placeType || "place"
@@ -296,7 +307,7 @@ export const useFloorRender = ({
 
 			canvas.add(roomPolygon)
 
-			if (!room.nameHidden && !room.icon) {
+			if (!room.nameHidden && !getRoomMapIcon(room)) {
 				const walls = room.wallsPosition ?? []
 				const centroid = walls.length
 					? walls.reduce(
@@ -453,7 +464,9 @@ export const useFloorRender = ({
 
 		// Collect room icons
 		floorRooms.forEach((room) => {
-			if (!room.nameHidden && room.icon) {
+			const roomIcon = getRoomMapIcon(room)
+
+			if (!room.nameHidden && roomIcon) {
 				const walls = room.wallsPosition ?? []
 				const centroid = walls.length
 					? walls.reduce(
@@ -472,23 +485,26 @@ export const useFloorRender = ({
 
 				const centerX = floor.position.x + room.position.x + centroid.x
 				const centerY = floor.position.y + room.position.y + centroid.y
-
-				const label = new fabric.FabricText(room.name, {
-					fontSize: 14,
-					fontFamily,
-					fill: colors.roomLabel,
-					originX: "center",
-					originY: "top",
-					top: 14,
-					objectCaching: false,
-					noScaleCache: true,
-				})
+				const extraObjects = isToiletRoom(room)
+					? []
+					: [
+							new fabric.FabricText(room.name, {
+								fontSize: 14,
+								fontFamily,
+								fill: colors.roomLabel,
+								originX: "center",
+								originY: "top",
+								top: 14,
+								objectCaching: false,
+								noScaleCache: true,
+							}),
+						]
 
 				iconTasks.push({
-					iconSrc: `/icons/${room.icon}.svg`,
+					iconSrc: `/icons/${roomIcon}.svg`,
 					x: centerX,
 					y: centerY,
-					extraObjects: [label],
+					extraObjects,
 					angle: (-viewportRef.current.rotation * 180) / Math.PI,
 				})
 			}
