@@ -6,6 +6,7 @@ import { DialogProvider } from "@/shared/ui/confirm-dialog"
 import { PopupProvider } from "@/shared/ui/popup"
 
 import { QueryClientProvider } from "./query-client-provider"
+import { SentryProvider } from "./sentry-provider"
 import { TelegramUiProvider } from "./telegram-ui-provider"
 import { TmaProvider } from "./tma-provider"
 import { VkmaProvider } from "./vkma-provider"
@@ -13,6 +14,7 @@ import { VkmaProvider } from "./vkma-provider"
 export default nestProviders()
 	.push(NuqsAdapter)
 	.push(ThemeProvider, { attribute: "class" })
+	.push(SentryProvider)
 	.push(QueryClientProvider)
 	.push(TmaProvider)
 	.push(VkmaProvider)

@@ -13,6 +13,7 @@
 		"@orpc/server": "^1.7.1",
 		"@repo/orpc": "workspace:*",
 		"@repo/shared": "workspace:*",
+		"@sentry/react": "^10.54.0",
 		"@tanstack/react-query": "^5.90.12",
 		"@tma.js/sdk-react": "^3.0.16",
 		"@turbo/gen": "^2.7.2",
