@@ -1,21 +1,10 @@
 "use client"
 
-import * as Sentry from "@sentry/react"
+import * as Sentry from "@sentry/nextjs"
 import { type ReactNode, useState } from "react"
 
 import { Button } from "@/shared/ui/button"
 import { LottiePlayer } from "@/shared/ui/lottie"
-
-const GLITCHTIP_DSN =
-	"https://df2dbf351aa540a89eb7cbf1821ef945@glitchtip.layxl.dev/1"
-
-if (!Sentry.isInitialized()) {
-	Sentry.init({
-		dsn: GLITCHTIP_DSN,
-		tracesSampleRate: 0.01,
-		// autoSessionTracking: false,
-	})
-}
 
 type FallbackProps = {
 	error: unknown
