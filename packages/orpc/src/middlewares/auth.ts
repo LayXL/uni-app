@@ -23,6 +23,14 @@ function decodeNestedURIComponent(value: string) {
 	return current
 }
 
+function decodeURIComponentSafe(value: string) {
+	try {
+		return decodeURIComponent(value)
+	} catch {
+		return ""
+	}
+}
+
 function authTokenStringToSearchParams(rawAuthToken: string) {
 	const decoded = decodeNestedURIComponent(rawAuthToken)
 
@@ -31,7 +39,7 @@ function authTokenStringToSearchParams(rawAuthToken: string) {
 
 function getAuthorizationHeader(context: Context) {
 	const [authType, authToken] =
-		decodeURIComponent(
+		decodeURIComponentSafe(
 			context.headers
 				?.get("cookie")
 				?.split(";")

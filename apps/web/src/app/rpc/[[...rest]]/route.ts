@@ -3,6 +3,14 @@ import { RPCHandler } from "@orpc/server/fetch"
 
 export const dynamic = "force-dynamic"
 
+function decodeURIComponentSafe(value: string) {
+	try {
+		return decodeURIComponent(value)
+	} catch {
+		return ""
+	}
+}
+
 async function handleRequest(request: Request) {
 	const { router } = await import("@repo/orpc/router")
 
@@ -18,7 +26,7 @@ async function handleRequest(request: Request) {
 
 	const cookie = request.headers.get("cookie")
 
-	const session = decodeURIComponent(
+	const session = decodeURIComponentSafe(
 		cookie
 			?.split("; ")
 			.find((cookie) => cookie.startsWith("session="))
