@@ -184,6 +184,7 @@ export const RouteBuilderModal = () => {
 
 		return (
 			item.value.toLowerCase().includes(q) ||
+			entity?.description?.toLowerCase().includes(q) ||
 			entity?.aliases?.some((alias) => alias.toLowerCase().includes(q)) ||
 			false
 		)

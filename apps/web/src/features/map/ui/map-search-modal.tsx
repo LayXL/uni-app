@@ -122,6 +122,7 @@ export const MapSearchModal = ({ isOpen, onClose }: MapSearchModalProps) => {
 
 		return (
 			item.value.toLowerCase().includes(q) ||
+			entity?.description?.toLowerCase().includes(q) ||
 			entity?.aliases?.some((alias) => alias.toLowerCase().includes(q)) ||
 			false
 		)
