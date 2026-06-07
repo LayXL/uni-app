@@ -165,7 +165,11 @@ export const RouteBuilderModal = () => {
 					entity.name.toLowerCase() !== TOILET_ROOM_NAME,
 			)
 			.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
-			.map((entity) => ({ key: entity.id, value: entity.name }))
+			.map((entity) => ({
+				key: entity.id,
+				value: entity.name,
+				description: entity.description,
+			}))
 
 		return items
 	}, [entities])

@@ -113,7 +113,11 @@ export const MapSearchModal = ({ isOpen, onClose }: MapSearchModalProps) => {
 		return entities
 			.filter((entity) => !entity.hiddenInSearch && entity.name)
 			.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
-			.map((entity) => ({ key: entity.id, value: entity.name }))
+			.map((entity) => ({
+				key: entity.id,
+				value: entity.name,
+				description: entity.description,
+			}))
 	}, [entities])
 
 	const filterEntity = (item: SearchInputItem<number>, query: string) => {

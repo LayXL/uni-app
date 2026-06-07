@@ -20,6 +20,7 @@ import { Touchable } from "./touchable"
 export type SearchInputItem<T = string> = {
 	key: T
 	value: string
+	description?: string
 }
 
 type SearchInputProps<T> = Omit<
@@ -243,7 +244,10 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 											"bg-accent text-accent-foreground",
 									)}
 								>
-									{item.value}
+									<div>{item.value}</div>
+									{item.description && (
+										<div className="text-sm opacity-70">{item.description}</div>
+									)}
 								</button>
 							</Touchable>
 						))
