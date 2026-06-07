@@ -26,11 +26,14 @@ export const MapViewer = () => {
 	const mapData = useMapData()
 	const colorScheme = useColorScheme()
 
-	const { start, end, isActive } = useRouteBuilder()
+	const { start, end, endNearestToilet, isActive } = useRouteBuilder()
 
 	const { data: routeData } = useQuery(
 		orpc.map.buildRoute.queryOptions({
-			input: start && end ? { start, end } : skipToken,
+			input:
+				start && (end || endNearestToilet)
+					? { start, end, nearestToilet: endNearestToilet }
+					: skipToken,
 		}),
 	)
 

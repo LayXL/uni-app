@@ -96,6 +96,27 @@ const SearchInputTrigger = ({
 
 type Point = { floor: number; x: number; y: number }
 
+const TOILET_ROOM_NAME = "туалет"
+const NEAREST_TOILET_ID = -1
+const NEAREST_TOILET_LABEL = "Ближайший туалет"
+
+const getEntityPoint = (entity: MapEntity): Point => {
+	if (isRoom(entity)) {
+		const door = entity.doorsPosition?.[0]
+		return {
+			floor: entity.floorId,
+			x: door ? entity.position.x + door.x : entity.position.x,
+			y: door ? entity.position.y + door.y : entity.position.y,
+		}
+	}
+
+	return {
+		floor: entity.floorId,
+		x: entity.position.x,
+		y: entity.position.y,
+	}
+}
+
 export type CreateEntitySelectHandler = (
 	entities: MapEntity[] | undefined,
 	setEntityId: (id: number) => void,
@@ -108,21 +129,7 @@ const createEntitySelectHandler: CreateEntitySelectHandler =
 		if (!entity) return
 
 		setEntityId(entityId)
-
-		if (isRoom(entity)) {
-			const door = entity.doorsPosition?.[0]
-			setPosition({
-				floor: entity.floorId,
-				x: door ? entity.position.x + door.x : entity.position.x,
-				y: door ? entity.position.y + door.y : entity.position.y,
-			})
-		} else {
-			setPosition({
-				floor: entity.floorId,
-				x: entity.position.x,
-				y: entity.position.y,
-			})
-		}
+		setPosition(getEntityPoint(entity))
 	}
 
 export const RouteBuilderModal = () => {
@@ -132,8 +139,12 @@ export const RouteBuilderModal = () => {
 		isModalOpen,
 		startRoomId,
 		endRoomId,
+		start,
+		end,
+		endNearestToilet,
 		setStartRoomId,
 		setEndRoomId,
+		setEndNearestToilet,
 		setStart,
 		setEnd,
 		closeModal,
@@ -146,11 +157,26 @@ export const RouteBuilderModal = () => {
 	}, [mapData?.entities])
 
 	const entityItems = useMemo<SearchInputItem<number>[]>(() => {
-		return entities
-			.filter((entity) => !entity.hiddenInSearch && entity.name)
+		const items = entities
+			.filter(
+				(entity) =>
+					!entity.hiddenInSearch &&
+					entity.name &&
+					entity.name.toLowerCase() !== TOILET_ROOM_NAME,
+			)
 			.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
 			.map((entity) => ({ key: entity.id, value: entity.name }))
+
+		return items
 	}, [entities])
+
+	const endEntityItems = useMemo<SearchInputItem<number>[]>(
+		() => [
+			{ key: NEAREST_TOILET_ID, value: NEAREST_TOILET_LABEL },
+			...entityItems,
+		],
+		[entityItems],
+	)
 
 	const filterEntity = (item: SearchInputItem<number>, query: string) => {
 		const entity = entities.find((e) => e.id === item.key)
@@ -168,11 +194,20 @@ export const RouteBuilderModal = () => {
 		setStartRoomId,
 		setStart,
 	)
-	const handleEndSelect = createEntitySelectHandler(
+	const handleEndEntitySelect = createEntitySelectHandler(
 		entities,
 		setEndRoomId,
 		setEnd,
 	)
+
+	const handleEndSelect = (entityId: number) => {
+		if (entityId === NEAREST_TOILET_ID) {
+			setEndNearestToilet()
+			return
+		}
+
+		handleEndEntitySelect(entityId)
+	}
 
 	return (
 		<ModalRoot isOpen={isModalOpen} onClose={closeModal}>
@@ -195,7 +230,7 @@ export const RouteBuilderModal = () => {
 							icon="iconify:material-symbols:flag-rounded"
 							value={endRoomId ?? undefined}
 							placeholder="Куда"
-							items={entityItems}
+							items={endEntityItems}
 							excludeKey={startRoomId}
 							onChange={handleEndSelect}
 							filterFn={filterEntity}
@@ -213,7 +248,7 @@ export const RouteBuilderModal = () => {
 						setIsActive(true)
 						closeModal()
 					}}
-					disabled={!startRoomId || !endRoomId}
+					disabled={!start || (!end && !endNearestToilet)}
 					label="Построить маршрут"
 				/>
 			</div>

@@ -125,7 +125,8 @@ const buildSteps = (
 export const RouteNavigation = () => {
 	const mapData = useMapData()
 
-	const { start, end, isActive, resetRoute } = useRouteBuilder()
+	const { start, end, endNearestToilet, isActive, resetRoute } =
+		useRouteBuilder()
 
 	const setActiveFloor = useActiveFloor((state) => state.setActiveFloor)
 	const moveTo = useMapState((state) => state.moveTo)
@@ -134,7 +135,10 @@ export const RouteNavigation = () => {
 
 	const { data } = useQuery(
 		orpc.map.buildRoute.queryOptions({
-			input: start && end && isActive ? { start, end } : skipToken,
+			input:
+				start && (end || endNearestToilet) && isActive
+					? { start, end, nearestToilet: endNearestToilet }
+					: skipToken,
 		}),
 	)
 

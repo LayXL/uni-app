@@ -1,6 +1,7 @@
 import z from "zod"
 
 import type { Coordinate } from "@repo/shared/building-scheme"
+import { isRoom } from "@repo/shared/building-scheme"
 import { getConfig } from "@repo/shared/config/get-config"
 
 import { publicProcedure } from "../../procedures/public"
@@ -91,11 +92,14 @@ export const buildRoute = publicProcedure
 				x: z.number(),
 				y: z.number(),
 			}),
-			end: z.object({
-				floor: z.number(),
-				x: z.number(),
-				y: z.number(),
-			}),
+			end: z
+				.object({
+					floor: z.number(),
+					x: z.number(),
+					y: z.number(),
+				})
+				.optional(),
+			nearestToilet: z.boolean().optional().default(false),
 		}),
 	)
 	.output(z.object({ route: routeSchema }))
@@ -133,7 +137,7 @@ export const buildRoute = publicProcedure
 		}[] = []
 
 		let startNode: GraphNode | null = null
-		let endNode: GraphNode | null = null
+		const endNodes: GraphNode[] = []
 
 		for (const floor of buildingScheme.floors) {
 			const floorRoads = floor.roads || []
@@ -228,11 +232,34 @@ export const buildRoute = publicProcedure
 				addPointToRoad(minProps.roadIdx, minProps.point)
 				const node = getNode(floor.id, minProps.point.x, minProps.point.y)
 				if (type === "start") startNode = node
-				else endNode = node
+				else endNodes.push(node)
 			}
 
 			handlePOI({ ...input.start }, "start")
-			handlePOI({ ...input.end }, "end")
+			if (input.end && !input.nearestToilet) {
+				handlePOI({ ...input.end }, "end")
+			}
+			if (input.nearestToilet) {
+				for (const toilet of buildingScheme.entities) {
+					if (
+						!isRoom(toilet) ||
+						toilet.floorId !== floor.id ||
+						toilet.name.toLowerCase() !== "туалет"
+					) {
+						continue
+					}
+
+					const door = toilet.doorsPosition?.[0]
+					handlePOI(
+						{
+							floor: toilet.floorId,
+							x: door ? toilet.position.x + door.x : toilet.position.x,
+							y: door ? toilet.position.y + door.y : toilet.position.y,
+						},
+						"end",
+					)
+				}
+			}
 
 			// 4. Create nodes and horizontal edges
 			pointsOnRoads.forEach((points, roadIdx) => {
@@ -285,12 +312,12 @@ export const buildRoute = publicProcedure
 			}
 		})
 
-		if (!startNode || !endNode) {
+		if (!startNode || endNodes.length === 0) {
 			return { route: [] }
 		}
 
 		const start = startNode as GraphNode
-		const end = endNode as GraphNode
+		const endNodeIds = new Set(endNodes.map((node) => node.id))
 
 		// 7. Dijkstra
 		const distances = new Map<string, number>()
@@ -301,6 +328,7 @@ export const buildRoute = publicProcedure
 		queue.push({ id: start.id, dist: 0 })
 
 		let found = false
+		let reachedEnd: GraphNode | null = null
 		while (queue.length > 0) {
 			queue.sort((a, b) => a.dist - b.dist)
 			const nextItem = queue.shift()
@@ -308,8 +336,9 @@ export const buildRoute = publicProcedure
 			const { id, dist } = nextItem
 
 			if (dist > (distances.get(id) ?? Infinity)) continue
-			if (id === end.id) {
+			if (endNodeIds.has(id)) {
 				found = true
+				reachedEnd = nodes.get(id) ?? null
 				break
 			}
 
@@ -325,13 +354,13 @@ export const buildRoute = publicProcedure
 			}
 		}
 
-		if (!found) {
+		if (!found || !reachedEnd) {
 			return { route: [] }
 		}
 
 		// 8. Reconstruct path forward
 		const rawPath: GraphNode[] = []
-		let temp: GraphNode | null = end
+		let temp: GraphNode | null = reachedEnd
 		while (temp) {
 			rawPath.unshift(temp)
 			temp = previous.get(temp.id)?.node ?? null

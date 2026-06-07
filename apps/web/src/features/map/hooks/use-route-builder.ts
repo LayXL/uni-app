@@ -13,11 +13,13 @@ type State = {
 	endRoomId?: number
 	start?: Point
 	end?: Point
+	endNearestToilet: boolean
 	hasPoints: boolean
 	openModal: () => void
 	closeModal: () => void
 	setStartRoomId: (startRoomId: number) => void
 	setEndRoomId: (endRoomId: number) => void
+	setEndNearestToilet: () => void
 	setStart: (start: Point) => void
 	setEnd: (end: Point) => void
 	resetRoute: () => void
@@ -31,11 +33,19 @@ export const useRouteBuilder = create<State>((set) => ({
 	endRoomId: undefined,
 	start: undefined,
 	end: undefined,
+	endNearestToilet: false,
 	hasPoints: false,
 	openModal: () => set({ isModalOpen: true }),
 	closeModal: () => set({ isModalOpen: false }),
 	setStartRoomId: (startRoomId: number) => set({ startRoomId }),
-	setEndRoomId: (endRoomId: number) => set({ endRoomId }),
+	setEndRoomId: (endRoomId: number) =>
+		set({ endRoomId, endNearestToilet: false }),
+	setEndNearestToilet: () =>
+		set({
+			endRoomId: -1,
+			end: undefined,
+			endNearestToilet: true,
+		}),
 	setStart: (start) =>
 		set((state) => ({ start, hasPoints: state.end !== undefined })),
 	setEnd: (end) =>
@@ -47,6 +57,7 @@ export const useRouteBuilder = create<State>((set) => ({
 			hasPoints: false,
 			startRoomId: undefined,
 			endRoomId: undefined,
+			endNearestToilet: false,
 			isActive: false,
 		}),
 	setIsActive: (isActive: boolean) => set({ isActive }),
