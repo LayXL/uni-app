@@ -81,7 +81,7 @@ const FeaturesOverviewStep = ({ onNext }: StepProps) => {
 				/>
 			</div>
 			<div className="fixed bottom-0 left-0 right-0 mb-(--safe-area-inset-bottom)">
-				<div className="pointer-events-none absolute inset-0 -mt-8 bg-linear-to-t from-background from-50% to-transparent" />
+				<div className="pointer-events-none absolute inset-0 -mt-8 bg-linear-to-t from-background from-50% to-background/0" />
 				<div className="p-3 grid">
 					<Button label="Поехали!" onClick={onNext} />
 				</div>
