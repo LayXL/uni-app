@@ -18,6 +18,7 @@ import { RouteNavigation } from "../../features/map/ui/route-navigation"
 import { HomeworkButton } from "./_ui/homework-button"
 import { MapBottomBarHome } from "./_ui/map-bottom-bar-home"
 import { ScheduleViewerHome } from "./_ui/schedule-viewer-home"
+import { SettingsButton } from "./_ui/settings-button"
 
 export default async function () {
 	const fetcher = new Fetcher()
@@ -60,6 +61,7 @@ export default async function () {
 				</ScheduleViewerHome>
 			</div>
 			<HomeworkButton />
+			<SettingsButton />
 			<RouteNavigation />
 		</HydrationBoundary>
 	)

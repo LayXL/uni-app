@@ -14,6 +14,10 @@ packages/
   typescript-config
 ```
 
+## Documentation
+
+- [Entity relationships](docs/entity-relationships.md)
+
 ## How to run
 
 ```
