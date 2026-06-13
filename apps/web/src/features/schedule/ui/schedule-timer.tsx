@@ -2,13 +2,13 @@
 
 import { useQuery } from "@tanstack/react-query"
 import { differenceInSeconds, format, isAfter, parse } from "date-fns"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo } from "react"
 
 import { orpc } from "@repo/orpc/react"
 import { getNextTwoWeeksDates } from "@repo/shared/lessons/get-next-two-weeks-dates"
 
+import { useNowInYekaterinburg } from "@/shared/hooks/use-now-in-yekaterinburg"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
-import { getClientTestNow } from "@/shared/utils/test-time"
 
 import { useScheduleGroup } from "../hooks/use-schedule-group"
 
@@ -25,14 +25,6 @@ const formatTimeDiff = (diff: number) => {
 	return `${m}:${s.toString().padStart(2, "0")}`
 }
 
-const getNowInYekaterinburg = () => {
-	return new Date(
-		getClientTestNow().toLocaleString("en-US", {
-			timeZone: "Asia/Yekaterinburg",
-		}),
-	)
-}
-
 const formatDuration = (diffInSeconds: number) => {
 	const hours = Math.floor(diffInSeconds / 3600)
 	const minutes = Math.floor((diffInSeconds % 3600) / 60)
@@ -45,15 +37,7 @@ const formatDuration = (diffInSeconds: number) => {
 
 const ScheduleTimerWithGroup = ({ group }: { group: number }) => {
 	const dates = getNextTwoWeeksDates()
-	const [now, setNow] = useState<Date>(getNowInYekaterinburg())
-
-	useEffect(() => {
-		const interval = setInterval(() => {
-			setNow(getNowInYekaterinburg())
-		}, 1000)
-
-		return () => clearInterval(interval)
-	}, [])
+	const now = useNowInYekaterinburg(1000)
 
 	const { data: schedule } = useQuery(
 		orpc.schedule.getSchedule.queryOptions({ input: { group, dates } }),

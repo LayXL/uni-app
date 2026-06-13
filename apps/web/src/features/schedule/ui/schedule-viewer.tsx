@@ -9,8 +9,10 @@ import { orpc } from "@repo/orpc/react"
 import { getNextTwoWeeksDates } from "@repo/shared/lessons/get-next-two-weeks-dates"
 
 import { EventCard } from "@/entities/event/ui/event-card"
+import { isLessonActive } from "@/entities/lesson/lib/is-lesson-active"
 import { LessonCard } from "@/entities/lesson/ui/lesson-card"
 import { groupScheduleItems } from "@/features/schedule/lib/group-schedule-items"
+import { useNowInYekaterinburg } from "@/shared/hooks/use-now-in-yekaterinburg"
 
 import { useScheduleGroup } from "../hooks/use-schedule-group"
 import { WithoutLessonsPlaceholder } from "./without-lessons-placeholder"
@@ -25,6 +27,7 @@ export const ScheduleViewerWithGroup = ({
 	onClassroomClick?: (classroom: string) => void
 }) => {
 	const dates = getNextTwoWeeksDates()
+	const now = useNowInYekaterinburg()
 
 	const { data } = useQuery(
 		orpc.schedule.getSchedule.queryOptions({
@@ -87,6 +90,7 @@ export const ScheduleViewerWithGroup = ({
 									key={i}
 									group={group}
 									lesson={lesson}
+									isActive={isLessonActive(lesson, now)}
 									onClassroomClick={onClassroomClick}
 									isTeacherView={isTeacherView}
 								/>

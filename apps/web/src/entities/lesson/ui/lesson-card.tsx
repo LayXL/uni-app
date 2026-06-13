@@ -18,6 +18,7 @@ type LessonCardProps = {
 	group?: number
 	lesson: Lesson
 	isTeacherView?: boolean
+	isActive?: boolean
 	onClassroomClick?: (classroom: string) => void
 }
 
@@ -25,6 +26,7 @@ export const LessonCard = ({
 	lesson,
 	group,
 	isTeacherView,
+	isActive,
 	onClassroomClick,
 }: LessonCardProps) => {
 	const [isOpen, setIsOpen] = useState(false)
@@ -38,7 +40,10 @@ export const LessonCard = ({
 			<Touchable>
 				<button
 					type="button"
-					className="relative bg-card px-2 py-2 rounded-3xl flex items-center gap-2"
+					className={cn(
+						"relative bg-card px-2 py-2 rounded-3xl flex items-center gap-2 ring-2 ring-transparent transition-shadow",
+						isActive && "ring-accent",
+					)}
 					onClick={() => setIsOpen(true)}
 				>
 					<LiquidBorder />

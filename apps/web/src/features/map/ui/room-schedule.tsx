@@ -7,7 +7,9 @@ import { orpc } from "@repo/orpc/react"
 import type { Room } from "@repo/shared/building-scheme"
 import { getNextTwoWeeksDates } from "@repo/shared/lessons/get-next-two-weeks-dates"
 
+import { isLessonActive } from "@/entities/lesson/lib/is-lesson-active"
 import { LessonCard } from "@/entities/lesson/ui/lesson-card"
+import { useNowInYekaterinburg } from "@/shared/hooks/use-now-in-yekaterinburg"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { Touchable } from "@/shared/ui/touchable"
 import { cn } from "@/shared/utils/cn"
@@ -19,6 +21,7 @@ type RoomScheduleProps = {
 }
 
 export const RoomSchedule = ({ room }: RoomScheduleProps) => {
+	const now = useNowInYekaterinburg()
 	const [selectedDate, setSelectedDate] = useState<string>(
 		getNextTwoWeeksDates()[0],
 	)
@@ -94,7 +97,11 @@ export const RoomSchedule = ({ room }: RoomScheduleProps) => {
 				>
 					{filteredSchedule && filteredSchedule.length > 0 ? (
 						filteredSchedule.map((lesson, i) => (
-							<LessonCard key={i} lesson={lesson} />
+							<LessonCard
+								key={i}
+								lesson={lesson}
+								isActive={isLessonActive(lesson, now)}
+							/>
 						))
 					) : (
 						<p className="text-sm text-muted">
