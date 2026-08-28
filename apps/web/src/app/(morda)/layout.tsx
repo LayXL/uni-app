@@ -5,12 +5,7 @@ import { orpc } from "@repo/orpc/react"
 
 import { UnauthorizedPage } from "@/shared/ui/unauthorized-page"
 import { Fetcher } from "@/shared/utils/fetcher"
-
-const isUnauthorizedError = (error: unknown) =>
-	typeof error === "object" &&
-	error !== null &&
-	(("code" in error && error.code === "UNAUTHORIZED") ||
-		("status" in error && error.status === 401))
+import { isUnauthorizedError } from "@/shared/utils/is-unauthorized-error"
 
 export default async function ({ children }: { children: ReactNode }) {
 	const fetcher = new Fetcher()

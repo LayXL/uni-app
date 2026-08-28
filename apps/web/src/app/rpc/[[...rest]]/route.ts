@@ -1,6 +1,8 @@
 import { onError } from "@orpc/server"
 import { RPCHandler } from "@orpc/server/fetch"
 
+import { isUnauthorizedError } from "@/shared/utils/is-unauthorized-error"
+
 export const dynamic = "force-dynamic"
 
 function decodeURIComponentSafe(value: string) {
@@ -17,6 +19,8 @@ async function handleRequest(request: Request) {
 	const handler = new RPCHandler(router, {
 		interceptors: [
 			onError((error) => {
+				if (isUnauthorizedError(error)) return
+
 				console.error("Caught internal error:", error)
 			}),
 		],

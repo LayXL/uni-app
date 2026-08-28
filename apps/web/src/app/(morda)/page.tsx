@@ -10,6 +10,7 @@ import { MapViewer } from "@/features/map/ui/map-viewer"
 import { ScheduleHeader } from "@/features/schedule/ui/schedule-header"
 import { ScheduleTimer } from "@/features/schedule/ui/schedule-timer"
 import { Fetcher } from "@/shared/utils/fetcher"
+import { isUnauthorizedError } from "@/shared/utils/is-unauthorized-error"
 import { getServerTestNow } from "@/shared/utils/server-test-time"
 import { SaveCurrentGroupAsUser } from "@/widgets/save-current-group-as-user"
 import { ScheduleWithMapNavigation } from "@/widgets/schedule-with-map-navigation"
@@ -23,7 +24,12 @@ import { SettingsButton } from "./_ui/settings-button"
 export default async function () {
 	const fetcher = new Fetcher()
 
-	const user = await fetcher.fetch(orpc.users.me)
+	const user = await fetcher.fetch(orpc.users.me).catch((error: unknown) => {
+		if (isUnauthorizedError(error)) return null
+		throw error
+	})
+
+	if (!user) return null
 
 	if (user.group) {
 		const dates = getNextTwoWeeksDates({ now: await getServerTestNow() })
