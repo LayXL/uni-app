@@ -3,6 +3,7 @@ import { useMemo, useState } from "react"
 import type { MapEntity } from "@repo/shared/building-scheme"
 import { isRoom } from "@repo/shared/building-scheme"
 
+import { analytics } from "@/shared/lib/analytics"
 import { Button } from "@/shared/ui/button"
 import { Icon } from "@/shared/ui/icon"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
@@ -214,6 +215,23 @@ export const RouteBuilderModal = () => {
 		handleEndEntitySelect(entityId)
 	}
 
+	const trackRoomSearch = (
+		entityId: number,
+		source: "route_start" | "route_end",
+	) => {
+		const room = entities.find(
+			(entity) => entity.id === entityId && isRoom(entity),
+		)
+		if (!room || !isRoom(room)) return
+
+		analytics.track("room_searched", {
+			room_id: room.id,
+			room_name: room.name,
+			floor_id: room.floorId,
+			source,
+		})
+	}
+
 	return (
 		<ModalRoot isOpen={isModalOpen} onClose={closeModal}>
 			<div className="flex flex-col gap-4 justify-between">
@@ -227,7 +245,10 @@ export const RouteBuilderModal = () => {
 							placeholder="Откуда"
 							items={entityItems}
 							excludeKey={endRoomId}
-							onChange={handleStartSelect}
+							onChange={(entityId) => {
+								trackRoomSearch(entityId, "route_start")
+								handleStartSelect(entityId)
+							}}
 							filterFn={filterEntity}
 						/>
 						<div className="h-px ml-12 mr-px bg-border" />
@@ -237,7 +258,10 @@ export const RouteBuilderModal = () => {
 							placeholder="Куда"
 							items={endEntityItems}
 							excludeKey={startRoomId}
-							onChange={handleEndSelect}
+							onChange={(entityId) => {
+								trackRoomSearch(entityId, "route_end")
+								handleEndSelect(entityId)
+							}}
 							filterFn={filterEntity}
 						/>
 					</div>
@@ -250,6 +274,11 @@ export const RouteBuilderModal = () => {
 				</div>
 				<Button
 					onClick={() => {
+						analytics.track("route_built", {
+							start_entity_id: startRoomId ?? null,
+							end_entity_id: endRoomId ?? null,
+							nearest_toilet: endNearestToilet,
+						})
 						setIsActive(true)
 						closeModal()
 					}}

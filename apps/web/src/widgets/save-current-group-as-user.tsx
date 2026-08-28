@@ -9,6 +9,7 @@ import { transformToGroupName } from "@repo/shared/groups/transform-to-group-nam
 import { isTestingTeacherGroupId } from "@repo/shared/testing-group"
 
 import { useScheduleGroup } from "@/features/schedule/hooks/use-schedule-group"
+import { analytics } from "@/shared/lib/analytics"
 import { Button } from "@/shared/ui/button"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
 
@@ -52,9 +53,13 @@ export const SaveCurrentGroupAsUser = () => {
 								return
 							}
 
-							orpc.users.updateUserGroup.call({ groupId: group.id })
+							await orpc.users.updateUserGroup.call({ groupId: group.id })
 							await queryClient.invalidateQueries({
 								queryKey: orpc.users.me.queryKey(),
+							})
+							analytics.track("group_saved_as_default", {
+								group_id: group.id,
+								group_name: group.displayName,
 							})
 							setIsOpen(false)
 						}}

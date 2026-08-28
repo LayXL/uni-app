@@ -2,11 +2,12 @@
 
 import { AnimatePresence, motion } from "motion/react"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
 
 import { GroupSelector } from "@/entities/group/ui/group-selector"
+import { analytics } from "@/shared/lib/analytics"
 import { Button } from "@/shared/ui/button"
 import { Icon } from "@/shared/ui/icon"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
@@ -91,8 +92,17 @@ const FeaturesOverviewStep = ({ onNext }: StepProps) => {
 }
 
 const GroupSelectionStep = ({ onNext }: StepProps) => {
-	const handleGroupClick = async (groupId: number) => {
+	const handleGroupClick = async (groupId: number, groupName: string) => {
 		await orpc.users.updateUserGroup.call({ groupId })
+		analytics.track("group_selected", {
+			group_id: groupId,
+			group_name: groupName,
+			source: "onboarding",
+		})
+		analytics.track("onboarding_completed", {
+			group_id: groupId,
+			group_name: groupName,
+		})
 		onNext()
 	}
 
@@ -115,6 +125,7 @@ const GroupSelectionStep = ({ onNext }: StepProps) => {
 	)
 }
 const STEPS = [FeaturesOverviewStep, GroupSelectionStep]
+const STEP_NAMES = ["features", "group_selection"] as const
 
 export default function OnboardingPage() {
 	const router = useRouter()
@@ -122,6 +133,24 @@ export default function OnboardingPage() {
 	const [step, setStep] = useState(0)
 
 	const Step = STEPS[step]
+
+	useEffect(() => {
+		analytics.track("onboarding_started", { step_count: STEPS.length })
+	}, [])
+
+	const handleNext = () => {
+		analytics.track("onboarding_step_completed", {
+			step: STEP_NAMES[step],
+			step_number: step + 1,
+		})
+
+		if (step === STEPS.length - 1) {
+			router.replace("/")
+			return
+		}
+
+		setStep(step + 1)
+	}
 
 	return (
 		<AnimatePresence>
@@ -132,16 +161,7 @@ export default function OnboardingPage() {
 				exit={{ opacity: 0 }}
 				className="absolute inset-0 p-4 pt-(--safe-area-inset-top)"
 			>
-				<Step
-					onNext={() => {
-						if (step === STEPS.length - 1) {
-							router.replace("/")
-							return
-						}
-
-						setStep(step + 1)
-					}}
-				/>
+				<Step onNext={handleNext} />
 			</motion.div>
 		</AnimatePresence>
 	)

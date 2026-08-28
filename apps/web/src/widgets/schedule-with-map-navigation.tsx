@@ -6,6 +6,7 @@ import { useActiveFloor } from "@/features/map/hooks/use-active-floor"
 import { useMapData } from "@/features/map/hooks/use-map-data"
 import { useMapState } from "@/features/map/hooks/use-map-state"
 import { ScheduleViewer } from "@/features/schedule/ui/schedule-viewer"
+import { analytics } from "@/shared/lib/analytics"
 
 export const ScheduleWithMapNavigation = () => {
 	const mapData = useMapData()
@@ -16,6 +17,12 @@ export const ScheduleWithMapNavigation = () => {
 		const room = mapData.entities.find((e) => isRoom(e) && e.name === classroom)
 
 		if (room && isRoom(room)) {
+			analytics.track("room_clicked", {
+				room_id: room.id,
+				room_name: room.name,
+				floor_id: room.floorId,
+				source: "schedule",
+			})
 			window.scrollTo({ top: 0, behavior: "smooth" })
 			setActiveFloor(room.floorId)
 			setZoom(0.5)

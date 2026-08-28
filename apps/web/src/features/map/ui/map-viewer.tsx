@@ -5,6 +5,9 @@ import * as fabric from "fabric"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
+import { isRoom } from "@repo/shared/building-scheme"
+
+import { analytics } from "@/shared/lib/analytics"
 
 import { useActiveFloor } from "../hooks/use-active-floor"
 import { useColorScheme } from "../hooks/use-color-scheme"
@@ -194,6 +197,26 @@ export const MapViewer = () => {
 		rotateAtCenter(-currentRotation)
 	}, [rotateAtCenter, viewportRef])
 
+	const handleRoomClick = useCallback(
+		(roomId: number) => {
+			const room = mapData?.entities.find(
+				(entity) => entity.id === roomId && isRoom(entity),
+			)
+
+			if (room && isRoom(room)) {
+				analytics.track("room_clicked", {
+					room_id: room.id,
+					room_name: room.name,
+					floor_id: room.floorId,
+					source: "map",
+				})
+			}
+
+			setSelectedRoomId(roomId)
+		},
+		[mapData, setSelectedRoomId],
+	)
+
 	useMapInteractions({
 		fabricRef,
 		zoomAtPoint,
@@ -201,7 +224,7 @@ export const MapViewer = () => {
 		applyViewport,
 		viewportRef,
 		screenToWorld,
-		onRoomClick: (roomId) => setSelectedRoomId(roomId),
+		onRoomClick: handleRoomClick,
 		onPointerMove: isDebug ? setCursorCoords : undefined,
 	})
 

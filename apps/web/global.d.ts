@@ -9,6 +9,7 @@ interface Telegram {
 declare global {
 	interface Window {
 		Telegram?: Telegram
+		ym?: (counterId: number, method: string, ...args: unknown[]) => void
 	}
 }
 

@@ -3,6 +3,7 @@ import { useShallow } from "zustand/react/shallow"
 
 import { isRoom, type MapEntity } from "@repo/shared/building-scheme"
 
+import { analytics } from "@/shared/lib/analytics"
 import { Icon } from "@/shared/ui/icon"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { ModalRoot } from "@/shared/ui/modal-root"
@@ -135,6 +136,15 @@ export const MapSearchModal = ({ isOpen, onClose }: MapSearchModalProps) => {
 	const handleSelect = (entityId: number) => {
 		const entity = entities.find((e) => e.id === entityId)
 		if (!entity) return
+
+		if (isRoom(entity)) {
+			analytics.track("room_searched", {
+				room_id: entity.id,
+				room_name: entity.name,
+				floor_id: entity.floorId,
+				source: "map_search",
+			})
+		}
 
 		setActiveFloor(entity.floorId)
 		setSelectedRoomId(entityId)

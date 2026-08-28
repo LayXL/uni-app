@@ -9,6 +9,7 @@ import { transformToGroupName } from "@repo/shared/groups/transform-to-group-nam
 
 import { GroupSelector } from "@/entities/group/ui/group-selector"
 import { useLocalStorage } from "@/shared/hooks/use-local-storage"
+import { analytics } from "@/shared/lib/analytics"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { usePopupClose } from "@/shared/ui/popup"
 import { Portal } from "@/shared/ui/portal"
@@ -25,10 +26,19 @@ export const ScheduleGroup = () => {
 
 	usePopupClose(isOpen, () => setIsOpen(false))
 
-	const handleChange = async (groupId: number) => {
+	const handleChange = (
+		groupId: number,
+		groupName: string,
+		source: "schedule_search" | "schedule_recent",
+	) => {
 		const group = groups.data?.find((g) => g.id === groupId)
 		if (!group) return
 
+		analytics.track("group_selected", {
+			group_id: groupId,
+			group_name: groupName,
+			source,
+		})
 		setGroup(group)
 		setIsOpen(false)
 		setViewedGroups((prev) => {
@@ -59,7 +69,12 @@ export const ScheduleGroup = () => {
 							setIsOpen(false)
 						}}
 					>
-						<GroupSelector onChange={handleChange} noAbsolutePosition />
+						<GroupSelector
+							onChange={(groupId, groupName) =>
+								handleChange(groupId, groupName, "schedule_search")
+							}
+							noAbsolutePosition
+						/>
 						<div className="-mx-4 overflow-x-auto overflow-y-hidden">
 							<div className="flex w-max gap-2 px-4">
 								{[...viewedGroups].reverse().map((groupId) => {
@@ -70,7 +85,13 @@ export const ScheduleGroup = () => {
 										<Touchable key={groupId}>
 											<button
 												type="button"
-												onClick={() => handleChange(groupId)}
+												onClick={() =>
+													handleChange(
+														groupId,
+														group.displayName,
+														"schedule_recent",
+													)
+												}
 												className="bg-card relative rounded-3xl px-3 py-2"
 											>
 												<LiquidBorder />

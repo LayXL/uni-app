@@ -1,11 +1,12 @@
 import type { Viewport } from "next"
-import type { ReactNode } from "react"
+import { type ReactNode, Suspense } from "react"
 import "./globals.css"
 
 import { Inter } from "next/font/google"
 
 import { cn } from "@/shared/utils/cn"
 
+import { YandexMetrika } from "./_components/yandex-metrika"
 import Providers from "./_providers"
 
 export const viewport: Viewport = {
@@ -33,6 +34,18 @@ export default function ({ children }: LayoutProps) {
 				className={cn(inter.className, "bg-background text-foreground")}
 			>
 				<Providers>{children}</Providers>
+				<Suspense fallback={null}>
+					<YandexMetrika />
+				</Suspense>
+				<noscript>
+					<div>
+						<img
+							src="https://mc.yandex.ru/watch/112037217"
+							style={{ position: "absolute", left: "-9999px" }}
+							alt=""
+						/>
+					</div>
+				</noscript>
 			</body>
 		</html>
 	)
