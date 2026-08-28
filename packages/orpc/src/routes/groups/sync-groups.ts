@@ -102,12 +102,24 @@ const synchronizeGroups = async () => {
 	const { cookie } = await getSession(env.bitrixLogin, env.bitrixPassword)
 	const fetchedGroups = await getAllGroups(cookie)
 	const incomingGroups = prepareGroups(fetchedGroups)
+	const studentsCount = incomingGroups.filter(
+		(group) => group.type === "studentsGroup",
+	).length
+	const teachersCount = incomingGroups.length - studentsCount
 
-	if (
-		!incomingGroups.some((group) => group.type === "studentsGroup") ||
-		!incomingGroups.some((group) => group.type === "teacher")
-	) {
-		throw new Error("Bitrix returned an incomplete group list")
+	// biome-ignore lint/suspicious/noConsole: Operational diagnostics for manual synchronization
+	console.info("Groups received from Bitrix", {
+		fetched: fetchedGroups.length,
+		unique: incomingGroups.length,
+		students: studentsCount,
+		teachers: teachersCount,
+		duplicatesSkipped: fetchedGroups.length - incomingGroups.length,
+	})
+
+	if (studentsCount === 0 || teachersCount === 0) {
+		throw new Error(
+			`Bitrix returned an incomplete group list: students=${studentsCount}, teachers=${teachersCount}`,
+		)
 	}
 
 	return db.transaction(async (tx) => {
@@ -175,7 +187,9 @@ export const syncGroups = privateProcedure.handler(async ({ context }) => {
 
 	try {
 		return await synchronizeGroups()
-	} catch {
+	} catch (error) {
+		// biome-ignore lint/suspicious/noConsole: Preserve the original synchronization error in server logs
+		console.error("Failed to synchronize groups with Bitrix", error)
 		throw new ORPCError("INTERNAL_SERVER_ERROR", {
 			message: "Не удалось синхронизировать группы с Bitrix",
 		})

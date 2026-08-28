@@ -1,72 +1,105 @@
 import { bitrix } from "../ky"
 
-export async function getAllGroups(cookie: string) {
-	const groups: {
-		bitrixId: string
-		displayName: string
-		type: "teacher" | "studentsGroup"
-	}[] = []
+const BITRIX_REQUEST_CONCURRENCY = 8
 
-	const grades = [3, 4]
+type Group = {
+	bitrixId: string
+	displayName: string
+	type: "teacher" | "studentsGroup"
+}
 
-	for (const grade of grades) {
-		const data = await bitrix
-			.post("local/handlers/schedule/groups.php", {
-				body: `gradeLevel=${grade}`,
+type BitrixGroup = {
+	GROUP_NAME: string
+	GROUP_ID: string
+}
+
+const mapWithConcurrency = async <Input, Output>(
+	items: Input[],
+	concurrency: number,
+	mapper: (item: Input) => Promise<Output>,
+) => {
+	const results = new Array<Output>(items.length)
+	let nextIndex = 0
+
+	const worker = async () => {
+		while (nextIndex < items.length) {
+			const currentIndex = nextIndex
+			nextIndex += 1
+			results[currentIndex] = await mapper(items[currentIndex])
+		}
+	}
+
+	await Promise.all(
+		Array.from({ length: Math.min(concurrency, items.length) }, () => worker()),
+	)
+
+	return results
+}
+
+const getGroupsForGrade = async (grade: number, cookie: string) => {
+	const data = await bitrix
+		.post("local/handlers/schedule/groups.php", {
+			body: `gradeLevel=${grade}`,
+			headers: {
+				Cookie: cookie,
+				"Content-Type": "application/x-www-form-urlencoded",
+			},
+		})
+		.json<Record<string, BitrixGroup>>()
+
+	return Object.values(data)
+}
+
+const parseStudentGroup = async (
+	group: BitrixGroup,
+	cookie: string,
+): Promise<Group[]> => {
+	try {
+		const groupSchedule = await bitrix
+			.get("mobile/teacher/schedule/spo_and_vo.php", {
+				searchParams: { name: group.GROUP_NAME },
 				headers: {
 					Cookie: cookie,
 					"Content-Type": "application/x-www-form-urlencoded",
 				},
 			})
-			.json<Record<string, { GROUP_NAME: string; GROUP_ID: string }>>()
+			.text()
 
-		for (const group of Object.values(data)) {
-			console.info(`Parsing ${group.GROUP_NAME}`)
+		if (!groupSchedule.includes("subgroupContent")) return []
 
-			const groupSchedule = await bitrix
-				.get(
-					`mobile/teacher/schedule/spo_and_vo.php?name=${group.GROUP_NAME}`,
-					{
-						method: "GET",
-						headers: {
-							Cookie: cookie,
-							"Content-Type": "application/x-www-form-urlencoded",
-						},
-					},
-				)
-				.text()
-
-			if (!groupSchedule.includes("subgroupContent")) continue
-
-			if (groupSchedule.includes("Выберите подгруппу")) {
-				console.info(`Group ${group.GROUP_NAME} has subgroups!`)
-
-				groups.push(
-					...groupSchedule
-						.split('id="subgroupSelect">')[1]
-						.split("</select")[0]
-						.split('">')
-						.toSpliced(0, 1)
-						.map((x: string) => ({
-							displayName: x.split("</")[0],
-							bitrixId: group.GROUP_ID,
-							type: "studentsGroup" as const,
-						})),
-				)
-			} else
-				groups.push({
+		if (!groupSchedule.includes("Выберите подгруппу")) {
+			return [
+				{
 					bitrixId: group.GROUP_ID,
 					displayName: group.GROUP_NAME,
 					type: "studentsGroup",
-				})
+				},
+			]
 		}
+
+		return groupSchedule
+			.split('id="subgroupSelect">')[1]
+			.split("</select")[0]
+			.split('">')
+			.toSpliced(0, 1)
+			.map((option) => ({
+				displayName: option.split("</")[0],
+				bitrixId: group.GROUP_ID,
+				type: "studentsGroup" as const,
+			}))
+	} catch (error) {
+		throw new Error(
+			`Failed to parse Bitrix group ${group.GROUP_NAME} (${group.GROUP_ID})`,
+			{ cause: error },
+		)
 	}
+}
 
-	console.info("Groups parsed!")
-
-	const departments = await getAllDepartments(cookie)
-
-	for (const department of departments) {
+const getTeachersForDepartment = async (
+	department: string,
+	cookie: string,
+): Promise<Group[]> => {
+	try {
 		const data = await bitrix
 			.post("local/handlers/schedule/users.php", {
 				body: `gradeLevel=57&group=${department}`,
@@ -77,18 +110,61 @@ export async function getAllGroups(cookie: string) {
 			})
 			.json<{ USER_ID: string; NAME: string }[]>()
 
-		groups.push(
-			...data.map((teacher) => ({
-				bitrixId: teacher.USER_ID,
-				displayName: teacher.NAME.replace(" нет", " "),
-				type: "teacher" as const,
-			})),
+		return data.map((teacher) => ({
+			bitrixId: teacher.USER_ID,
+			displayName: teacher.NAME.replace(" нет", " "),
+			type: "teacher",
+		}))
+	} catch (error) {
+		throw new Error(
+			`Failed to fetch Bitrix teachers for department ${department}`,
+			{ cause: error },
 		)
 	}
+}
 
-	console.info("Teachers parsed")
+export async function getAllGroups(cookie: string) {
+	const startedAt = Date.now()
+	const groupsByGrade = await Promise.all(
+		[3, 4].map((grade) => getGroupsForGrade(grade, cookie)),
+	)
+	const fetchedStudentGroups = groupsByGrade.flat()
+	const studentGroupSources = [
+		...new Map(
+			fetchedStudentGroups.map((group) => [
+				JSON.stringify([group.GROUP_ID, group.GROUP_NAME]),
+				group,
+			]),
+		).values(),
+	]
+	const studentGroups = (
+		await mapWithConcurrency(
+			studentGroupSources,
+			BITRIX_REQUEST_CONCURRENCY,
+			(group) => parseStudentGroup(group, cookie),
+		)
+	).flat()
 
-	return groups
+	const departments = [...new Set(await getAllDepartments(cookie))]
+	const teachers = (
+		await mapWithConcurrency(
+			departments,
+			BITRIX_REQUEST_CONCURRENCY,
+			(department) => getTeachersForDepartment(department, cookie),
+		)
+	).flat()
+
+	// biome-ignore lint/suspicious/noConsole: Operational diagnostics for group synchronization
+	console.info("Bitrix groups parsed", {
+		studentGroupSources: studentGroupSources.length,
+		studentGroups: studentGroups.length,
+		departments: departments.length,
+		teachers: teachers.length,
+		total: studentGroups.length + teachers.length,
+		durationMs: Date.now() - startedAt,
+	})
+
+	return [...studentGroups, ...teachers]
 }
 
 async function getAllDepartments(cookie: string): Promise<string[]> {
