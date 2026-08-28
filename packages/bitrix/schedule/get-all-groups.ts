@@ -1,6 +1,6 @@
 import { bitrix } from "../ky"
 
-const BITRIX_REQUEST_CONCURRENCY = 8
+const BITRIX_REQUEST_COOLDOWN_MS = 100
 
 type Group = {
 	bitrixId: string
@@ -13,25 +13,18 @@ type BitrixGroup = {
 	GROUP_ID: string
 }
 
-const mapWithConcurrency = async <Input, Output>(
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+const mapSequentially = async <Input, Output>(
 	items: Input[],
-	concurrency: number,
 	mapper: (item: Input) => Promise<Output>,
 ) => {
-	const results = new Array<Output>(items.length)
-	let nextIndex = 0
+	const results: Output[] = []
 
-	const worker = async () => {
-		while (nextIndex < items.length) {
-			const currentIndex = nextIndex
-			nextIndex += 1
-			results[currentIndex] = await mapper(items[currentIndex])
-		}
+	for (const item of items) {
+		results.push(await mapper(item))
+		await sleep(BITRIX_REQUEST_COOLDOWN_MS)
 	}
-
-	await Promise.all(
-		Array.from({ length: Math.min(concurrency, items.length) }, () => worker()),
-	)
 
 	return results
 }
@@ -125,8 +118,8 @@ const getTeachersForDepartment = async (
 
 export async function getAllGroups(cookie: string) {
 	const startedAt = Date.now()
-	const groupsByGrade = await Promise.all(
-		[3, 4].map((grade) => getGroupsForGrade(grade, cookie)),
+	const groupsByGrade = await mapSequentially([3, 4], (grade) =>
+		getGroupsForGrade(grade, cookie),
 	)
 	const fetchedStudentGroups = groupsByGrade.flat()
 	const studentGroupSources = [
@@ -138,19 +131,16 @@ export async function getAllGroups(cookie: string) {
 		).values(),
 	]
 	const studentGroups = (
-		await mapWithConcurrency(
-			studentGroupSources,
-			BITRIX_REQUEST_CONCURRENCY,
-			(group) => parseStudentGroup(group, cookie),
+		await mapSequentially(studentGroupSources, (group) =>
+			parseStudentGroup(group, cookie),
 		)
 	).flat()
 
 	const departments = [...new Set(await getAllDepartments(cookie))]
+	await sleep(BITRIX_REQUEST_COOLDOWN_MS)
 	const teachers = (
-		await mapWithConcurrency(
-			departments,
-			BITRIX_REQUEST_CONCURRENCY,
-			(department) => getTeachersForDepartment(department, cookie),
+		await mapSequentially(departments, (department) =>
+			getTeachersForDepartment(department, cookie),
 		)
 	).flat()
 
@@ -161,6 +151,7 @@ export async function getAllGroups(cookie: string) {
 		departments: departments.length,
 		teachers: teachers.length,
 		total: studentGroups.length + teachers.length,
+		requestCooldownMs: BITRIX_REQUEST_COOLDOWN_MS,
 		durationMs: Date.now() - startedAt,
 	})
 
