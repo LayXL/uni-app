@@ -1,7 +1,7 @@
 import { ORPCError } from "@orpc/client"
 import z from "zod"
 
-import { db, eq, groupsTable } from "@repo/drizzle"
+import { and, db, eq, groupsTable } from "@repo/drizzle"
 import { env } from "@repo/env"
 import { testingGroup, testingTeacherGroups } from "@repo/shared/testing-group"
 
@@ -25,7 +25,9 @@ export const getGroup = publicProcedure
 		const group = await db
 			.select()
 			.from(groupsTable)
-			.where(eq(groupsTable.id, input.id))
+			.where(
+				and(eq(groupsTable.id, input.id), eq(groupsTable.isDeleted, false)),
+			)
 			.limit(1)
 			.then(([group]) => group)
 

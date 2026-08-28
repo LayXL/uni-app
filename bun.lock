@@ -164,6 +164,7 @@
         "@orpc/client": "^1.10.0",
         "@orpc/server": "^1.10.0",
         "@orpc/tanstack-query": "^1.10.0",
+        "@repo/bitrix": "workspace:*",
         "@repo/drizzle": "workspace:*",
         "@repo/env": "workspace:*",
         "@repo/shared": "workspace:*",

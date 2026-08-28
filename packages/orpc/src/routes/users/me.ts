@@ -14,7 +14,9 @@ export const me = privateProcedure.handler(async ({ context }) => {
 				.then(([group]) => group)
 		: null
 	const visibleGroup =
-		group && (!isTestingGroupId(group.id) || env.testingGroupEnabled)
+		group &&
+		!group.isDeleted &&
+		(!isTestingGroupId(group.id) || env.testingGroupEnabled)
 			? group
 			: null
 

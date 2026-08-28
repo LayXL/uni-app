@@ -2,7 +2,7 @@ import { getAllGroups } from "@repo/bitrix/schedule/get-all-groups"
 import { getSchedule } from "@repo/bitrix/schedule/get-schedule"
 import { getTeacherSchedule } from "@repo/bitrix/schedule/get-teacher-schedule"
 import { getSession } from "@repo/bitrix/session/get-session"
-import { classesTable, db, groupsTable, gte } from "@repo/drizzle"
+import { and, classesTable, db, eq, groupsTable, gt, gte } from "@repo/drizzle"
 import { env } from "@repo/env"
 import { getSubjectIdByName } from "@repo/shared/get-subject-id-by-name"
 
@@ -88,7 +88,10 @@ export const updateScheduleInDatabase = async () => {
 }
 
 const getGroups = async (cookie: string) => {
-	const groups = await db.query.groupsTable.findMany()
+	const groups = await db
+		.select()
+		.from(groupsTable)
+		.where(and(eq(groupsTable.isDeleted, false), gt(groupsTable.id, 0)))
 
 	if (groups.length === 0) {
 		console.info("No groups found in database, fetching from Bitrix")

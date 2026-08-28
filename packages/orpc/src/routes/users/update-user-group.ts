@@ -1,7 +1,7 @@
 import { ORPCError } from "@orpc/client"
 import { z } from "zod"
 
-import { db, eq, groupsTable, usersTable } from "@repo/drizzle"
+import { and, db, eq, groupsTable, usersTable } from "@repo/drizzle"
 import { env } from "@repo/env"
 import { isTestingGroupId, testingGroup } from "@repo/shared/testing-group"
 
@@ -40,7 +40,10 @@ export const updateUserGroup = privateProcedure
 			}
 
 			const group = await db.query.groupsTable.findFirst({
-				where: eq(groupsTable.id, input.groupId),
+				where: and(
+					eq(groupsTable.id, input.groupId),
+					eq(groupsTable.isDeleted, false),
+				),
 			})
 
 			if (!group) {
