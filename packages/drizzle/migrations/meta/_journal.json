@@ -127,6 +127,13 @@
       "when": 1773055196238,
       "tag": "0017_mixed_firelord",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1788100694542,
+      "tag": "0018_ensure_config_id_unique",
+      "breakpoints": true
     }
   ]
 }
