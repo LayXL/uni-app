@@ -6,13 +6,17 @@ type ToggleProps = {
 	value: boolean
 	onChange: (value: boolean) => void
 	className?: string
+	ariaLabel?: string
 }
 
-export function Toggle({ value, onChange, className }: ToggleProps) {
+export function Toggle({ value, onChange, className, ariaLabel }: ToggleProps) {
 	return (
 		<Touchable>
 			<button
 				type="button"
+				role="switch"
+				aria-checked={value}
+				aria-label={ariaLabel}
 				onClick={() => onChange(!value)}
 				className={cn(
 					"relative w-12 h-7 rounded-full transition-colors",

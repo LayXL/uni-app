@@ -7,11 +7,16 @@ import { UnauthorizedPage } from "@/shared/ui/unauthorized-page"
 import { Fetcher } from "@/shared/utils/fetcher"
 import { isUnauthorizedError } from "@/shared/utils/is-unauthorized-error"
 
+import { MaintenanceGate } from "./_ui/maintenance-gate"
+
 export default async function ({ children }: { children: ReactNode }) {
 	const fetcher = new Fetcher()
 
 	try {
-		await fetcher.fetch(orpc.users.me)
+		await Promise.all([
+			fetcher.fetch(orpc.users.me),
+			fetcher.fetch(orpc.system.getMaintenance),
+		])
 	} catch (error) {
 		if (isUnauthorizedError(error)) {
 			return <UnauthorizedPage />
@@ -22,7 +27,7 @@ export default async function ({ children }: { children: ReactNode }) {
 
 	return (
 		<HydrationBoundary state={fetcher.dehydrate()}>
-			{children}
+			<MaintenanceGate>{children}</MaintenanceGate>
 		</HydrationBoundary>
 	)
 }
