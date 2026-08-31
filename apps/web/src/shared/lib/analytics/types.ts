@@ -32,6 +32,12 @@ export type AnalyticsEventMap = {
 		channel: "secretscode"
 		group_name: string
 	}
+	maintenance_channel_button_shown: {
+		channel: "secretscode"
+	}
+	maintenance_channel_button_clicked: {
+		channel: "secretscode"
+	}
 	onboarding_started: {
 		step_count: number
 	}
