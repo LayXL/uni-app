@@ -8,6 +8,7 @@ import { Fetcher } from "@/shared/utils/fetcher"
 import { isUnauthorizedError } from "@/shared/utils/is-unauthorized-error"
 
 import { MaintenanceGate } from "./_ui/maintenance-gate"
+import { YandexMetrikaUser } from "./_ui/yandex-metrika-user"
 
 export default async function ({ children }: { children: ReactNode }) {
 	const fetcher = new Fetcher()
@@ -27,6 +28,7 @@ export default async function ({ children }: { children: ReactNode }) {
 
 	return (
 		<HydrationBoundary state={fetcher.dehydrate()}>
+			<YandexMetrikaUser />
 			<MaintenanceGate>{children}</MaintenanceGate>
 		</HydrationBoundary>
 	)

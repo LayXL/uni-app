@@ -9,6 +9,7 @@ export const YANDEX_METRIKA_COUNTER_ID = 112037217
 type PendingCall =
 	| { method: "reachGoal"; event: AnalyticsEvent }
 	| { method: "hit"; pageView: AnalyticsPageView }
+	| { method: "setUserID"; userId: string }
 
 const pendingCalls: PendingCall[] = []
 
@@ -18,7 +19,9 @@ const send = (call: PendingCall) => {
 	const ym = window.ym
 	if (!ym) return false
 
-	if (call.method === "reachGoal") {
+	if (call.method === "setUserID") {
+		ym(YANDEX_METRIKA_COUNTER_ID, "setUserID", call.userId)
+	} else if (call.method === "reachGoal") {
 		ym(
 			YANDEX_METRIKA_COUNTER_ID,
 			"reachGoal",
@@ -42,6 +45,10 @@ export const flushYandexMetrikaQueue = () => {
 	if (typeof window === "undefined" || !window.ym) return
 
 	for (const call of pendingCalls.splice(0)) send(call)
+}
+
+export const setYandexMetrikaUserId = (userId: string) => {
+	enqueueOrSend({ method: "setUserID", userId })
 }
 
 export const yandexMetrikaAdapter: AnalyticsAdapter = {
