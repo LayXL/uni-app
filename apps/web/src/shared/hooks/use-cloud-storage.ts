@@ -1,6 +1,7 @@
 "use client"
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import bridge from "@vkontakte/vk-bridge"
 import superjson from "superjson"
 
 import { isTelegram } from "../utils/is-telegram"
@@ -25,10 +26,26 @@ const getCloudStorage = (): CloudStorageApi | null => {
 	return (webApp as { CloudStorage?: CloudStorageApi }).CloudStorage ?? null
 }
 
-const getCloudItem = async (key: string): Promise<string | null> => {
-	const cloudStorage = getCloudStorage()
-	if (!cloudStorage) return null
+const getLocalItem = (key: string): string | null => {
+	try {
+		return window.localStorage.getItem(key)
+	} catch {
+		return null
+	}
+}
 
+const setLocalItem = (key: string, value: string) => {
+	try {
+		window.localStorage.setItem(key, value)
+	} catch {
+		// Ignore write failures (quota exceeded, private mode, etc).
+	}
+}
+
+const getTelegramCloudItem = async (
+	cloudStorage: CloudStorageApi,
+	key: string,
+): Promise<string | null> => {
 	if (cloudStorage.getItem.length >= 2) {
 		return new Promise((resolve, reject) => {
 			cloudStorage.getItem(key, (error, value) => {
@@ -45,10 +62,11 @@ const getCloudItem = async (key: string): Promise<string | null> => {
 	return value ?? null
 }
 
-const setCloudItem = async (key: string, value: string): Promise<void> => {
-	const cloudStorage = getCloudStorage()
-	if (!cloudStorage) return
-
+const setTelegramCloudItem = async (
+	cloudStorage: CloudStorageApi,
+	key: string,
+	value: string,
+): Promise<void> => {
 	if (cloudStorage.setItem.length >= 3) {
 		return new Promise((resolve, reject) => {
 			cloudStorage.setItem(key, value, (error) => {
@@ -64,6 +82,55 @@ const setCloudItem = async (key: string, value: string): Promise<void> => {
 	await Promise.resolve(cloudStorage.setItem(key, value))
 }
 
+const getCloudItem = async (key: string): Promise<string | null> => {
+	const cloudStorage = getCloudStorage()
+	if (cloudStorage) {
+		try {
+			return await getTelegramCloudItem(cloudStorage, key)
+		} catch {
+			return getLocalItem(key)
+		}
+	}
+
+	if (!isTelegram() && bridge.isEmbedded()) {
+		try {
+			const { keys } = await bridge.send("VKWebAppStorageGet", {
+				keys: [key],
+			})
+			return keys.find((item) => item.key === key)?.value || null
+		} catch {
+			return getLocalItem(key)
+		}
+	}
+
+	return getLocalItem(key)
+}
+
+const setCloudItem = async (key: string, value: string): Promise<void> => {
+	const cloudStorage = getCloudStorage()
+	if (cloudStorage) {
+		try {
+			await setTelegramCloudItem(cloudStorage, key, value)
+			return
+		} catch {
+			setLocalItem(key, value)
+			return
+		}
+	}
+
+	if (!isTelegram() && bridge.isEmbedded()) {
+		try {
+			await bridge.send("VKWebAppStorageSet", { key, value })
+			return
+		} catch {
+			setLocalItem(key, value)
+			return
+		}
+	}
+
+	setLocalItem(key, value)
+}
+
 export const useCloudStorage = <T>(
 	key: string,
 	defaultValue: T,
@@ -73,7 +140,7 @@ export const useCloudStorage = <T>(
 
 	const { data } = useQuery({
 		queryKey,
-		enabled: isTelegram(),
+		enabled: typeof window !== "undefined",
 		queryFn: async () => {
 			const raw = await getCloudItem(key)
 			if (!raw) return defaultValue

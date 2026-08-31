@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { format, parseISO } from "date-fns"
 import { ru } from "date-fns/locale"
-import { useMemo } from "react"
+import { Fragment, useMemo } from "react"
 
 import { orpc } from "@repo/orpc/react"
 import { getNextTwoWeeksDates } from "@repo/shared/lessons/get-next-two-weeks-dates"
@@ -15,6 +15,7 @@ import { groupScheduleItems } from "@/features/schedule/lib/group-schedule-items
 import { useNowInYekaterinburg } from "@/shared/hooks/use-now-in-yekaterinburg"
 
 import { useScheduleGroup } from "../hooks/use-schedule-group"
+import { ScheduleChannelBanner } from "./schedule-channel-banner"
 import { WithoutLessonsPlaceholder } from "./without-lessons-placeholder"
 
 export const ScheduleViewerWithGroup = ({
@@ -57,46 +58,49 @@ export const ScheduleViewerWithGroup = ({
 
 	return (
 		<div className="pb-2 flex flex-col gap-6">
-			{groupedSchedule.map(({ date, lessons }) => {
+			{groupedSchedule.map(({ date, lessons }, dayIndex) => {
 				const dayEvents = eventsByDate.get(date) ?? []
 
 				return (
-					<div key={date} className="px-2 flex flex-col gap-2">
-						<h2 className="text-lg font-semibold px-2">
-							{format(parseISO(date), "d MMMM, EEEE", { locale: ru })}
-						</h2>
-						<div className="flex flex-col gap-2">
-							{dayEvents.map((event) => (
-								<EventCard
-									key={`event-${event.id}`}
-									id={event.id}
-									title={event.title}
-									description={event.description}
-									coverImage={event.coverImage}
-									backgroundColor={event.backgroundColor}
-									borderColor={event.borderColor}
-									textColor={event.textColor}
-									buttonColor={event.buttonColor}
-									date={event.date}
-									buttonUrl={event.buttonUrl}
-									buttonText={event.buttonText}
-								/>
-							))}
-							{lessons.length === 0 && dayEvents.length === 0 && (
-								<WithoutLessonsPlaceholder date={date} />
-							)}
-							{lessons.map((lesson, i) => (
-								<LessonCard
-									key={i}
-									group={group}
-									lesson={lesson}
-									isActive={isLessonActive(lesson, now)}
-									onClassroomClick={onClassroomClick}
-									isTeacherView={isTeacherView}
-								/>
-							))}
+					<Fragment key={date}>
+						<div className="px-2 flex flex-col gap-2">
+							<h2 className="text-lg font-semibold px-2">
+								{format(parseISO(date), "d MMMM, EEEE", { locale: ru })}
+							</h2>
+							<div className="flex flex-col gap-2">
+								{dayEvents.map((event) => (
+									<EventCard
+										key={`event-${event.id}`}
+										id={event.id}
+										title={event.title}
+										description={event.description}
+										coverImage={event.coverImage}
+										backgroundColor={event.backgroundColor}
+										borderColor={event.borderColor}
+										textColor={event.textColor}
+										buttonColor={event.buttonColor}
+										date={event.date}
+										buttonUrl={event.buttonUrl}
+										buttonText={event.buttonText}
+									/>
+								))}
+								{lessons.length === 0 && dayEvents.length === 0 && (
+									<WithoutLessonsPlaceholder date={date} />
+								)}
+								{lessons.map((lesson, i) => (
+									<LessonCard
+										key={i}
+										group={group}
+										lesson={lesson}
+										isActive={isLessonActive(lesson, now)}
+										onClassroomClick={onClassroomClick}
+										isTeacherView={isTeacherView}
+									/>
+								))}
+							</div>
 						</div>
-					</div>
+						{dayIndex === 0 && !isTeacherView && <ScheduleChannelBanner />}
+					</Fragment>
 				)
 			})}
 		</div>

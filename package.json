@@ -5,6 +5,8 @@
   "scripts": {
     "build": "turbo build",
     "dev": "dotenv -- turbo dev --filter=!@repo/proxy",
+    "storybook": "cd apps/web && bun run storybook",
+    "build-storybook": "cd apps/web && bun run build-storybook",
     "update-schedule": "bun run apps/schedule-updater/force-update",
     "db:push": "cd packages/drizzle && bun run --env-file ../../.env push",
     "db:generate": "cd packages/drizzle && bun run --env-file ../../.env generate",

@@ -19,6 +19,9 @@
 | `room_searched`             | Выбор кабинета через поиск карты или построение маршрута | `room_id`, `room_name`, `floor_id`, `source` (`map_search`, `route_start` или `route_end`) |
 | `group_selected`            | Выбор группы в онбординге или расписании                 | `group_id`, `group_name`, `source` (`onboarding`, `schedule_search` или `schedule_recent`) |
 | `group_saved_as_default`    | Сохранение просматриваемой группы как своей              | `group_id`, `group_name`                                                                   |
+| `channel_banner_shown`      | Показ баннера Telegram-канала в расписании               | `channel`, `group_name`                                                                    |
+| `channel_banner_clicked`    | Переход в Telegram-канал по баннеру                      | `channel`, `group_name`                                                                    |
+| `channel_banner_dismissed`  | Постоянное скрытие баннера крестиком                     | `channel`, `group_name`                                                                    |
 | `onboarding_started`        | Открытие онбординга                                      | `step_count`                                                                               |
 | `onboarding_step_completed` | Завершение шага онбординга                               | `step`, `step_number`                                                                      |
 | `onboarding_completed`      | Успешное сохранение группы и завершение онбординга       | `group_id`, `group_name`                                                                   |

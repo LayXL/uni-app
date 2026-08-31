@@ -20,6 +20,18 @@ export type AnalyticsEventMap = {
 		group_id: number
 		group_name: string
 	}
+	channel_banner_shown: {
+		channel: "secretscode"
+		group_name: string
+	}
+	channel_banner_clicked: {
+		channel: "secretscode"
+		group_name: string
+	}
+	channel_banner_dismissed: {
+		channel: "secretscode"
+		group_name: string
+	}
 	onboarding_started: {
 		step_count: number
 	}
