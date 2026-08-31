@@ -1,37 +1,128 @@
-## Project structure
+# Uni App
 
+Монорепозиторий сервиса МИДИС с расписанием, картой помещений и построением
+маршрутов, домашними заданиями, событиями и Telegram-уведомлениями. Веб-клиент
+работает как Telegram Mini App и VK Mini App, а серверный API находится в том же
+Next.js-приложении и доступен через `/rpc`.
+
+## Возможности
+
+- просмотр расписания учебных групп и преподавателей;
+- интерактивная карта, поиск кабинетов и построение маршрутов;
+- домашние задания, файлы и отметки о выполнении;
+- события для выбранных групп;
+- управляемый администратором экран технических работ;
+- Telegram-бот с ежедневной отправкой расписания на следующий день;
+- автоматическая синхронизация расписания с порталом Битрикс.
+
+## Структура проекта
+
+| Путь                         | Назначение                                        |
+| ---------------------------- | ------------------------------------------------- |
+| `apps/web`                   | Next.js 16, React 19, интерфейс и oRPC API        |
+| `apps/bot`                   | Telegram-бот на grammY и уведомления о расписании |
+| `apps/schedule-updater`      | синхронизация групп и занятий с Битрикс           |
+| `apps/proxy`                 | отдельный Bun reverse proxy для портала Битрикс   |
+| `packages/orpc`              | роутер, процедуры, авторизация и клиент oRPC      |
+| `packages/drizzle`           | Drizzle-схема PostgreSQL и миграции               |
+| `packages/bitrix`            | клиент и парсер расписания Битрикс                |
+| `packages/shared`            | общие типы, данные и бизнес-логика                |
+| `packages/env`               | валидация переменных окружения через Zod          |
+| `packages/typescript-config` | общая конфигурация TypeScript                     |
+
+Задачи монорепозитория запускаются через Turborepo, зависимости устанавливаются
+Bun. В корневом `package.json` зафиксирован Bun 1.2.16; Docker-образы основных
+приложений используют Bun 1.3.6, а образ прокси — Bun 1.3.3.
+
+## Локальный запуск
+
+Понадобятся PostgreSQL, Bun и учетные данные Telegram, VK и Битрикс.
+
+```bash
+bun install --frozen-lockfile
+cp .env.example .env
+bun run db:migrate
+bun run dev
 ```
-apps/
-  bot
-  schedule-updater
-  web
-packages/
-  bitrix
-  drizzle
-  env
-  orpc
-  shared
-  typescript-config
+
+Перед запуском заполните обязательные значения в `.env`. Команда `bun run dev`
+поднимает `web`, `bot` и `schedule-updater`; `proxy` намеренно исключен из этого
+сценария. Веб-приложение доступно по адресу `http://127.0.0.1:3000`.
+
+В режиме `NODE_ENV=development` для входа без контейнера Mini App откройте
+`http://127.0.0.1:3000/auth/telegram`: страница создаст тестовые Telegram launch
+params, установит cookie сессии и вернет на главную.
+
+### Переменные окружения
+
+Актуальный шаблон находится в [`.env.example`](.env.example). Переменные без
+значения по умолчанию обязательны для общего сценария `bun run dev`, потому что
+их валидирует пакет `@repo/env` при запуске приложений.
+
+| Переменная                                                             | Назначение                                            | Значение по умолчанию                                    |
+| ---------------------------------------------------------------------- | ----------------------------------------------------- | -------------------------------------------------------- |
+| `NODE_ENV`                                                             | режим приложения: `development` или `production`      | `production`                                             |
+| `TELEGRAM_BOT_TOKEN`                                                   | токен Telegram-бота                                   | обязательна                                              |
+| `TELEGRAM_BOT_ENV`                                                     | API-среда grammY: `test` или `prod`                   | `prod`                                                   |
+| `WEB_APP_URL`                                                          | URL Mini App в кнопках бота                           | `http://127.0.0.1:3000/auth`                             |
+| `BITRIX_URL`                                                           | базовый URL портала                                   | `https://portal.midis.info/`                             |
+| `BITRIX_LOGIN`, `BITRIX_PASSWORD`                                      | учетные данные для загрузки расписания                | обязательны                                              |
+| `DATABASE_URL`                                                         | строка подключения PostgreSQL                         | `postgresql://postgres:postgres@localhost:5432/schedule` |
+| `VK_CLIENT_SECRET`                                                     | проверка подписи VK Mini Apps в production            | обязательна                                              |
+| `S3_BUCKET`, `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | загрузка файлов домашних заданий и обложек событий    | опциональны вместе                                       |
+| `NEXT_PUBLIC_ORPC_URL`                                                 | публичный URL oRPC для браузера                       | `<origin>/rpc`                                           |
+| `SERVER_ORPC_URL`                                                      | URL oRPC для серверного рендеринга                    | `NEXT_PUBLIC_ORPC_URL` или `http://localhost:3000/rpc`   |
+| `PROXY_TARGET`                                                         | адрес назначения reverse proxy                        | `https://portal.midis.info`                              |
+| `PORT`                                                                 | порт, который слушает запущенный напрямую proxy       | `3000`                                                   |
+| `PROXY_PORT`                                                           | порт proxy, публикуемый Docker Compose на хосте       | `3000`                                                   |
+| `TESTING_GROUP_ENABLED`                                                | включает встроенную тестовую группу и тестовые данные | `false`                                                  |
+| `TEST_TIME_OFFSET_HOURS`                                               | серверное смещение тестового времени в часах          | `0`                                                      |
+| `NEXT_PUBLIC_TEST_TIME_OFFSET_HOURS`                                   | начальное клиентское смещение тестового времени       | `0`                                                      |
+
+`TEST_TIME_OFFSET_DAYS` и `NEXT_PUBLIC_TEST_TIME_OFFSET_DAYS` пока поддерживаются
+как устаревшие аналоги смещения в днях. Для нового окружения используйте варианты
+с `*_HOURS`.
+
+S3-переменные можно не задавать, пока не используется загрузка файлов. Для
+загрузки должны быть заданы сразу все четыре значения.
+
+## Основные команды
+
+| Команда                   | Назначение                                                |
+| ------------------------- | --------------------------------------------------------- |
+| `bun run dev`             | запустить web, bot и schedule-updater в watch-режиме      |
+| `bun run build`           | собрать приложения, для которых определена задача `build` |
+| `bun run lint`            | проверить и автоматически исправить файлы через Biome     |
+| `bun run update-schedule` | немедленно синхронизировать расписание с Битрикс          |
+| `bun run db:migrate`      | применить существующие миграции Drizzle                   |
+| `bun run db:generate`     | создать миграцию после изменения схемы                    |
+| `bun run db:push`         | напрямую синхронизировать схему с БД без миграции         |
+| `bun run db studio`       | открыть Drizzle Studio                                    |
+| `bun run gen:icons`       | обновить тип имен локальных SVG-иконок                    |
+| `bun run gen:iconify`     | скачать используемые Iconify SVG в `public/icons/iconify` |
+
+Планировщик `schedule-updater` синхронизирует расписание каждый час с 05:30 до
+19:30 по часовому поясу `Asia/Yekaterinburg`. Бот проверяет очередь уведомлений
+раз в минуту и после 18:00 по тому же часовому поясу отправляет подписанным
+пользователям расписание на следующий день.
+
+## Reverse proxy
+
+Прокси запускается отдельно и по умолчанию слушает порт `3000`:
+
+```bash
+docker compose -f docker-compose-proxy.yml up --build
 ```
 
-## Documentation
+`PROXY_TARGET` задает целевой портал, а `PROXY_PORT` — публикуемый Docker-порт.
+Если одновременно запущено веб-приложение, выберите для прокси другой
+`PROXY_PORT`.
 
-- [Entity relationships](docs/entity-relationships.md)
+## Документация
 
-## How to run
+- [Взаимосвязи сущностей](docs/entity-relationships.md)
+- [Клиентская аналитика](apps/web/src/shared/lib/analytics/README.md)
 
-```
-bun dev
-```
-
-## How to build
-
-```
-bun run build
-```
-
-## Update schedule
-
-```
-bun update-schedule
-```
+Схема БД в `packages/drizzle/schema.ts`, типы аналитических событий в
+`apps/web/src/shared/lib/analytics/types.ts`, а `packages/env/index.ts` являются
+источниками истины для соответствующих разделов документации.

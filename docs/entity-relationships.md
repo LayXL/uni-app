@@ -1,7 +1,8 @@
-# Диаграмма взаимосвязей сущностей
+# Взаимосвязи сущностей
 
-Диаграмма построена по актуальной Drizzle-схеме из
-`packages/drizzle/schema.ts`.
+Источник истины — Drizzle-схема `packages/drizzle/schema.ts`. В диаграмме
+показаны физические внешние ключи PostgreSQL и две логические связи, которые
+приложение поддерживает без ограничений БД.
 
 ```mermaid
 erDiagram
@@ -23,21 +24,21 @@ erDiagram
 
     USERS {
         serial id PK
-        bigint telegramId UK
-        integer vkId UK
-        integer group FK
-        boolean isAdmin
-        boolean isEnabledNotifications
-        varchar firstName
-        varchar lastName
+        bigint telegramId UK "nullable"
+        integer vkId UK "nullable"
+        integer group FK "nullable"
+        boolean isAdmin "default false"
+        boolean isEnabledNotifications "default true"
+        varchar firstName "nullable"
+        varchar lastName "nullable"
     }
 
     GROUPS {
         serial id PK
         varchar bitrixId
         varchar displayName
-        group_type type
-        boolean isDeleted
+        group_type type "default studentsGroup"
+        boolean isDeleted "default false"
     }
 
     SUBJECTS {
@@ -50,54 +51,55 @@ erDiagram
         integer order PK
         integer subject PK,FK
         varchar classroom PK
-        boolean isCancelled
-        boolean isDistance
-        boolean isChanged
-        json original
-        integer_array groups
+        boolean isCancelled "default false"
+        boolean isDistance "default false"
+        boolean isChanged "default false"
+        json original "nullable"
+        integer_array groups "default empty array"
     }
 
     HOMEWORKS {
         text id PK
         date date
-        integer subject FK
-        timestamp createdAt
+        integer subject FK "nullable"
+        timestamp createdAt "default now"
         timestamp deadline
-        integer author FK
-        integer group FK
+        integer author FK "nullable"
+        integer group FK "nullable"
         varchar title
         text description
-        json files
-        boolean isSharedWithWholeGroup
+        json files "default empty array"
+        boolean isSharedWithWholeGroup "default false"
     }
 
     HOMEWORK_COMPLETIONS {
         integer userId PK,FK
         text homeworkId PK,FK
-        timestamp completedAt
+        timestamp completedAt "default now"
     }
 
     EVENTS {
         serial id PK
-        timestamp createdAt
-        integer author FK
+        timestamp createdAt "default now"
+        integer author FK "nullable"
         varchar title
-        text description
-        text coverImage
-        varchar backgroundColor
-        varchar borderColor
-        varchar textColor
-        varchar buttonColor
-        text groupsRegex
+        text description "nullable"
+        text coverImage "nullable"
+        varchar backgroundColor "nullable"
+        varchar borderColor "nullable"
+        varchar textColor "nullable"
+        varchar buttonColor "nullable"
+        text groupsRegex "nullable"
         timestamp date
-        text buttonUrl
-        varchar buttonText
+        text buttonUrl "nullable"
+        varchar buttonText "nullable"
     }
 ```
 
 ## Обозначения и особенности
 
 - `PK` — первичный ключ, `FK` — внешний ключ, `UK` — уникальное поле.
+- Все поля без пометки `nullable` имеют ограничение `NOT NULL`.
 - `group_type` принимает значения `teacher` и `studentsGroup`.
 - `HOMEWORK_COMPLETIONS` реализует связь многие-ко-многим между
   пользователями и домашними заданиями.
@@ -105,5 +107,9 @@ erDiagram
   `classes.groups`, поэтому PostgreSQL не контролирует ее внешним ключом.
 - Связь `GROUPS` ↔ `EVENTS` логическая: событие выбирает группы через
   сопоставление `events.groupsRegex` с `groups.displayName`.
-- `CONFIG` — самостоятельное key-value хранилище конфигурации без связей с
-  другими таблицами.
+- `CONFIG` — самостоятельное key-value хранилище без связей с другими таблицами.
+  Сейчас в нем находятся опубликованная и резервная схемы здания (`buildingScheme`,
+  `buildingSchemeBackup`) и настройки экрана технических работ
+  (`maintenanceMode`).
+- Для внешних ключей не заданы каскадные действия: используются стандартные
+  правила PostgreSQL/Drizzle при удалении и обновлении связанных записей.
