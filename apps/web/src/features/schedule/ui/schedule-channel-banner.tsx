@@ -4,13 +4,13 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { useEffect, useRef } from "react"
 
 import { useUser } from "@/entities/user/hooks/useUser"
+import { SCHEDULE_CHANNEL_BANNER_HIDDEN_AT_STORAGE_KEY } from "@/shared/config/storage-keys"
 import { useCloudStorage } from "@/shared/hooks/use-cloud-storage"
 import { analytics } from "@/shared/lib/analytics"
 import { Icon } from "@/shared/ui/icon"
 import { Touchable } from "@/shared/ui/touchable"
 
 const ELIGIBLE_GROUP_CODES = new Set(["БИ", "ДГ", "ДИ", "ДЦ", "П", "ПИ", "ДВ"])
-const HIDDEN_AT_STORAGE_KEY = "secretsCodeBannerHiddenAt"
 const CHANNEL_URL = "https://t.me/secretscode"
 const CHANNEL_IMAGE_URL = "/images/secretscode-channel-v2.webp"
 
@@ -134,7 +134,7 @@ export const ScheduleChannelBanner = () => {
 	const user = useUser()
 	const trackedGroupNames = useRef(new Set<string>())
 	const [hiddenAt, setHiddenAt] = useCloudStorage<number | null>(
-		HIDDEN_AT_STORAGE_KEY,
+		SCHEDULE_CHANNEL_BANNER_HIDDEN_AT_STORAGE_KEY,
 		null,
 	)
 	const groupName = user.group?.displayName

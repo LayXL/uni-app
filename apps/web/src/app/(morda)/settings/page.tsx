@@ -3,6 +3,7 @@ import { PageTitle } from "@/shared/ui/page-title"
 import { AdminEventsLink } from "./_ui/admin-events-link"
 import { AdminMaintenanceControl } from "./_ui/admin-maintenance-control"
 import { AdminMapEditorLink } from "./_ui/admin-map-editor-link"
+import { AdminRestoreScheduleChannelBannerButton } from "./_ui/admin-restore-schedule-channel-banner-button"
 import { AdminSyncGroupsButton } from "./_ui/admin-sync-groups-button"
 import { DebugResetUserGroupButton } from "./_ui/debug-reset-user-group-button"
 import { DebugTimeOffsetControl } from "./_ui/debug-time-offset-control"
@@ -15,6 +16,7 @@ export default function SettingsPage() {
 			<AdminEventsLink />
 			<AdminMapEditorLink />
 			<AdminSyncGroupsButton />
+			<AdminRestoreScheduleChannelBannerButton />
 			<DebugTimeOffsetControl />
 			<DebugResetUserGroupButton />
 		</div>

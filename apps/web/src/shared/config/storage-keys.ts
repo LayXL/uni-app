@@ -1,0 +1,2 @@
+export const SCHEDULE_CHANNEL_BANNER_HIDDEN_AT_STORAGE_KEY =
+	"secretsCodeBannerHiddenAt"
