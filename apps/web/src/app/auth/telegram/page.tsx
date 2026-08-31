@@ -56,7 +56,13 @@ export default function Page() {
 		const hash = retrieveRawInitData()
 
 		if (hash && hash.length > 0) {
-			cookie.set("session", `tma ${hash}`, { expires: 7 })
+			const isProduction = process.env.NODE_ENV === "production"
+
+			cookie.set("session", `tma ${hash}`, {
+				expires: 7,
+				sameSite: isProduction ? "none" : "lax",
+				secure: isProduction,
+			})
 			router.replace("/")
 		}
 	}, [router.replace])
