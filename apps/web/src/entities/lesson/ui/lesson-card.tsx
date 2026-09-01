@@ -76,7 +76,7 @@ export const LessonCard = ({
 					onClick={() => setIsOpen(true)}
 				>
 					<LiquidBorder />
-					<div className="flex min-w-0 items-center gap-1 text-sm tabular-nums">
+					<div className="flex min-w-0 items-center gap-1 text-sm">
 						<p className="shrink-0">{lesson.order} пара</p>
 						<p className="shrink-0">с</p>
 						<p className="shrink-0">{formatLessonTime(lesson.startTime)}</p>
