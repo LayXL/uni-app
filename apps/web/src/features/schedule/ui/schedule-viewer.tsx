@@ -68,12 +68,12 @@ export const ScheduleViewerWithGroup = ({
 				return (
 					<Fragment key={date}>
 						<div className="px-2 flex flex-col gap-2">
-							<h2 className="flex items-baseline gap-2 px-2 text-lg font-semibold">
+							<h2 className="flex items-baseline justify-between gap-2 px-2 text-lg font-semibold">
 								<span>
 									{format(parseISO(date), "d MMMM, EEEE", { locale: ru })}
 								</span>
 								{relativeDateLabel && (
-									<span className="text-sm font-normal text-muted">
+									<span className="shrink-0 text-sm font-normal text-muted">
 										{relativeDateLabel}
 									</span>
 								)}
