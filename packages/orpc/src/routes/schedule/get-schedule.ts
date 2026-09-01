@@ -17,7 +17,10 @@ import {
 import { env } from "@repo/env"
 import { getConfig } from "@repo/shared/config/get-config"
 import { getTestingLessons } from "@repo/shared/lessons/get-testing-lessons"
-import { mapClassroom } from "@repo/shared/lessons/normalize-classroom-name"
+import {
+	getClassroomNamesForRoom,
+	mapClassroom,
+} from "@repo/shared/lessons/normalize-classroom-name"
 import { lessonSchema } from "@repo/shared/lessons/types/lesson"
 import { isTestingScheduleGroupId } from "@repo/shared/testing-group"
 
@@ -72,11 +75,12 @@ export const getSchedule = publicProcedure
 				.max(90),
 			group: z.number().optional(),
 			classrooms: z.string().array().optional(),
+			classroomIds: z.number().array().max(20).optional(),
 		}),
 	)
 	.output(lessonSchema.array())
 	.handler(async ({ input }) => {
-		const { dates, group, classrooms } = input
+		const { dates, group, classrooms, classroomIds } = input
 
 		const shouldUseTestingSchedule =
 			env.testingGroupEnabled && isTestingScheduleGroupId(group)
@@ -84,9 +88,28 @@ export const getSchedule = publicProcedure
 			getConfig("timetable"),
 			getConfig("buildingScheme"),
 		])
+		const requestedClassrooms = classroomIds
+			? [
+					...new Set(
+						classroomIds.flatMap((roomId) =>
+							getClassroomNamesForRoom(buildingScheme.entities, roomId),
+						),
+					),
+				]
+			: classrooms
+
+		if (classroomIds?.length && requestedClassrooms?.length === 0) return []
+
 		const schedule = shouldUseTestingSchedule
-			? getTestingLessons(dates, { buildingScheme, group, classrooms })
-			: await getScheduleFromDb(dates, { group, classrooms })
+			? getTestingLessons(dates, {
+					buildingScheme,
+					group,
+					classrooms: requestedClassrooms,
+				})
+			: await getScheduleFromDb(dates, {
+					group,
+					classrooms: requestedClassrooms,
+				})
 
 		const daysWithoutClasses = dates.filter(
 			(date) => !schedule.some((lesson) => lesson.date === date),
@@ -98,7 +121,7 @@ export const getSchedule = publicProcedure
 					const parsedDate = parseISO(date)
 					const predictedSchedule = await getScheduleFromDb(
 						[format(subDays(parsedDate, 14), "yyyy-MM-dd")],
-						{ group, classrooms },
+						{ group, classrooms: requestedClassrooms },
 					)
 
 					return predictedSchedule.map((lesson) => ({ ...lesson, date }))

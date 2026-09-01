@@ -26,14 +26,11 @@ export const RoomSchedule = ({ room }: RoomScheduleProps) => {
 		getNextTwoWeeksDates()[0],
 	)
 
-	const mayHaveSchedule = useMemo(() => room?.name.match(/\d{3}/g), [room])
-
 	const { data: schedule } = useQuery(
 		orpc.schedule.getSchedule.queryOptions({
-			input:
-				mayHaveSchedule && room
-					? { dates: getNextTwoWeeksDates(), classrooms: [room.name] }
-					: skipToken,
+			input: room
+				? { dates: getNextTwoWeeksDates(), classroomIds: [room.id] }
+				: skipToken,
 		}),
 	)
 
@@ -58,7 +55,7 @@ export const RoomSchedule = ({ room }: RoomScheduleProps) => {
 		}
 	}
 
-	if (!room || !mayHaveSchedule || !schedule?.length) return null
+	if (!room || !schedule?.length) return null
 
 	return (
 		<div className="flex flex-col gap-2">

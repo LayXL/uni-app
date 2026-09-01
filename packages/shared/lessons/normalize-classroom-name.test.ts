@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test"
 
 import type { MapEntity, Room } from "../building-scheme"
 import {
+	getClassroomNamesForRoom,
 	mapClassroom,
 	normalizeClassroomName,
 } from "./normalize-classroom-name"
@@ -85,5 +86,27 @@ describe("mapClassroom", () => {
 		"308А",
 	])("does not guess a room for %s", (classroom) => {
 		expect(mapClassroom(rooms, classroom)).toEqual({ classroom })
+	})
+})
+
+describe("getClassroomNamesForRoom", () => {
+	test("returns the canonical name and Bitrix aliases of the assembly hall", () => {
+		expect(getClassroomNamesForRoom(rooms, 10)).toEqual([
+			"Актовый зал",
+			"305Aкт",
+			"305Акт",
+		])
+	})
+
+	test("uses the school alias for a duplicated room number", () => {
+		expect(getClassroomNamesForRoom(rooms, 9)).toEqual(["127 шк"])
+	})
+
+	test("uses the plain number for the main-building duplicate", () => {
+		expect(getClassroomNamesForRoom(rooms, 8)).toEqual(["127"])
+	})
+
+	test("returns no names for an unknown room", () => {
+		expect(getClassroomNamesForRoom(rooms, 999)).toEqual([])
 	})
 })

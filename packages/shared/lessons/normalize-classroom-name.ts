@@ -1,30 +1,52 @@
 import { isRoom, type MapEntity, type Room } from "../building-scheme"
 
 type ClassroomMapping = {
+	aliases: string[]
 	displayName: string
 	roomName: string
 	floorId?: number
 }
 
 const assemblyHall: ClassroomMapping = {
+	aliases: ["305Aкт", "305Акт"],
 	displayName: "Актовый зал",
 	roomName: "Актовый зал",
 }
 
-const classroomMappings = new Map<string, ClassroomMapping>([
-	["305aкт", assemblyHall],
-	["305акт", assemblyHall],
-	["122 а", { displayName: "122А", roomName: "122А" }],
-	["122 б", { displayName: "122Б", roomName: "122Б" }],
-	["122 биб.", { displayName: "122", roomName: "122" }],
-	["315а", { displayName: "315а", roomName: "315а" }],
-	["124 шк", { displayName: "124 шк", roomName: "124", floorId: 4 }],
-	["125тр.зал", { displayName: "125тр.зал", roomName: "125", floorId: 4 }],
-	["127 шк", { displayName: "127 шк", roomName: "127", floorId: 4 }],
-])
+const classroomMappings: ClassroomMapping[] = [
+	assemblyHall,
+	{ aliases: ["122 А"], displayName: "122А", roomName: "122А" },
+	{ aliases: ["122 Б"], displayName: "122Б", roomName: "122Б" },
+	{ aliases: ["122 биб."], displayName: "122", roomName: "122" },
+	{ aliases: ["315А", "315а"], displayName: "315а", roomName: "315а" },
+	{
+		aliases: ["124 шк"],
+		displayName: "124 шк",
+		roomName: "124",
+		floorId: 4,
+	},
+	{
+		aliases: ["125тр.зал"],
+		displayName: "125тр.зал",
+		roomName: "125",
+		floorId: 4,
+	},
+	{
+		aliases: ["127 шк"],
+		displayName: "127 шк",
+		roomName: "127",
+		floorId: 4,
+	},
+]
 
 const normalizeKey = (classroom: string) =>
 	classroom.trim().toLocaleLowerCase("ru-RU").replaceAll(/\s+/g, " ")
+
+const classroomMappingsByAlias = new Map(
+	classroomMappings.flatMap((mapping) =>
+		mapping.aliases.map((alias) => [normalizeKey(alias), mapping] as const),
+	),
+)
 
 const stripSubgroupSuffix = (classroom: string) => {
 	const match = classroom.match(/^\s*(\d{3}(?:\s*[а-яё])?)\s+\(\d+\)\s*$/iu)
@@ -34,7 +56,7 @@ const stripSubgroupSuffix = (classroom: string) => {
 
 const getClassroomMapping = (classroom: string) => {
 	const withoutSubgroup = stripSubgroupSuffix(classroom)
-	const mapping = classroomMappings.get(normalizeKey(withoutSubgroup))
+	const mapping = classroomMappingsByAlias.get(normalizeKey(withoutSubgroup))
 
 	return {
 		displayName: mapping?.displayName ?? withoutSubgroup,
@@ -68,4 +90,33 @@ export const mapClassroom = (entities: MapEntity[], classroom: string) => {
 	}
 
 	return { classroom: room.name, classroomId: room.id }
+}
+
+export const getClassroomNamesForRoom = (
+	entities: MapEntity[],
+	roomId: number,
+) => {
+	const room = entities.find(
+		(entity): entity is Room => entity.id === roomId && isRoom(entity),
+	)
+	if (!room) return []
+
+	const aliases = classroomMappings
+		.filter(
+			(mapping) =>
+				normalizeKey(mapping.roomName) === normalizeKey(room.name) &&
+				(mapping.floorId === undefined || mapping.floorId === room.floorId),
+		)
+		.flatMap((mapping) => mapping.aliases)
+
+	const roomsWithSameName = entities.filter(
+		(entity) =>
+			isRoom(entity) && normalizeKey(entity.name) === normalizeKey(room.name),
+	)
+	const names =
+		roomsWithSameName.length > 1 && aliases.length > 0
+			? aliases
+			: [room.name, ...aliases]
+
+	return [...new Set(names)]
 }
