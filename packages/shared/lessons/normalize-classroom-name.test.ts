@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test"
 
 import type { MapEntity, Room } from "../building-scheme"
 import {
-	findRoomByClassroomName,
+	mapClassroom,
 	normalizeClassroomName,
 } from "./normalize-classroom-name"
 
@@ -53,22 +53,28 @@ describe("normalizeClassroomName", () => {
 	})
 })
 
-describe("findRoomByClassroomName", () => {
+describe("mapClassroom", () => {
 	test.each([
-		["305Aкт", 10],
-		["122 А", 2],
-		["122 Б", 3],
-		["122 биб.", 1],
-		["315А", 4],
-		["124 шк", 6],
-		["125тр.зал", 7],
-		["127 шк", 9],
-	])("maps %s to room %i", (classroom, roomId) => {
-		expect(findRoomByClassroomName(rooms, classroom)?.id).toBe(roomId)
+		["305Aкт", "Актовый зал", 10],
+		["122 А", "122А", 2],
+		["122 Б", "122Б", 3],
+		["122 биб.", "122", 1],
+		["315А", "315а", 4],
+		["124 шк", "124", 6],
+		["125тр.зал", "125", 7],
+		["127 шк", "127", 9],
+	])("maps %s to classroom %s with room %i", (input, classroom, roomId) => {
+		expect(mapClassroom(rooms, input)).toEqual({
+			classroom,
+			classroomId: roomId,
+		})
 	})
 
-	test("keeps the main-building room as the default for a plain number", () => {
-		expect(findRoomByClassroomName(rooms, "127")?.id).toBe(8)
+	test("maps a plain number to the main-building room", () => {
+		expect(mapClassroom(rooms, "127")).toEqual({
+			classroom: "127",
+			classroomId: 8,
+		})
 	})
 
 	test.each([
@@ -78,6 +84,6 @@ describe("findRoomByClassroomName", () => {
 		"305а",
 		"308А",
 	])("does not guess a room for %s", (classroom) => {
-		expect(findRoomByClassroomName(rooms, classroom)).toBeUndefined()
+		expect(mapClassroom(rooms, classroom)).toEqual({ classroom })
 	})
 })

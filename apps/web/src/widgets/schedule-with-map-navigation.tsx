@@ -1,6 +1,6 @@
 "use client"
 
-import { findRoomByClassroomName } from "@repo/shared/lessons/normalize-classroom-name"
+import { isRoom } from "@repo/shared/building-scheme"
 
 import { useActiveFloor } from "@/features/map/hooks/use-active-floor"
 import { useMapData } from "@/features/map/hooks/use-map-data"
@@ -13,10 +13,10 @@ export const ScheduleWithMapNavigation = () => {
 	const { setActiveFloor } = useActiveFloor()
 	const { moveTo, setZoom } = useMapState()
 
-	const handleClassroomClick = (classroom: string) => {
-		const room = findRoomByClassroomName(mapData.entities, classroom)
+	const handleClassroomClick = (classroomId: number) => {
+		const room = mapData.entities.find((entity) => entity.id === classroomId)
 
-		if (room) {
+		if (room && isRoom(room)) {
 			analytics.track("room_clicked", {
 				room_id: room.id,
 				room_name: room.name,

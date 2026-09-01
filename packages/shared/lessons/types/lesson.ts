@@ -4,6 +4,7 @@ export const lessonSchema = z.object({
 	date: z.string(),
 	order: z.number(),
 	classroom: z.string(),
+	classroomId: z.number().optional(),
 	isCancelled: z.boolean(),
 	isDistance: z.boolean(),
 	isChanged: z.boolean(),

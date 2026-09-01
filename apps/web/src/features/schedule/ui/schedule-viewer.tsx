@@ -1,7 +1,7 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { format, parseISO } from "date-fns"
+import { addDays, format, parseISO } from "date-fns"
 import { ru } from "date-fns/locale"
 import { Fragment, useMemo } from "react"
 
@@ -25,10 +25,12 @@ export const ScheduleViewerWithGroup = ({
 }: {
 	group: number
 	isTeacherView?: boolean
-	onClassroomClick?: (classroom: string) => void
+	onClassroomClick?: (classroomId: number) => void
 }) => {
 	const dates = getNextTwoWeeksDates()
 	const now = useNowInYekaterinburg()
+	const today = format(now, "yyyy-MM-dd")
+	const tomorrow = format(addDays(now, 1), "yyyy-MM-dd")
 
 	const { data } = useQuery(
 		orpc.schedule.getSchedule.queryOptions({
@@ -60,12 +62,21 @@ export const ScheduleViewerWithGroup = ({
 		<div className="pb-2 flex flex-col gap-6">
 			{groupedSchedule.map(({ date, lessons }, dayIndex) => {
 				const dayEvents = eventsByDate.get(date) ?? []
+				const relativeDateLabel =
+					date === today ? "сегодня" : date === tomorrow ? "завтра" : null
 
 				return (
 					<Fragment key={date}>
 						<div className="px-2 flex flex-col gap-2">
-							<h2 className="text-lg font-semibold px-2">
-								{format(parseISO(date), "d MMMM, EEEE", { locale: ru })}
+							<h2 className="flex items-baseline gap-2 px-2 text-lg font-semibold">
+								<span>
+									{format(parseISO(date), "d MMMM, EEEE", { locale: ru })}
+								</span>
+								{relativeDateLabel && (
+									<span className="text-sm font-normal text-muted">
+										{relativeDateLabel}
+									</span>
+								)}
 							</h2>
 							<div className="flex flex-col gap-2">
 								{dayEvents.map((event) => (
@@ -110,7 +121,7 @@ export const ScheduleViewerWithGroup = ({
 export const ScheduleViewer = ({
 	onClassroomClick,
 }: {
-	onClassroomClick?: (classroom: string) => void
+	onClassroomClick?: (classroomId: number) => void
 }) => {
 	const { group } = useScheduleGroup()
 

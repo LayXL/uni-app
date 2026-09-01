@@ -46,7 +46,7 @@ const getClassroomMapping = (classroom: string) => {
 export const normalizeClassroomName = (classroom: string) =>
 	getClassroomMapping(classroom).displayName
 
-export const findRoomByClassroomName = (
+const findRoomByClassroomName = (
 	entities: MapEntity[],
 	classroom: string,
 ): Room | undefined => {
@@ -58,4 +58,14 @@ export const findRoomByClassroomName = (
 			normalizeKey(entity.name) === normalizeKey(mapping.roomName) &&
 			(mapping.floorId === undefined || entity.floorId === mapping.floorId),
 	)
+}
+
+export const mapClassroom = (entities: MapEntity[], classroom: string) => {
+	const room = findRoomByClassroomName(entities, classroom)
+
+	if (!room) {
+		return { classroom: normalizeClassroomName(classroom) }
+	}
+
+	return { classroom: room.name, classroomId: room.id }
 }

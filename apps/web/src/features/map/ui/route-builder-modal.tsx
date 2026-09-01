@@ -17,6 +17,7 @@ import type { IconName } from "@/types/icon-name"
 
 import { useMapData } from "../hooks/use-map-data"
 import { useRouteBuilder } from "../hooks/use-route-builder"
+import { getEntitySearchDescription } from "../lib/get-entity-search-description"
 import { RouteBuilderSuggestions } from "./route-builder-suggestions"
 
 type SearchInputTriggerProps = {
@@ -169,11 +170,11 @@ export const RouteBuilderModal = () => {
 			.map((entity) => ({
 				key: entity.id,
 				value: entity.name,
-				description: entity.description,
+				description: getEntitySearchDescription(entity, mapData.floors),
 			}))
 
 		return items
-	}, [entities])
+	}, [entities, mapData.floors])
 
 	const endEntityItems = useMemo<SearchInputItem<number>[]>(
 		() => [
@@ -189,7 +190,7 @@ export const RouteBuilderModal = () => {
 
 		return (
 			item.value.toLowerCase().includes(q) ||
-			entity?.description?.toLowerCase().includes(q) ||
+			item.description?.toLowerCase().includes(q) ||
 			entity?.aliases?.some((alias) => alias.toLowerCase().includes(q)) ||
 			false
 		)

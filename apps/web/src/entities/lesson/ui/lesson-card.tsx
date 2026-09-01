@@ -19,7 +19,7 @@ type LessonCardProps = {
 	lesson: Lesson
 	isTeacherView?: boolean
 	isActive?: boolean
-	onClassroomClick?: (classroom: string) => void
+	onClassroomClick?: (classroomId: number) => void
 }
 
 export const LessonCard = ({
@@ -93,8 +93,8 @@ export const LessonCard = ({
 					lesson={lesson}
 					group={group}
 					isTeacherView={isTeacherView}
-					onClassroomClick={(classroom) => {
-						onClassroomClick?.(classroom)
+					onClassroomClick={(classroomId) => {
+						onClassroomClick?.(classroomId)
 						setIsOpen(false)
 					}}
 				/>

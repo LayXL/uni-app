@@ -31,7 +31,7 @@ const FeatureCard = ({
 			<Icon name={icon} size={20} />
 		</div>
 		<div className="flex flex-col gap-0.5">
-			<h3 className="font-bold">{title}</h3>
+			<h3 className="font-medium">{title}</h3>
 			{description && <p className="text-sm text-muted">{description}</p>}
 		</div>
 	</div>

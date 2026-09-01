@@ -18,6 +18,7 @@ import { useActiveFloor } from "../hooks/use-active-floor"
 import { useMapData } from "../hooks/use-map-data"
 import { useMapState } from "../hooks/use-map-state"
 import { useSelectedRoom } from "../hooks/use-selected-room"
+import { getEntitySearchDescription } from "../lib/get-entity-search-description"
 
 type SearchInputTriggerProps = {
 	icon: IconName
@@ -117,9 +118,9 @@ export const MapSearchModal = ({ isOpen, onClose }: MapSearchModalProps) => {
 			.map((entity) => ({
 				key: entity.id,
 				value: entity.name,
-				description: entity.description,
+				description: getEntitySearchDescription(entity, mapData.floors),
 			}))
-	}, [entities])
+	}, [entities, mapData.floors])
 
 	const filterEntity = (item: SearchInputItem<number>, query: string) => {
 		const entity = entities.find((e) => e.id === item.key)
@@ -127,7 +128,7 @@ export const MapSearchModal = ({ isOpen, onClose }: MapSearchModalProps) => {
 
 		return (
 			item.value.toLowerCase().includes(q) ||
-			entity?.description?.toLowerCase().includes(q) ||
+			item.description?.toLowerCase().includes(q) ||
 			entity?.aliases?.some((alias) => alias.toLowerCase().includes(q)) ||
 			false
 		)

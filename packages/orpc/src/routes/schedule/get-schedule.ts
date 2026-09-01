@@ -17,7 +17,7 @@ import {
 import { env } from "@repo/env"
 import { getConfig } from "@repo/shared/config/get-config"
 import { getTestingLessons } from "@repo/shared/lessons/get-testing-lessons"
-import { normalizeClassroomName } from "@repo/shared/lessons/normalize-classroom-name"
+import { mapClassroom } from "@repo/shared/lessons/normalize-classroom-name"
 import { lessonSchema } from "@repo/shared/lessons/types/lesson"
 import { isTestingScheduleGroupId } from "@repo/shared/testing-group"
 
@@ -82,12 +82,11 @@ export const getSchedule = publicProcedure
 			env.testingGroupEnabled && isTestingScheduleGroupId(group)
 		const [timetable, buildingScheme] = await Promise.all([
 			getConfig("timetable"),
-			shouldUseTestingSchedule ? getConfig("buildingScheme") : null,
+			getConfig("buildingScheme"),
 		])
-		const schedule =
-			shouldUseTestingSchedule && buildingScheme
-				? getTestingLessons(dates, { buildingScheme, group, classrooms })
-				: await getScheduleFromDb(dates, { group, classrooms })
+		const schedule = shouldUseTestingSchedule
+			? getTestingLessons(dates, { buildingScheme, group, classrooms })
+			: await getScheduleFromDb(dates, { group, classrooms })
 
 		const daysWithoutClasses = dates.filter(
 			(date) => !schedule.some((lesson) => lesson.date === date),
@@ -122,7 +121,7 @@ export const getSchedule = publicProcedure
 
 			return {
 				...lesson,
-				classroom: normalizeClassroomName(lesson.classroom),
+				...mapClassroom(buildingScheme.entities, lesson.classroom),
 				startTime: addZeroToTime(timetableItemSchedule?.time.start ?? ""),
 				endTime: addZeroToTime(timetableItemSchedule?.time.end ?? ""),
 			}

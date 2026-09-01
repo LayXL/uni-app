@@ -11,7 +11,7 @@ type LessonModalProps = {
 	lesson: Lesson
 	group?: number
 	isTeacherView?: boolean
-	onClassroomClick?: (classroom: string) => void
+	onClassroomClick?: (classroomId: number) => void
 }
 
 export const LessonModal = ({
@@ -64,7 +64,11 @@ export const LessonModal = ({
 					<button
 						type="button"
 						className="relative bg-card rounded-3xl p-4 text-left"
-						onClick={() => onClassroomClick?.(lesson.classroom)}
+						onClick={() => {
+							if (lesson.classroomId !== undefined) {
+								onClassroomClick?.(lesson.classroomId)
+							}
+						}}
 					>
 						<LiquidBorder />
 						<p className="text-lg font-medium">{lesson.classroom}</p>
