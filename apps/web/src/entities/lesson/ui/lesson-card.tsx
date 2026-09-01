@@ -91,6 +91,8 @@ export const LessonCard = ({
 			<ModalRoot isOpen={isOpen} onClose={() => setIsOpen(false)}>
 				<LessonModal
 					lesson={lesson}
+					group={group}
+					isTeacherView={isTeacherView}
 					onClassroomClick={(classroom) => {
 						onClassroomClick?.(classroom)
 						setIsOpen(false)
