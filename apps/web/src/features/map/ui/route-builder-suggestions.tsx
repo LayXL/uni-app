@@ -4,6 +4,7 @@ import { Fragment, useMemo } from "react"
 
 import { orpc } from "@repo/orpc/react"
 import type { MapEntity } from "@repo/shared/building-scheme"
+import { findRoomByClassroomName } from "@repo/shared/lessons/normalize-classroom-name"
 
 import { useUser } from "@/entities/user/hooks/useUser"
 import { Icon } from "@/shared/ui/icon"
@@ -48,7 +49,7 @@ export const RouteBuilderSuggestions = ({
 
 	const suggestions = todaySchedule?.reduce(
 		(acc, lesson, index) => {
-			const entityId = entities.find((e) => e.name === lesson.classroom)?.id
+			const entityId = findRoomByClassroomName(entities, lesson.classroom)?.id
 
 			if (entityId) {
 				const from = acc[index - 1]?.to ?? 166

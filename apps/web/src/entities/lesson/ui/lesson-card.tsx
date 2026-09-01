@@ -62,7 +62,9 @@ export const LessonCard = ({
 							<p
 								className={cn("min-w-max", lesson.isDistance && "text-accent")}
 							>
-								{lesson.isDistance ? "дистант" : `${lesson.classroom} ауд`}
+								{lesson.isDistance
+									? "дистант"
+									: `${lesson.classroom}${lesson.classroom === "Актовый зал" ? "" : " ауд"}`}
 							</p>
 							{!isTeacherView && (
 								<p className="min-w-max">

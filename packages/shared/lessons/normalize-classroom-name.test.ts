@@ -1,6 +1,32 @@
 import { describe, expect, test } from "bun:test"
 
-import { normalizeClassroomName } from "./normalize-classroom-name"
+import type { MapEntity, Room } from "../building-scheme"
+import {
+	findRoomByClassroomName,
+	normalizeClassroomName,
+} from "./normalize-classroom-name"
+
+const createRoom = (id: number, floorId: number, name: string): Room => ({
+	type: "room",
+	id,
+	floorId,
+	name,
+	position: { x: 0, y: 0 },
+	wallsPosition: [],
+})
+
+const rooms: MapEntity[] = [
+	createRoom(1, 0, "122"),
+	createRoom(2, 0, "122А"),
+	createRoom(3, 0, "122Б"),
+	createRoom(4, 2, "315а"),
+	createRoom(5, 0, "125"),
+	createRoom(6, 4, "124"),
+	createRoom(7, 4, "125"),
+	createRoom(8, 0, "127"),
+	createRoom(9, 4, "127"),
+	createRoom(10, 6, "Актовый зал"),
+]
 
 describe("normalizeClassroomName", () => {
 	test.each([
@@ -13,5 +39,45 @@ describe("normalizeClassroomName", () => {
 
 	test("keeps other classroom names unchanged", () => {
 		expect(normalizeClassroomName("305")).toBe("305")
+	})
+
+	test.each([
+		["122 А", "122А"],
+		["122 Б", "122Б"],
+		["122 биб.", "122"],
+		["315А", "315а"],
+		["103 (2)", "103"],
+		["122 А (1)", "122А"],
+	])("normalizes %s to %s", (classroom, expected) => {
+		expect(normalizeClassroomName(classroom)).toBe(expected)
+	})
+})
+
+describe("findRoomByClassroomName", () => {
+	test.each([
+		["305Aкт", 10],
+		["122 А", 2],
+		["122 Б", 3],
+		["122 биб.", 1],
+		["315А", 4],
+		["124 шк", 6],
+		["125тр.зал", 7],
+		["127 шк", 9],
+	])("maps %s to room %i", (classroom, roomId) => {
+		expect(findRoomByClassroomName(rooms, classroom)?.id).toBe(roomId)
+	})
+
+	test("keeps the main-building room as the default for a plain number", () => {
+		expect(findRoomByClassroomName(rooms, "127")?.id).toBe(8)
+	})
+
+	test.each([
+		"1",
+		"108 басП",
+		"211 шк",
+		"305а",
+		"308А",
+	])("does not guess a room for %s", (classroom) => {
+		expect(findRoomByClassroomName(rooms, classroom)).toBeUndefined()
 	})
 })
