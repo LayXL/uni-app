@@ -92,7 +92,7 @@ export const RoomSchedule = ({ room }: RoomScheduleProps) => {
 			</div>
 			<div className="relative">
 				<div
-					className="flex flex-col gap-2 max-h-64 overflow-scroll"
+					className="flex flex-col gap-2 max-h-64 overflow-scroll p-0.5"
 					onScroll={handleScroll}
 				>
 					{filteredSchedule && filteredSchedule.length > 0 ? (
