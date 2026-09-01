@@ -12,7 +12,6 @@ import {
 	usersTable,
 } from "@repo/drizzle"
 import { env } from "@repo/env"
-import { cutSubjectName } from "@repo/shared/subjects/cut-subject-name"
 
 import { bot } from "../bot"
 
@@ -140,7 +139,7 @@ const formatScheduleMessage = async (
 
 			const status = statuses.length > 0 ? ` (${statuses.join(", ")})` : ""
 
-			return `${formatOrderAsEmojiNumber(lesson.order)} ${escapeHtml(cutSubjectName(lesson.subjectName))}${status}\n📍 ${escapeHtml(lesson.classroom)}`
+			return `${formatOrderAsEmojiNumber(lesson.order)} ${escapeHtml(lesson.subjectName)}${status}\n📍 ${escapeHtml(lesson.classroom)}`
 		})
 		.join("\n\n")
 

@@ -85,6 +85,12 @@ const manyParallelGroupsLesson = {
 	],
 } satisfies Lesson
 
+const distanceLesson = {
+	...lesson,
+	classroom: "дистант",
+	isDistance: true,
+} satisfies Lesson
+
 const meta = {
 	title: "Расписание/Карточка занятия",
 	component: LessonCard,
@@ -118,6 +124,13 @@ export const Active: Story = {
 	name: "Текущее занятие",
 	args: {
 		isActive: true,
+	},
+}
+
+export const Distance: Story = {
+	name: "Дистант",
+	args: {
+		lesson: distanceLesson,
 	},
 }
 

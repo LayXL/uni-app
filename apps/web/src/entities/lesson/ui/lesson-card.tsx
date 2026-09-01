@@ -4,7 +4,6 @@ import { useState } from "react"
 
 import { transformToGroupName } from "@repo/shared/groups/transform-to-group-name"
 import type { Lesson } from "@repo/shared/lessons/types/lesson"
-import { cutSubjectName } from "@repo/shared/subjects/cut-subject-name"
 
 import { Icon } from "@/shared/ui/icon"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
@@ -97,7 +96,7 @@ export const LessonCard = ({
 						)}
 					</div>
 					<p className="line-clamp-1 break-all font-medium">
-						{cutSubjectName(lesson.subject.name)}
+						{lesson.subject.name}
 					</p>
 					<p className="line-clamp-1 break-all text-sm text-muted">
 						{teachers.join(", ")}

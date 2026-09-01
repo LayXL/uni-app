@@ -16,6 +16,7 @@ import { useNowInYekaterinburg } from "@/shared/hooks/use-now-in-yekaterinburg"
 
 import { useScheduleGroup } from "../hooks/use-schedule-group"
 import { ScheduleChannelBanner } from "./schedule-channel-banner"
+import { ScheduleDayChanges } from "./schedule-day-changes"
 import { WithoutLessonsPlaceholder } from "./without-lessons-placeholder"
 
 export const ScheduleViewerWithGroup = ({
@@ -78,6 +79,7 @@ export const ScheduleViewerWithGroup = ({
 									</span>
 								)}
 							</h2>
+							<ScheduleDayChanges lessons={lessons} />
 							<div className="flex flex-col gap-2">
 								{dayEvents.map((event) => (
 									<EventCard
