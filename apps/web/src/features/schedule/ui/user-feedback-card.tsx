@@ -246,7 +246,7 @@ export const UserFeedbackCard = ({
 							htmlFor={commentId}
 							className="mb-2 block pt-3 text-sm font-medium text-muted"
 						>
-							Дополнительный комментарий
+							Комментарий
 						</label>
 						<div className="relative rounded-2xl bg-secondary transition-shadow focus-within:ring-2 focus-within:ring-inset focus-within:ring-accent motion-reduce:transition-none">
 							<LiquidBorder />

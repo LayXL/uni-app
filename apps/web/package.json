@@ -3,7 +3,7 @@
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
-		"dev": "next dev -H 127.0.0.1 --turbopack",
+		"dev": "next dev -H 0.0.0.0 --turbopack",
 		"build": "next build",
 		"start": "cd ../../packages/drizzle && bunx drizzle-kit migrate && cd ../../apps/web && next start",
 		"lint": "next lint",

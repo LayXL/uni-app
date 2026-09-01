@@ -12,6 +12,7 @@ import {
 import { usePathname, useRouter } from "next/navigation"
 import { type ReactNode, useEffect, useMemo, useRef } from "react"
 
+import { FullscreenSafeAreaGradient } from "@/shared/ui/fullscreen-safe-area-gradient"
 import { usePopupCloseTop, usePopupStackCount } from "@/shared/ui/popup"
 
 const useMiniApp = () => {
@@ -157,5 +158,10 @@ export const TelegramUiProvider = ({ children }: { children: ReactNode }) => {
 	useSettingsButton()
 	useBackButton()
 
-	return children
+	return (
+		<>
+			{children}
+			<FullscreenSafeAreaGradient />
+		</>
+	)
 }
