@@ -134,6 +134,13 @@
       "when": 1788100694542,
       "tag": "0018_ensure_config_id_unique",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1788269074133,
+      "tag": "0019_daily_schedule_notification_runs",
+      "breakpoints": true
     }
   ]
 }

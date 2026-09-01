@@ -19,6 +19,14 @@ export const configTable = pgTable("config", {
 	json: json().notNull(),
 })
 
+export const dailyScheduleNotificationRunsTable = pgTable(
+	"daily_schedule_notification_runs",
+	{
+		date: date().primaryKey(),
+		startedAt: timestamp().notNull().default(sql`now()`),
+	},
+)
+
 export const usersTable = pgTable("users", {
 	id: serial().primaryKey(),
 	telegramId: bigint({ mode: "number" }).unique(),

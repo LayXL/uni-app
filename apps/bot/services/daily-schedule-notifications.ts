@@ -5,6 +5,7 @@ import {
 	arrayContains,
 	asc,
 	classesTable,
+	dailyScheduleNotificationRunsTable,
 	db,
 	eq,
 	isNotNull,
@@ -18,6 +19,7 @@ import { bot } from "../bot"
 const YEKATERINBURG_TIMEZONE = "Asia/Yekaterinburg"
 const CHECK_INTERVAL_MS = 60_000
 const SEND_HOUR = 18
+const SEND_MINUTE = 0
 const openMiniAppInlineKeyboard = new InlineKeyboard().webApp(
 	"🚀 Открыть расписание",
 	env.webAppUrl,
@@ -31,7 +33,6 @@ type SendDailySchedulesResult = {
 
 let isSchedulerStarted = false
 let isSending = false
-let lastSentDate: string | null = null
 
 const dateFormatter = new Intl.DateTimeFormat("en-CA", {
 	timeZone: YEKATERINBURG_TIMEZONE,
@@ -57,8 +58,10 @@ const getYekaterinburgDate = () => {
 	return dateFormatter.format(new Date())
 }
 
-const getYekaterinburgHour = () => {
-	return Number(timeFormatter.format(new Date()).slice(0, 2))
+const getYekaterinburgTime = () => {
+	const [hour, minute] = timeFormatter.format(new Date()).split(":").map(Number)
+
+	return { hour, minute }
 }
 
 const getNextDate = (date: string) => {
@@ -161,21 +164,14 @@ const sendDailySchedules = async (options?: {
 	}
 
 	const today = getYekaterinburgDate()
-	const hour = getYekaterinburgHour()
+	const { hour, minute } = getYekaterinburgTime()
+	const targetDate = options?.date ?? getNextDate(today)
 
-	if (!force && hour < SEND_HOUR) {
+	if (!force && (hour !== SEND_HOUR || minute !== SEND_MINUTE)) {
 		return {
 			status: "skippedByTime",
 			sentCount: 0,
-			targetDate: options?.date ?? getNextDate(today),
-		}
-	}
-
-	if (!force && lastSentDate === today) {
-		return {
-			status: "alreadySentToday",
-			sentCount: 0,
-			targetDate: options?.date ?? getNextDate(today),
+			targetDate,
 		}
 	}
 
@@ -183,6 +179,22 @@ const sendDailySchedules = async (options?: {
 	let sentCount = 0
 
 	try {
+		if (!force) {
+			const claimedRuns = await db
+				.insert(dailyScheduleNotificationRunsTable)
+				.values({ date: today })
+				.onConflictDoNothing()
+				.returning({ date: dailyScheduleNotificationRunsTable.date })
+
+			if (claimedRuns.length === 0) {
+				return {
+					status: "alreadySentToday",
+					sentCount: 0,
+					targetDate,
+				}
+			}
+		}
+
 		const users = await db
 			.select({
 				telegramId: usersTable.telegramId,
@@ -197,7 +209,6 @@ const sendDailySchedules = async (options?: {
 				),
 			)
 
-		const targetDate = options?.date ?? getNextDate(today)
 		const messageByGroup = new Map<number, string | null>()
 
 		for (const user of users) {
@@ -225,10 +236,6 @@ const sendDailySchedules = async (options?: {
 				})
 				sentCount += 1
 			} catch {}
-		}
-
-		if (!force) {
-			lastSentDate = today
 		}
 
 		return { status: "sent", sentCount, targetDate }
