@@ -7,6 +7,7 @@ import { AdminRestoreScheduleChannelBannerButton } from "./_ui/admin-restore-sch
 import { AdminSyncGroupsButton } from "./_ui/admin-sync-groups-button"
 import { DebugResetUserGroupButton } from "./_ui/debug-reset-user-group-button"
 import { DebugTimeOffsetControl } from "./_ui/debug-time-offset-control"
+import { RestoreUserFeedbackButton } from "./_ui/restore-user-feedback-button"
 
 export default function SettingsPage() {
 	return (
@@ -17,6 +18,7 @@ export default function SettingsPage() {
 			<AdminMapEditorLink />
 			<AdminSyncGroupsButton />
 			<AdminRestoreScheduleChannelBannerButton />
+			<RestoreUserFeedbackButton />
 			<DebugTimeOffsetControl />
 			<DebugResetUserGroupButton />
 		</div>

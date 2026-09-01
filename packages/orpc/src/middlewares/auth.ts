@@ -73,8 +73,12 @@ export const authMiddleware = base.middleware(async ({ context, next }) => {
 		if (!initData.user?.id) throw new ORPCError("UNAUTHORIZED")
 
 		const tgUser = initData.user
-		const firstName = (tgUser.firstName as string | undefined) ?? null
-		const lastName = (tgUser.lastName as string | undefined) ?? null
+		const telegramProfile = {
+			firstName: tgUser.first_name,
+			lastName: tgUser.last_name ?? null,
+			username: tgUser.username ?? null,
+			photoUrl: tgUser.photo_url ?? null,
+		}
 
 		const [user] = await db
 			.select()
@@ -85,7 +89,7 @@ export const authMiddleware = base.middleware(async ({ context, next }) => {
 		if (!user) {
 			const [newUser] = await db
 				.insert(usersTable)
-				.values({ telegramId: tgUser.id, firstName, lastName })
+				.values({ telegramId: tgUser.id, ...telegramProfile })
 				.onConflictDoNothing({ target: usersTable.telegramId })
 				.returning()
 
@@ -104,10 +108,15 @@ export const authMiddleware = base.middleware(async ({ context, next }) => {
 			return next({ context: { ...context, user: existingUser } })
 		}
 
-		if (user.firstName !== firstName || user.lastName !== lastName) {
+		if (
+			user.firstName !== telegramProfile.firstName ||
+			user.lastName !== telegramProfile.lastName ||
+			user.username !== telegramProfile.username ||
+			user.photoUrl !== telegramProfile.photoUrl
+		) {
 			const [updatedUser] = await db
 				.update(usersTable)
-				.set({ firstName, lastName })
+				.set(telegramProfile)
 				.where(eq(usersTable.id, user.id))
 				.returning()
 

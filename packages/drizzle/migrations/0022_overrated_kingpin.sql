@@ -1,0 +1,1 @@
+ALTER TABLE "user_feedback" ADD COLUMN "comment" text DEFAULT '' NOT NULL;

@@ -15,8 +15,10 @@ import { groupScheduleItems } from "@/features/schedule/lib/group-schedule-items
 import { useNowInYekaterinburg } from "@/shared/hooks/use-now-in-yekaterinburg"
 
 import { useScheduleGroup } from "../hooks/use-schedule-group"
+import { useUserFeedbackPrompt } from "../hooks/use-user-feedback-prompt"
 import { ScheduleChannelBanner } from "./schedule-channel-banner"
 import { ScheduleDayChanges } from "./schedule-day-changes"
+import { UserFeedbackCard } from "./user-feedback-card"
 import { WithoutLessonsPlaceholder } from "./without-lessons-placeholder"
 
 export const ScheduleViewerWithGroup = ({
@@ -58,6 +60,7 @@ export const ScheduleViewerWithGroup = ({
 	}, [events])
 
 	const groupedSchedule = data ? groupScheduleItems(data, dates) : []
+	const feedbackPrompt = useUserFeedbackPrompt({ enabled: !isTeacherView })
 
 	return (
 		<div className="pb-2 flex flex-col gap-6">
@@ -112,7 +115,18 @@ export const ScheduleViewerWithGroup = ({
 								))}
 							</div>
 						</div>
-						{dayIndex === 0 && !isTeacherView && <ScheduleChannelBanner />}
+						{dayIndex === 0 && !isTeacherView && feedbackPrompt.shouldShow && (
+							<UserFeedbackCard
+								onSubmit={feedbackPrompt.submit}
+								onClose={feedbackPrompt.dismiss}
+							/>
+						)}
+						{!isTeacherView &&
+							feedbackPrompt.isResolved &&
+							((dayIndex === 0 && !feedbackPrompt.shouldShow) ||
+								(dayIndex === 1 && feedbackPrompt.shouldShow)) && (
+								<ScheduleChannelBanner />
+							)}
 					</Fragment>
 				)
 			})}

@@ -32,6 +32,13 @@ export type AnalyticsEventMap = {
 		channel: "secretscode"
 		group_name: string
 	}
+	user_feedback_shown: {
+		visit_number: number
+	}
+	user_feedback_submitted: {
+		rating: number
+		reasons: string[]
+	}
 	maintenance_channel_button_shown: {
 		channel: "secretscode"
 	}

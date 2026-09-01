@@ -1,6 +1,4 @@
-import { and, arrayContains, eq } from "drizzle-orm"
-
-import { classesTable, db } from "@repo/drizzle"
+import { and, arrayContains, classesTable, db, eq } from "@repo/drizzle"
 
 import { populateLessons } from "./populate-lessons"
 

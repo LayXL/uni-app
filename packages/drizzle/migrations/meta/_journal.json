@@ -141,6 +141,34 @@
       "when": 1788269074133,
       "tag": "0019_daily_schedule_notification_runs",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1788292388278,
+      "tag": "0020_abandoned_ikaris",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1788293474866,
+      "tag": "0021_nostalgic_ricochet",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1788295388983,
+      "tag": "0022_overrated_kingpin",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1788295611848,
+      "tag": "0023_first_beyonder",
+      "breakpoints": true
     }
   ]
 }

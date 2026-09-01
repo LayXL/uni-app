@@ -1,0 +1,1 @@
+ALTER TABLE "user_feedback" ADD COLUMN "updatedAt" timestamp DEFAULT now() NOT NULL;

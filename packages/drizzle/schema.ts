@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm"
 import {
 	bigint,
 	boolean,
+	check,
 	date,
 	integer,
 	json,
@@ -36,6 +37,11 @@ export const usersTable = pgTable("users", {
 	isEnabledNotifications: boolean().notNull().default(true),
 	firstName: varchar({ length: 255 }),
 	lastName: varchar({ length: 255 }),
+	username: varchar({ length: 255 }),
+	photoUrl: text(),
+	appOpenCount: integer().notNull().default(0),
+	lastAppOpenSessionId: varchar({ length: 64 }),
+	lastAppOpenedAt: timestamp(),
 })
 
 export const groupTypeEnum = pgEnum("group_type", ["teacher", "studentsGroup"])
@@ -119,3 +125,32 @@ export const eventsTable = pgTable("events", {
 	buttonUrl: text(),
 	buttonText: varchar({ length: 255 }),
 })
+
+export const userFeedbackTable = pgTable(
+	"user_feedback",
+	{
+		id: serial().primaryKey(),
+		userId: integer()
+			.notNull()
+			.unique()
+			.references(() => usersTable.id, { onDelete: "cascade" }),
+		rating: integer().notNull(),
+		reasons: text().array().notNull().default([]),
+		comment: text().notNull().default(""),
+		group: integer().references(() => groupsTable.id, {
+			onDelete: "set null",
+		}),
+		platform: varchar({ length: 32 }).notNull(),
+		visitNumber: integer().notNull(),
+		sessionId: varchar({ length: 64 }).notNull(),
+		source: varchar({ length: 64 }).notNull().default("schedule"),
+		createdAt: timestamp().notNull().default(sql`now()`),
+		updatedAt: timestamp().notNull().default(sql`now()`),
+	},
+	(table) => [
+		check(
+			"user_feedback_rating_between_1_and_5",
+			sql`${table.rating} between 1 and 5`,
+		),
+	],
+)
