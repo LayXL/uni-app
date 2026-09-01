@@ -4,41 +4,51 @@ import { getTeacherGender } from "@repo/shared/groups/get-teacher-gender"
 import { transformToGroupName } from "@repo/shared/groups/transform-to-group-name"
 import type { Lesson } from "@repo/shared/lessons/types/lesson"
 
+import { Icon } from "@/shared/ui/icon"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { Touchable } from "@/shared/ui/touchable"
+
+import { formatLessonTime } from "../lib/format-lesson-time"
 
 type LessonModalProps = {
 	lesson: Lesson
 	group?: number
-	isTeacherView?: boolean
 	onClassroomClick?: (classroomId: number) => void
 }
 
 export const LessonModal = ({
 	lesson,
 	group,
-	isTeacherView,
 	onClassroomClick,
 }: LessonModalProps) => {
 	const teachers = lesson.groups.filter((group) => group.type === "teacher")
-	const otherGroups = lesson.groups.filter(
-		({ type, id }) => type === "studentsGroup" && id !== group,
+	const studentGroups = lesson.groups.filter(
+		({ type }) => type === "studentsGroup",
 	)
+	const shouldShowStudentGroups =
+		studentGroups.length > 0 &&
+		!(studentGroups.length === 1 && studentGroups[0]?.id === group)
 
 	return (
 		<div className="flex flex-col gap-2">
 			<h2 className="text-lg font-medium w-[calc(100%-3rem)]">
 				{lesson.subject.name}
 			</h2>
-			<p className="text-muted">
-				С {lesson.startTime} до {lesson.endTime}
-			</p>
-			{otherGroups.length > 0 && (
-				<p className="text-muted">
-					{group && !isTeacherView ? "Вместе с вами " : "На занятии "}
-					{otherGroups.length === 1 ? "будет группа " : "будут группы "}
-					{otherGroups.map((group) => transformToGroupName(group)).join(", ")}
-				</p>
+			<div className="flex items-center gap-1 text-muted tabular-nums">
+				<Icon name="clock-outline-16" className="shrink-0" />
+				<span>{formatLessonTime(lesson.startTime)}</span>
+				<Icon name="arrow-right-12" className="shrink-0" />
+				<span>{formatLessonTime(lesson.endTime)}</span>
+			</div>
+			{shouldShowStudentGroups && (
+				<div className="flex items-center gap-1 text-muted">
+					<Icon name="users-16" className="shrink-0" />
+					<p>
+						{studentGroups
+							.map((group) => transformToGroupName(group))
+							.join(", ")}
+					</p>
+				</div>
 			)}
 			{teachers.length > 0 &&
 				teachers.map((teacher) => (

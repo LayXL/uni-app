@@ -8,7 +8,6 @@ import { Touchable } from "@/shared/ui/touchable"
 import type { IconName } from "@/types/icon-name"
 
 import { useRouteBuilder } from "../hooks/use-route-builder"
-
 import { MapSearchModal } from "./map-search-modal"
 
 type MapBottomBarButtonProps = {
@@ -24,7 +23,7 @@ const MapBottomBarButton = ({ icon, onClick }: MapBottomBarButtonProps) => {
 				className="relative flex items-center justify-center size-12 rounded-3xl bg-background"
 				onClick={onClick}
 			>
-				<LiquidBorder degree={45} />
+				<LiquidBorder />
 				<Icon name={icon} size={20} />
 			</button>
 		</Touchable>

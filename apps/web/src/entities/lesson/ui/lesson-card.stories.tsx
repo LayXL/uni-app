@@ -33,6 +33,58 @@ const lesson = {
 	endTime: "09:35",
 } satisfies Lesson
 
+const longSubjectLesson = {
+	...lesson,
+	subject: {
+		id: 40,
+		name: "Проектирование пользовательских интерфейсов информационных систем",
+	},
+} satisfies Lesson
+
+const twoParallelGroupsLesson = {
+	...lesson,
+	groups: [
+		...lesson.groups,
+		{
+			id: 400,
+			displayName: "Дв-399",
+			type: "studentsGroup",
+		},
+		{
+			id: 401,
+			displayName: "Дв-400",
+			type: "studentsGroup",
+		},
+	],
+} satisfies Lesson
+
+const manyParallelGroupsLesson = {
+	...lesson,
+	groups: [
+		...lesson.groups,
+		{
+			id: 400,
+			displayName: "Дв-399",
+			type: "studentsGroup",
+		},
+		{
+			id: 401,
+			displayName: "Дв-400",
+			type: "studentsGroup",
+		},
+		{
+			id: 402,
+			displayName: "Дв-401",
+			type: "studentsGroup",
+		},
+		{
+			id: 403,
+			displayName: "Дв-402",
+			type: "studentsGroup",
+		},
+	],
+} satisfies Lesson
+
 const meta = {
 	title: "Расписание/Карточка занятия",
 	component: LessonCard,
@@ -66,6 +118,27 @@ export const Active: Story = {
 	name: "Текущее занятие",
 	args: {
 		isActive: true,
+	},
+}
+
+export const LongSubject: Story = {
+	name: "Длинное название предмета",
+	args: {
+		lesson: longSubjectLesson,
+	},
+}
+
+export const ManyParallelGroups: Story = {
+	name: "Много параллельных групп",
+	args: {
+		lesson: manyParallelGroupsLesson,
+	},
+}
+
+export const TwoParallelGroups: Story = {
+	name: "Две параллельные группы",
+	args: {
+		lesson: twoParallelGroupsLesson,
 	},
 }
 

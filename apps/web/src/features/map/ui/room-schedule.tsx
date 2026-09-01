@@ -98,6 +98,7 @@ export const RoomSchedule = ({ room }: RoomScheduleProps) => {
 								key={i}
 								lesson={lesson}
 								isActive={isLessonActive(lesson, now)}
+								hideClassroom
 							/>
 						))
 					) : (
