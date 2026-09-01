@@ -1,5 +1,5 @@
 import type { Options } from "ky"
-import ky, { HTTPError } from "ky"
+import ky, { HTTPError, TimeoutError } from "ky"
 
 import { env } from "@repo/env"
 
@@ -8,6 +8,9 @@ export const bitrix = ky.create({
 })
 
 const SERVICE_RECOVERY_DELAY_MS = 30_000
+const TIMEOUT_RECOVERY_DELAY_MS = 1_000
+const BITRIX_REQUEST_TIMEOUT_MS = 30_000
+const MAX_TIMEOUT_RETRIES = 3
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -19,15 +22,28 @@ export const getBitrixTextWithRecovery = async (
 	path: string,
 	options: Options,
 ) => {
+	let timeoutRetries = 0
+
 	while (true) {
 		try {
-			return await bitrix.get(path, options).text()
+			return await bitrix
+				.get(path, { timeout: BITRIX_REQUEST_TIMEOUT_MS, ...options })
+				.text()
 		} catch (error) {
-			if (!isServiceUnavailableError(error)) {
+			if (isServiceUnavailableError(error)) {
+				await sleep(SERVICE_RECOVERY_DELAY_MS)
+				continue
+			}
+
+			if (
+				!(error instanceof TimeoutError) ||
+				timeoutRetries >= MAX_TIMEOUT_RETRIES
+			) {
 				throw error
 			}
 
-			await sleep(SERVICE_RECOVERY_DELAY_MS)
+			timeoutRetries++
+			await sleep(TIMEOUT_RECOVERY_DELAY_MS)
 		}
 	}
 }

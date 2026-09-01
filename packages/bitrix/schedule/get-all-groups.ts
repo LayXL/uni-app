@@ -1,4 +1,4 @@
-import { bitrix } from "../ky"
+import { bitrix, getBitrixTextWithRecovery } from "../ky"
 
 const BITRIX_REQUEST_COOLDOWN_MS = 100
 
@@ -48,15 +48,16 @@ const parseStudentGroup = async (
 	cookie: string,
 ): Promise<Group[]> => {
 	try {
-		const groupSchedule = await bitrix
-			.get("mobile/teacher/schedule/spo_and_vo.php", {
+		const groupSchedule = await getBitrixTextWithRecovery(
+			"mobile/teacher/schedule/spo_and_vo.php",
+			{
 				searchParams: { name: group.GROUP_NAME },
 				headers: {
 					Cookie: cookie,
 					"Content-Type": "application/x-www-form-urlencoded",
 				},
-			})
-			.text()
+			},
+		)
 
 		if (!groupSchedule.includes("subgroupContent")) return []
 
