@@ -1,13 +1,16 @@
 import type { HTMLElement } from "node-html-parser"
 
+import { normalizeClassroomName } from "@repo/shared/lessons/normalize-classroom-name"
+
 export const parseLesson = (lesson: HTMLElement) => {
 	const colsCount = lesson.childNodes.length
 	const isTeacher = colsCount === 9
 
-	const classroom =
+	const classroom = normalizeClassroomName(
 		lesson
 			.querySelector(`td:nth-child(${isTeacher ? 4 : 3})`)
-			?.innerText.trim() ?? ""
+			?.innerText.trim() ?? "",
+	)
 
 	const subject =
 		lesson

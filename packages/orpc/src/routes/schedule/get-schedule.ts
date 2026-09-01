@@ -17,6 +17,7 @@ import {
 import { env } from "@repo/env"
 import { getConfig } from "@repo/shared/config/get-config"
 import { getTestingLessons } from "@repo/shared/lessons/get-testing-lessons"
+import { normalizeClassroomName } from "@repo/shared/lessons/normalize-classroom-name"
 import { lessonSchema } from "@repo/shared/lessons/types/lesson"
 import { isTestingScheduleGroupId } from "@repo/shared/testing-group"
 
@@ -121,6 +122,7 @@ export const getSchedule = publicProcedure
 
 			return {
 				...lesson,
+				classroom: normalizeClassroomName(lesson.classroom),
 				startTime: addZeroToTime(timetableItemSchedule?.time.start ?? ""),
 				endTime: addZeroToTime(timetableItemSchedule?.time.end ?? ""),
 			}
