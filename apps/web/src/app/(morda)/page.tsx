@@ -4,9 +4,6 @@ import { redirect } from "next/navigation"
 import { orpc } from "@repo/orpc/react"
 import { getNextTwoWeeksDates } from "@repo/shared/lessons/get-next-two-weeks-dates"
 
-import { MapViewerHome } from "@/app/(morda)/_ui/map-viewer-home"
-import { MapBottomBar } from "@/features/map/ui/map-bottom-bar"
-import { MapViewer } from "@/features/map/ui/map-viewer"
 import { ScheduleHeader } from "@/features/schedule/ui/schedule-header"
 import { ScheduleTimer } from "@/features/schedule/ui/schedule-timer"
 import { Fetcher } from "@/shared/utils/fetcher"
@@ -15,11 +12,7 @@ import { getServerTestNow } from "@/shared/utils/server-test-time"
 import { SaveCurrentGroupAsUser } from "@/widgets/save-current-group-as-user"
 import { ScheduleWithMapNavigation } from "@/widgets/schedule-with-map-navigation"
 
-import { RouteNavigation } from "../../features/map/ui/route-navigation"
-import { HomeworkButton } from "./_ui/homework-button"
-import { MapBottomBarHome } from "./_ui/map-bottom-bar-home"
-import { ScheduleViewerHome } from "./_ui/schedule-viewer-home"
-import { SettingsButton } from "./_ui/settings-button"
+import { SettingsLink } from "./_ui/settings-button"
 
 export default async function () {
 	const fetcher = new Fetcher()
@@ -35,7 +28,6 @@ export default async function () {
 		const dates = getNextTwoWeeksDates({ now: await getServerTestNow() })
 
 		await Promise.all([
-			fetcher.fetch(orpc.map.getMap),
 			fetcher.fetch(orpc.groups.getAllGroups),
 			fetcher.fetch(orpc.schedule.getTimetable),
 			fetcher.fetch(orpc.schedule.getSchedule, { dates, group: user.group.id }),
@@ -47,28 +39,18 @@ export default async function () {
 
 	return (
 		<HydrationBoundary state={fetcher.dehydrate()}>
-			<div className="h-screen absolute top-0 left-0 w-full" />
-			<div className="flex flex-col">
-				<MapViewerHome>
-					<MapViewer />
-				</MapViewerHome>
-				<ScheduleViewerHome>
-					<div className="-mt-4 flex flex-col bg-background rounded-t-3xl relative pb-(--safe-area-inset-bottom) mb-16">
-						<div className="absolute bottom-full left-3 py-2">
-							<MapBottomBarHome>
-								<MapBottomBar />
-							</MapBottomBarHome>
-						</div>
-						<ScheduleHeader />
-						<ScheduleTimer />
-						<SaveCurrentGroupAsUser />
-						<ScheduleWithMapNavigation />
-					</div>
-				</ScheduleViewerHome>
+			<link
+				rel="preload"
+				href="/images/secretscode-channel-v2.webp"
+				as="image"
+				type="image/webp"
+			/>
+			<div className="flex min-h-screen flex-col pt-(--safe-area-inset-top) pb-[calc(var(--tab-bar-height)+var(--safe-area-inset-bottom)+1.75rem)]">
+				<ScheduleHeader action={<SettingsLink />} />
+				<ScheduleTimer />
+				<SaveCurrentGroupAsUser />
+				<ScheduleWithMapNavigation />
 			</div>
-			<HomeworkButton />
-			<SettingsButton />
-			<RouteNavigation />
 		</HydrationBoundary>
 	)
 }

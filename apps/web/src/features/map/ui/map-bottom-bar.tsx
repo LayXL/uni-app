@@ -12,14 +12,20 @@ import { MapSearchModal } from "./map-search-modal"
 
 type MapBottomBarButtonProps = {
 	icon: IconName
+	label: string
 	onClick?: () => void
 }
 
-const MapBottomBarButton = ({ icon, onClick }: MapBottomBarButtonProps) => {
+const MapBottomBarButton = ({
+	icon,
+	label,
+	onClick,
+}: MapBottomBarButtonProps) => {
 	return (
 		<Touchable>
 			<button
 				type="button"
+				aria-label={label}
 				className="relative flex items-center justify-center size-12 rounded-3xl bg-background"
 				onClick={onClick}
 			>
@@ -39,10 +45,12 @@ export const MapBottomBar = () => {
 		<div className="flex gap-1">
 			<MapBottomBarButton
 				icon="iconify:material-symbols:search-rounded"
+				label="Найти аудиторию"
 				onClick={() => setIsSearchModalOpen(true)}
 			/>
 			<MapBottomBarButton
 				icon="iconify:material-symbols:route"
+				label="Построить маршрут"
 				onClick={openRouteBuilderModal}
 			/>
 			<MapSearchModal

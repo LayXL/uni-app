@@ -25,7 +25,11 @@ import { MapControls } from "./map-controls"
 import { RoomModal } from "./room-modal"
 import { RouteBuilderModal } from "./route-builder-modal"
 
-export const MapViewer = () => {
+type MapViewerProps = {
+	initialRoomId?: number
+}
+
+export const MapViewer = ({ initialRoomId }: MapViewerProps) => {
 	const mapData = useMapData()
 	const colorScheme = useColorScheme()
 
@@ -42,6 +46,15 @@ export const MapViewer = () => {
 
 	const { activeFloor, setActiveFloor } = useActiveFloor()
 	const { selectedRoomId, setSelectedRoomId } = useSelectedRoom()
+	const initialRoom = useMemo(
+		() =>
+			initialRoomId === undefined
+				? undefined
+				: mapData?.entities.find(
+						(entity) => entity.id === initialRoomId && isRoom(entity),
+					),
+		[initialRoomId, mapData],
+	)
 	const [isDebug] = useState(process.env.NODE_ENV === "development")
 
 	const canvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -53,7 +66,6 @@ export const MapViewer = () => {
 	const iconBaseScaleRef = useRef(new WeakMap<fabric.Object, number>())
 	const [rotation, setRotation] = useState(0)
 	const [isCanvasReady, setIsCanvasReady] = useState(false)
-	const [isFloorVisible, setIsFloorVisible] = useState(false)
 	const [cursorCoords, setCursorCoords] = useState<{
 		screen: { x: number; y: number }
 		world: { x: number; y: number }
@@ -154,27 +166,73 @@ export const MapViewer = () => {
 		[applyViewport, mapData],
 	)
 
+	const centerOnRoom = useCallback(
+		(roomId: number) => {
+			const canvas = fabricRef.current
+			const room = mapData?.entities.find(
+				(entity) => entity.id === roomId && isRoom(entity),
+			)
+			if (!canvas || !room || !isRoom(room)) return
+
+			const center = room.wallsPosition.length
+				? {
+						x:
+							room.position.x +
+							(Math.min(...room.wallsPosition.map((point) => point.x)) +
+								Math.max(...room.wallsPosition.map((point) => point.x))) /
+								2,
+						y:
+							room.position.y +
+							(Math.min(...room.wallsPosition.map((point) => point.y)) +
+								Math.max(...room.wallsPosition.map((point) => point.y))) /
+								2,
+					}
+				: room.position
+			const zoom = 0.5
+
+			applyViewport({
+				zoom,
+				rotation: 0,
+				translateX: canvas.getWidth() / 2 - center.x * zoom,
+				translateY: canvas.getHeight() / 2 - center.y * zoom,
+			})
+		},
+		[applyViewport, mapData],
+	)
+
 	const hasCenteredRef = useRef(false)
 	useEffect(() => {
-		if (isCanvasReady && mapData && !hasCenteredRef.current) {
-			centerOnFloor(activeFloor)
-			hasCenteredRef.current = true
-		}
-	}, [isCanvasReady, mapData, activeFloor, centerOnFloor])
+		if (!isCanvasReady || !mapData || hasCenteredRef.current) return
 
-	// Fade in the floor after it's rendered
-	useEffect(() => {
-		if (isCanvasReady && mapData) {
-			// Small delay to allow the floor to render before fading in
-			const timer = requestAnimationFrame(() => {
-				requestAnimationFrame(() => {
-					setIsFloorVisible(true)
-				})
+		if (initialRoom && isRoom(initialRoom)) {
+			if (activeFloor !== initialRoom.floorId) {
+				setActiveFloor(initialRoom.floorId)
+				return
+			}
+
+			centerOnRoom(initialRoom.id)
+			setSelectedRoomId(initialRoom.id)
+			analytics.track("room_clicked", {
+				room_id: initialRoom.id,
+				room_name: initialRoom.name,
+				floor_id: initialRoom.floorId,
+				source: "schedule",
 			})
-			return () => cancelAnimationFrame(timer)
+		} else {
+			centerOnFloor(activeFloor)
 		}
-		setIsFloorVisible(false)
-	}, [isCanvasReady, mapData])
+
+		hasCenteredRef.current = true
+	}, [
+		activeFloor,
+		centerOnFloor,
+		centerOnRoom,
+		initialRoom,
+		isCanvasReady,
+		mapData,
+		setActiveFloor,
+		setSelectedRoomId,
+	])
 
 	const zoomByStep = useCallback(
 		(deltaZoom: number) => {
@@ -246,11 +304,7 @@ export const MapViewer = () => {
 
 	return (
 		<div className="relative h-full w-full overflow-hidden bg-(--map-background)">
-			<canvas
-				ref={canvasRef}
-				className="size-full transition-opacity duration-300"
-				style={{ opacity: isFloorVisible ? 1 : 0 }}
-			/>
+			<canvas ref={canvasRef} className="size-full" />
 
 			{isDebug && cursorCoords && (
 				<CursorPositionDebug cursorCoords={cursorCoords} />

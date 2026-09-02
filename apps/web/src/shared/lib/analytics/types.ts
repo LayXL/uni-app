@@ -1,4 +1,8 @@
 export type AnalyticsEventMap = {
+	tab_bar_clicked: {
+		tab: "schedule" | "map" | "homework"
+		previous_tab: "schedule" | "map" | "homework"
+	}
 	room_clicked: {
 		room_id: number
 		room_name: string

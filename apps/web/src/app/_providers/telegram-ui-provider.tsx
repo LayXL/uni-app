@@ -139,8 +139,8 @@ const useBackButton = () => {
 			return
 		}
 
-		const hasHistory =
-			window.history.length > 1 && Boolean(pathname) && pathname !== "/"
+		const isMainPage = ["/", "/map", "/homework"].includes(pathname)
+		const hasHistory = window.history.length > 1 && !isMainPage
 		const hasPopups = popupCount > 0
 
 		if (hasHistory || hasPopups) {

@@ -53,6 +53,7 @@
 		-ms-user-select: none;
 
 		--map-height: 70vh;
+		--tab-bar-height: 4rem;
 		--acc-expand: 250ms;
 		--acc-collapse: 250ms;
 		--acc-chevron: 250ms;

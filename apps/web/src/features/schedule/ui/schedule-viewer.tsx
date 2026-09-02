@@ -121,12 +121,9 @@ export const ScheduleViewerWithGroup = ({
 								onClose={feedbackPrompt.dismiss}
 							/>
 						)}
-						{!isTeacherView &&
-							feedbackPrompt.isResolved &&
-							((dayIndex === 0 && !feedbackPrompt.shouldShow) ||
-								(dayIndex === 1 && feedbackPrompt.shouldShow)) && (
-								<ScheduleChannelBanner />
-							)}
+						{dayIndex === 2 && !isTeacherView && feedbackPrompt.isResolved && (
+							<ScheduleChannelBanner />
+						)}
 					</Fragment>
 				)
 			})}

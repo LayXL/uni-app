@@ -108,13 +108,23 @@ export const AnimatedScheduleChannelBanner = ({
 	onClick?: () => void
 }) => {
 	const shouldReduceMotion = useReducedMotion()
+	const hasBeenVisible = useRef(false)
+	const isFirstAppearance = isVisible && !hasBeenVisible.current
+
+	useEffect(() => {
+		if (isVisible) hasBeenVisible.current = true
+	}, [isVisible])
 
 	return (
 		<AnimatePresence initial={false}>
 			{isVisible && (
 				<motion.div
 					key="schedule-channel-banner"
-					initial={{ opacity: 0, height: 0, marginBottom: -24 }}
+					initial={
+						isFirstAppearance
+							? false
+							: { opacity: 0, height: 0, marginBottom: -24 }
+					}
 					animate={{ opacity: 1, height: "auto", marginBottom: 0 }}
 					exit={{ opacity: 0, height: 0, marginBottom: -24 }}
 					transition={{

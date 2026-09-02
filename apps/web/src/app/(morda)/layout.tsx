@@ -7,6 +7,7 @@ import { UnauthorizedPage } from "@/shared/ui/unauthorized-page"
 import { Fetcher } from "@/shared/utils/fetcher"
 import { isUnauthorizedError } from "@/shared/utils/is-unauthorized-error"
 
+import { MainTabBar } from "./_ui/main-tab-bar"
 import { MaintenanceGate } from "./_ui/maintenance-gate"
 import { YandexMetrikaUser } from "./_ui/yandex-metrika-user"
 
@@ -29,7 +30,10 @@ export default async function ({ children }: { children: ReactNode }) {
 	return (
 		<HydrationBoundary state={fetcher.dehydrate()}>
 			<YandexMetrikaUser />
-			<MaintenanceGate>{children}</MaintenanceGate>
+			<MaintenanceGate>
+				{children}
+				<MainTabBar />
+			</MaintenanceGate>
 		</HydrationBoundary>
 	)
 }

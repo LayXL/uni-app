@@ -15,6 +15,7 @@
 
 | Событие                     | Назначение                                               | Параметры                                                                                  |
 | --------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `tab_bar_clicked`           | Клик по вкладке нижнего таб-бара                         | `tab`, `previous_tab` (`schedule`, `map` или `homework`)                                   |
 | `room_clicked`              | Клик по кабинету на карте или в расписании               | `room_id`, `room_name`, `floor_id`, `source` (`map` или `schedule`)                        |
 | `room_searched`             | Выбор кабинета через поиск карты или построение маршрута | `room_id`, `room_name`, `floor_id`, `source` (`map_search`, `route_start` или `route_end`) |
 | `group_selected`            | Выбор группы в онбординге или расписании                 | `group_id`, `group_name`, `source` (`onboarding`, `schedule_search` или `schedule_recent`) |
