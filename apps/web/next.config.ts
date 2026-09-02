@@ -3,6 +3,9 @@ import type { NextConfig } from "next"
 const nextConfig: NextConfig = {
 	reactStrictMode: false,
 	reactCompiler: true,
+	cacheComponents: true,
+	partialPrefetching: true,
+	allowedDevOrigins: ["127.0.0.1"],
 	devIndicators: false,
 	async headers() {
 		return [

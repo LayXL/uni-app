@@ -10,7 +10,7 @@ import {
 	viewport,
 } from "@tma.js/sdk-react"
 import { usePathname, useRouter } from "next/navigation"
-import { type ReactNode, useEffect, useMemo, useRef } from "react"
+import { type ReactNode, Suspense, useEffect, useMemo, useRef } from "react"
 
 import { FullscreenSafeAreaGradient } from "@/shared/ui/fullscreen-safe-area-gradient"
 import { usePopupCloseTop, usePopupStackCount } from "@/shared/ui/popup"
@@ -151,17 +151,24 @@ const useBackButton = () => {
 	}, [pathname, popupCount, isAvailable])
 }
 
+const TelegramNavigationUi = () => {
+	useBackButton()
+
+	return <FullscreenSafeAreaGradient />
+}
+
 export const TelegramUiProvider = ({ children }: { children: ReactNode }) => {
 	useMiniApp()
 	useViewport()
 	useThemeParams()
 	useSettingsButton()
-	useBackButton()
 
 	return (
 		<>
 			{children}
-			<FullscreenSafeAreaGradient />
+			<Suspense fallback={null}>
+				<TelegramNavigationUi />
+			</Suspense>
 		</>
 	)
 }

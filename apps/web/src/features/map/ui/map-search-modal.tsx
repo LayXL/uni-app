@@ -18,6 +18,7 @@ import { useActiveFloor } from "../hooks/use-active-floor"
 import { useMapData } from "../hooks/use-map-data"
 import { useMapState } from "../hooks/use-map-state"
 import { useSelectedRoom } from "../hooks/use-selected-room"
+import { getRoomWorldCenter } from "../lib/geometry"
 import { getEntitySearchDescription } from "../lib/get-entity-search-description"
 
 type SearchInputTriggerProps = {
@@ -136,7 +137,8 @@ export const MapSearchModal = ({ isOpen, onClose }: MapSearchModalProps) => {
 
 	const handleSelect = (entityId: number) => {
 		const entity = entities.find((e) => e.id === entityId)
-		if (!entity) return
+		const floor = mapData.floors.find((floor) => floor.id === entity?.floorId)
+		if (!entity || !floor) return
 
 		if (isRoom(entity)) {
 			analytics.track("room_searched", {
@@ -157,22 +159,13 @@ export const MapSearchModal = ({ isOpen, onClose }: MapSearchModalProps) => {
 
 		setZoom(0.5)
 		if (isRoom(entity)) {
-			// Find center of the room from walls polygon
-			if (entity.wallsPosition && entity.wallsPosition.length > 0) {
-				const minX = Math.min(...entity.wallsPosition.map((p) => p.x))
-				const maxX = Math.max(...entity.wallsPosition.map((p) => p.x))
-				const minY = Math.min(...entity.wallsPosition.map((p) => p.y))
-				const maxY = Math.max(...entity.wallsPosition.map((p) => p.y))
-
-				const centerX = (minX + maxX) / 2
-				const centerY = (minY + maxY) / 2
-
-				moveTo(entity.position.x + centerX, entity.position.y + centerY)
-			} else {
-				moveTo(entity.position.x, entity.position.y)
-			}
+			const center = getRoomWorldCenter(entity, floor)
+			moveTo(center.x, center.y)
 		} else {
-			moveTo(entity.position.x, entity.position.y)
+			moveTo(
+				floor.position.x + entity.position.x,
+				floor.position.y + entity.position.y,
+			)
 		}
 
 		onClose()

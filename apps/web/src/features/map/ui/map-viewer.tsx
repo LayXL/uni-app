@@ -18,7 +18,12 @@ import { useMapInteractions } from "../hooks/use-map-interactions"
 import { useMapViewport } from "../hooks/use-map-viewport"
 import { useRouteBuilder } from "../hooks/use-route-builder"
 import { useSelectedRoom } from "../hooks/use-selected-room"
-import { clamp, collectBounds, createViewportMatrix } from "../lib/geometry"
+import {
+	clamp,
+	collectBounds,
+	createViewportMatrix,
+	getRoomWorldCenter,
+} from "../lib/geometry"
 import type { ViewportState } from "../types"
 import { CursorPositionDebug } from "./cursor-position-debug"
 import { MapControls } from "./map-controls"
@@ -28,6 +33,10 @@ import { RouteBuilderModal } from "./route-builder-modal"
 type MapViewerProps = {
 	initialRoomId?: number
 }
+
+const FLOOR_PADDING = 192
+const MAX_FLOOR_FIT_ZOOM = 1
+const MAX_ROOM_ZOOM = 0.5
 
 export const MapViewer = ({ initialRoomId }: MapViewerProps) => {
 	const mapData = useMapData()
@@ -133,37 +142,45 @@ export const MapViewer = ({ initialRoomId }: MapViewerProps) => {
 		onInit: () => setIsCanvasReady(true),
 	})
 
-	const centerOnFloor = useCallback(
+	const getFloorViewport = useCallback(
 		(floorId: number) => {
 			const canvas = fabricRef.current
-			if (!canvas || !mapData) return
+			if (!canvas || !mapData) return null
 
 			const floor = mapData.floors.find((f) => f.id === floorId)
-			if (!floor) return
+			if (!floor) return null
 
 			const bounds = collectBounds(floor, mapData.entities)
-			const padding = 192
-			const worldWidth = bounds.maxX - bounds.minX + padding * 2
-			const worldHeight = bounds.maxY - bounds.minY + padding * 2
+			const worldWidth = bounds.maxX - bounds.minX + FLOOR_PADDING * 2
+			const worldHeight = bounds.maxY - bounds.minY + FLOOR_PADDING * 2
 
 			const zoomFit = Math.min(
 				canvas.getWidth() / worldWidth,
 				canvas.getHeight() / worldHeight,
 			)
+			const zoom = clamp(zoomFit, 0.05, MAX_FLOOR_FIT_ZOOM)
 
 			const center = {
 				x: (bounds.maxX + bounds.minX) / 2,
 				y: (bounds.maxY + bounds.minY) / 2,
 			}
 
-			applyViewport({
-				zoom: clamp(zoomFit, 0.05, 8),
+			return {
+				zoom,
 				rotation: 0,
-				translateX: canvas.getWidth() / 2 - center.x * zoomFit,
-				translateY: canvas.getHeight() / 2 - center.y * zoomFit,
-			})
+				translateX: canvas.getWidth() / 2 - center.x * zoom,
+				translateY: canvas.getHeight() / 2 - center.y * zoom,
+			}
 		},
-		[applyViewport, mapData],
+		[mapData],
+	)
+
+	const centerOnFloor = useCallback(
+		(floorId: number) => {
+			const viewport = getFloorViewport(floorId)
+			if (viewport) applyViewport(viewport)
+		},
+		[applyViewport, getFloorViewport],
 	)
 
 	const centerOnRoom = useCallback(
@@ -172,23 +189,17 @@ export const MapViewer = ({ initialRoomId }: MapViewerProps) => {
 			const room = mapData?.entities.find(
 				(entity) => entity.id === roomId && isRoom(entity),
 			)
-			if (!canvas || !room || !isRoom(room)) return
+			const floor = mapData?.floors.find((floor) => floor.id === room?.floorId)
+			if (!canvas || !room || !isRoom(room) || !floor) return
 
-			const center = room.wallsPosition.length
-				? {
-						x:
-							room.position.x +
-							(Math.min(...room.wallsPosition.map((point) => point.x)) +
-								Math.max(...room.wallsPosition.map((point) => point.x))) /
-								2,
-						y:
-							room.position.y +
-							(Math.min(...room.wallsPosition.map((point) => point.y)) +
-								Math.max(...room.wallsPosition.map((point) => point.y))) /
-								2,
-					}
-				: room.position
-			const zoom = 0.5
+			const center = getRoomWorldCenter(room, floor)
+			const floorViewport = getFloorViewport(room.floorId)
+			const zoom = floorViewport
+				? Math.max(
+						floorViewport.zoom,
+						Math.min(floorViewport.zoom * 1.75, MAX_ROOM_ZOOM),
+					)
+				: MAX_ROOM_ZOOM
 
 			applyViewport({
 				zoom,
@@ -197,14 +208,17 @@ export const MapViewer = ({ initialRoomId }: MapViewerProps) => {
 				translateY: canvas.getHeight() / 2 - center.y * zoom,
 			})
 		},
-		[applyViewport, mapData],
+		[applyViewport, getFloorViewport, mapData],
 	)
 
-	const hasCenteredRef = useRef(false)
+	const centeredRoomIdRef = useRef<number | null>(null)
+	const hasCenteredDefaultRef = useRef(false)
 	useEffect(() => {
-		if (!isCanvasReady || !mapData || hasCenteredRef.current) return
+		if (!isCanvasReady || !mapData) return
 
 		if (initialRoom && isRoom(initialRoom)) {
+			if (centeredRoomIdRef.current === initialRoom.id) return
+
 			if (activeFloor !== initialRoom.floorId) {
 				setActiveFloor(initialRoom.floorId)
 				return
@@ -218,11 +232,17 @@ export const MapViewer = ({ initialRoomId }: MapViewerProps) => {
 				floor_id: initialRoom.floorId,
 				source: "schedule",
 			})
-		} else {
-			centerOnFloor(activeFloor)
+			centeredRoomIdRef.current = initialRoom.id
+			hasCenteredDefaultRef.current = false
+			return
 		}
 
-		hasCenteredRef.current = true
+		if (hasCenteredDefaultRef.current) return
+
+		centerOnFloor(activeFloor)
+		setSelectedRoomId(null)
+		centeredRoomIdRef.current = null
+		hasCenteredDefaultRef.current = true
 	}, [
 		activeFloor,
 		centerOnFloor,

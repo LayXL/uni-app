@@ -1,55 +1,14 @@
-import { HydrationBoundary } from "@tanstack/react-query"
-import { notFound } from "next/navigation"
+import { Suspense } from "react"
 
-import { orpc } from "@repo/orpc/react"
-import { getTeacherGender } from "@repo/shared/groups/get-teacher-gender"
-import { inclineTeacherName } from "@repo/shared/groups/incline-teacher-name"
-import { transformToGroupName } from "@repo/shared/groups/transform-to-group-name"
-import { getNextTwoWeeksDates } from "@repo/shared/lessons/get-next-two-weeks-dates"
+import {
+	GroupSchedulePageContent,
+	GroupScheduleSkeleton,
+} from "./_ui/group-schedule-page-content"
 
-import { ScheduleViewerWithGroup } from "@/features/schedule/ui/schedule-viewer"
-import { PageTitle } from "@/shared/ui/page-title"
-import { Fetcher } from "@/shared/utils/fetcher"
-import { getServerTestNow } from "@/shared/utils/server-test-time"
-
-type SchedulePageProps = {
-	params: Promise<{ groupId: string }>
-}
-
-export default async function SchedulePage({ params }: SchedulePageProps) {
-	const { groupId } = await params
-	const fetcher = new Fetcher()
-
-	const group = await fetcher.fetch(orpc.groups.getGroup, {
-		id: Number(groupId),
-	})
-
-	if (!group) {
-		return notFound()
-	}
-
-	await fetcher.fetch(orpc.schedule.getSchedule, {
-		dates: getNextTwoWeeksDates({ now: await getServerTestNow() }),
-		group: Number(groupId),
-	})
-
-	const title =
-		group.type === "teacher"
-			? `${getTeacherGender(group) === "female" ? "Преподавательницы" : "Преподавателя"} ${inclineTeacherName(group, "genitive")}`
-			: `Группы ${transformToGroupName(group)}`
-
+export default function SchedulePage() {
 	return (
-		<HydrationBoundary state={fetcher.dehydrate()}>
-			<div className="flex flex-col pt-[calc(var(--safe-area-inset-top)+1rem)]">
-				<div className="px-4">
-					<PageTitle title="Расписание" />
-				</div>
-				<p className="text-sm px-4 mb-4">{title}</p>
-				<ScheduleViewerWithGroup
-					group={Number(groupId)}
-					isTeacherView={group.type === "teacher"}
-				/>
-			</div>
-		</HydrationBoundary>
+		<Suspense fallback={<GroupScheduleSkeleton />}>
+			<GroupSchedulePageContent />
+		</Suspense>
 	)
 }

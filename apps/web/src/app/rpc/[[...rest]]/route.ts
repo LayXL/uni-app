@@ -3,8 +3,6 @@ import { RPCHandler } from "@orpc/server/fetch"
 
 import { isUnauthorizedError } from "@/shared/utils/is-unauthorized-error"
 
-export const dynamic = "force-dynamic"
-
 function decodeURIComponentSafe(value: string) {
 	try {
 		return decodeURIComponent(value)
@@ -21,6 +19,7 @@ async function handleRequest(request: Request) {
 			onError((error) => {
 				if (isUnauthorizedError(error)) return
 
+				// biome-ignore lint/suspicious/noConsole: server-side RPC error logging
 				console.error("Caught internal error:", error)
 			}),
 		],

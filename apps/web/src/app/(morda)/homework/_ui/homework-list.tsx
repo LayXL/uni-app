@@ -1,6 +1,6 @@
 "use client"
 
-import { useSuspenseQuery } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query"
 
 import { orpc } from "@repo/orpc/react"
 import { isTestingGroupId } from "@repo/shared/testing-group"
@@ -8,20 +8,41 @@ import { isTestingGroupId } from "@repo/shared/testing-group"
 import { HomeworkCard } from "@/entities/homework/ui/homework-card"
 import { useUser } from "@/entities/user/hooks/useUser"
 import { useScheduleGroup } from "@/features/schedule/hooks/use-schedule-group"
+import { useIsClient } from "@/shared/hooks/use-is-client"
 import { useLocalStorage } from "@/shared/hooks/use-local-storage"
 import { LottiePlayer } from "@/shared/ui/lottie"
 import { Toggle } from "@/shared/ui/toggle"
 
+export const HomeworkListSkeleton = () => (
+	<div
+		role="status"
+		aria-busy="true"
+		aria-label="Загрузка домашних заданий"
+		className="flex animate-pulse flex-col gap-2 px-4 pt-2"
+	>
+		<div className="h-24 rounded-3xl bg-card" />
+		<div className="h-24 rounded-3xl bg-card" />
+		<div className="h-24 rounded-3xl bg-card" />
+	</div>
+)
+
 export function HomeworkList() {
+	const isClient = useIsClient()
 	const user = useUser()
 	const { group } = useScheduleGroup()
 	const testingGroupId = isTestingGroupId(group?.id) ? group.id : undefined
-	const { data: homeworks } = useSuspenseQuery(
-		orpc.homeworks.getHomeworks.queryOptions(
+	const homeworksQuery = useQuery({
+		...orpc.homeworks.getHomeworks.queryOptions(
 			testingGroupId ? { input: { group: testingGroupId } } : {},
 		),
-	)
+		enabled: isClient,
+	})
 	const [onlyMine, setOnlyMine] = useLocalStorage("onlyMyHomeworks")
+
+	if (homeworksQuery.error) throw homeworksQuery.error
+	if (!isClient || homeworksQuery.isPending) return <HomeworkListSkeleton />
+
+	const homeworks = homeworksQuery.data
 
 	const visibleHomeworks = onlyMine
 		? homeworks.filter((hw) => hw.author === user.id)

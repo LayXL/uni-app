@@ -1,9 +1,13 @@
 "use client"
 
-import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query"
+import {
+	useQuery,
+	useQueryClient,
+	useSuspenseQuery,
+} from "@tanstack/react-query"
 import { format } from "date-fns"
 import { ru } from "date-fns/locale"
-import { useRouter } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import type React from "react"
 import { useState } from "react"
 
@@ -16,6 +20,7 @@ import {
 	HomeworkForm,
 	type HomeworkFormValues,
 } from "@/features/homework/ui/homework-form"
+import { useIsClient } from "@/shared/hooks/use-is-client"
 import { Button } from "@/shared/ui/button"
 import { useConfirmDialog } from "@/shared/ui/confirm-dialog"
 import { Icon } from "@/shared/ui/icon"
@@ -43,6 +48,33 @@ function MetaBadge({ icon, iconClassName, children }: MetaBadgeProps) {
 
 type HomeworkDetailProps = {
 	id: string
+}
+
+export const HomeworkDetailSkeleton = () => (
+	<div
+		role="status"
+		aria-busy="true"
+		aria-label="Загрузка домашнего задания"
+		className="flex animate-pulse flex-col gap-4 px-4 pt-[calc(var(--safe-area-inset-top)+1rem)]"
+	>
+		<div className="h-8 w-2/3 rounded-xl bg-card" />
+		<div className="h-24 rounded-3xl bg-card" />
+		<div className="h-12 w-1/2 rounded-2xl bg-card" />
+	</div>
+)
+
+export const HomeworkDetailPage = () => {
+	const isClient = useIsClient()
+	const { id } = useParams<{ id: string }>()
+	const homeworkQuery = useQuery({
+		...orpc.homeworks.getHomework.queryOptions({ input: { id } }),
+		enabled: isClient,
+	})
+
+	if (homeworkQuery.error) throw homeworkQuery.error
+	if (!isClient || homeworkQuery.isPending) return <HomeworkDetailSkeleton />
+
+	return <HomeworkDetail id={id} />
 }
 
 export function HomeworkDetail({ id }: HomeworkDetailProps) {
