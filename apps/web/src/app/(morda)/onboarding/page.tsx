@@ -1,7 +1,8 @@
 "use client"
 
+import { useQueryClient } from "@tanstack/react-query"
+import { useNavigate } from "@tanstack/react-router"
 import { AnimatePresence, motion } from "motion/react"
-import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
@@ -92,8 +93,13 @@ const FeaturesOverviewStep = ({ onNext }: StepProps) => {
 }
 
 const GroupSelectionStep = ({ onNext }: StepProps) => {
+	const queryClient = useQueryClient()
+
 	const handleGroupClick = async (groupId: number, groupName: string) => {
 		await orpc.users.updateUserGroup.call({ groupId })
+		await queryClient.invalidateQueries({
+			queryKey: orpc.users.me.queryKey(),
+		})
 		analytics.track("group_selected", {
 			group_id: groupId,
 			group_name: groupName,
@@ -128,7 +134,7 @@ const STEPS = [FeaturesOverviewStep, GroupSelectionStep]
 const STEP_NAMES = ["features", "group_selection"] as const
 
 export default function OnboardingPage() {
-	const router = useRouter()
+	const navigate = useNavigate()
 
 	const [step, setStep] = useState(0)
 
@@ -145,7 +151,7 @@ export default function OnboardingPage() {
 		})
 
 		if (step === STEPS.length - 1) {
-			router.replace("/")
+			void navigate({ to: "/", replace: true })
 			return
 		}
 

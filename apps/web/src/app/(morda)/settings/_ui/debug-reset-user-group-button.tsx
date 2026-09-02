@@ -1,7 +1,7 @@
 "use client"
 
 import { useQueryClient } from "@tanstack/react-query"
-import { useRouter } from "next/navigation"
+import { useNavigate } from "@tanstack/react-router"
 
 import { orpc } from "@repo/orpc/react"
 
@@ -11,9 +11,9 @@ import { Button } from "@/shared/ui/button"
 export const DebugResetUserGroupButton = () => {
 	const user = useUser()
 	const queryClient = useQueryClient()
-	const router = useRouter()
+	const navigate = useNavigate()
 
-	if (!user.isAdmin && process.env.NODE_ENV !== "development") return null
+	if (!user.isAdmin && !import.meta.env.DEV) return null
 
 	return (
 		<Button
@@ -24,7 +24,7 @@ export const DebugResetUserGroupButton = () => {
 
 				queryClient.invalidateQueries({ queryKey: orpc.users.me.queryKey() })
 
-				router.replace("/onboarding")
+				void navigate({ to: "/onboarding", replace: true })
 			}}
 			label="Сбросить группу"
 		/>

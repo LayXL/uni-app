@@ -1,8 +1,9 @@
 "use client"
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import bridge from "@vkontakte/vk-bridge"
 import superjson from "superjson"
+
+import bridge from "@/shared/lib/vk-bridge"
 
 import { isTelegram } from "../utils/is-telegram"
 

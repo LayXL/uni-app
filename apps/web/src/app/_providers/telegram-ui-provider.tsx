@@ -1,5 +1,6 @@
 "use client"
 
+import { useLocation, useNavigate, useRouter } from "@tanstack/react-router"
 import {
 	backButton,
 	miniApp,
@@ -9,7 +10,6 @@ import {
 	useSignal,
 	viewport,
 } from "@tma.js/sdk-react"
-import { usePathname, useRouter } from "next/navigation"
 import { type ReactNode, Suspense, useEffect, useMemo, useRef } from "react"
 
 import { FullscreenSafeAreaGradient } from "@/shared/ui/fullscreen-safe-area-gradient"
@@ -77,7 +77,7 @@ const useThemeParams = () => {
 }
 
 const useSettingsButton = () => {
-	const router = useRouter()
+	const navigate = useNavigate()
 	const isAvailable = useSignal(settingsButton.mount.isAvailable, () => false)
 
 	useEffect(() => {
@@ -89,7 +89,7 @@ const useSettingsButton = () => {
 		settingsButton.show()
 
 		const offClick = settingsButton.onClick(() => {
-			router.push("/settings")
+			void navigate({ to: "/settings" })
 		})
 
 		return () => {
@@ -97,12 +97,12 @@ const useSettingsButton = () => {
 			settingsButton.unmount()
 			offClick()
 		}
-	}, [isAvailable, router])
+	}, [isAvailable, navigate])
 }
 
 const useBackButton = () => {
 	const router = useRouter()
-	const pathname = usePathname()
+	const pathname = useLocation({ select: (location) => location.pathname })
 
 	const popupCount = usePopupStackCount()
 	const closeTopPopup = usePopupCloseTop()
@@ -124,7 +124,7 @@ const useBackButton = () => {
 		const offClick = backButton.onClick(() => {
 			const closed = closeTopPopupRef.current()
 			if (!closed) {
-				router.back()
+				router.history.back()
 			}
 		})
 

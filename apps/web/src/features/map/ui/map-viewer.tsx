@@ -64,7 +64,7 @@ export const MapViewer = ({ initialRoomId }: MapViewerProps) => {
 					),
 		[initialRoomId, mapData],
 	)
-	const [isDebug] = useState(process.env.NODE_ENV === "development")
+	const [isDebug] = useState(import.meta.env.DEV)
 
 	const canvasRef = useRef<HTMLCanvasElement | null>(null)
 	const fabricRef = useRef<fabric.Canvas | null>(null)

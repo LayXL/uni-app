@@ -1,6 +1,6 @@
 "use client"
 
-import * as Sentry from "@sentry/nextjs"
+import * as Sentry from "@sentry/tanstackstart-react"
 import { type ReactNode, useState } from "react"
 
 import { Button } from "@/shared/ui/button"

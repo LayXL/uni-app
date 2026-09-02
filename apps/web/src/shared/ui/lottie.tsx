@@ -1,11 +1,17 @@
 "use client"
 
 import type { ClassValue } from "clsx"
-import Lottie, { type LottieRefCurrentProps } from "lottie-react"
+import importedLottie, { type LottieRefCurrentProps } from "lottie-react"
 import { useEffect, useRef, useState } from "react"
 
 import { cn } from "../utils/cn"
 import { haptic } from "../utils/haptic"
+
+type LottieComponent = typeof importedLottie
+type InteropLottieComponent = LottieComponent & { default?: LottieComponent }
+
+const lottieModule = importedLottie as InteropLottieComponent
+const Lottie = lottieModule.default ?? lottieModule
 
 export type LottiePlayerProps = {
 	src: string

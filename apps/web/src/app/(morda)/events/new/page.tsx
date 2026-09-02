@@ -1,7 +1,7 @@
 "use client"
 
 import { useQueryClient } from "@tanstack/react-query"
-import { useRouter } from "next/navigation"
+import { useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
@@ -11,7 +11,7 @@ import { PageTitle } from "@/shared/ui/page-title"
 import { EventForm, type EventFormValues } from "../_ui/event-form"
 
 export default function NewEventPage() {
-	const router = useRouter()
+	const navigate = useNavigate()
 	const queryClient = useQueryClient()
 	const [error, setError] = useState<string | null>(null)
 
@@ -36,7 +36,7 @@ export default function NewEventPage() {
 				queryKey: orpc.events.getAllEvents.queryKey(),
 			})
 
-			router.replace("/events")
+			void navigate({ to: "/events", replace: true })
 		} catch {
 			setError("Не удалось создать событие")
 		}

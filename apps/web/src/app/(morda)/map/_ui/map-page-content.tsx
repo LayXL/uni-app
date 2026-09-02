@@ -1,7 +1,6 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { useSearchParams } from "next/navigation"
 
 import { orpc } from "@repo/orpc/react"
 
@@ -34,9 +33,12 @@ const MapPageView = ({ initialRoomId }: { initialRoomId?: number }) => (
 	</div>
 )
 
-export const MapPageContent = () => {
+export const MapPageContent = ({
+	initialRoomId,
+}: {
+	initialRoomId?: number
+}) => {
 	const isClient = useIsClient()
-	const searchParams = useSearchParams()
 	const mapQuery = useQuery({
 		...orpc.map.getMap.queryOptions(),
 		enabled: isClient,
@@ -45,14 +47,5 @@ export const MapPageContent = () => {
 	if (mapQuery.error) throw mapQuery.error
 	if (!isClient || mapQuery.isPending) return <MapPageSkeleton />
 
-	const room = searchParams.get("room")
-	const initialRoomId = room ? Number(room) : undefined
-
-	return (
-		<MapPageView
-			initialRoomId={
-				Number.isInteger(initialRoomId) ? initialRoomId : undefined
-			}
-		/>
-	)
+	return <MapPageView initialRoomId={initialRoomId} />
 }

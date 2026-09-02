@@ -1,4 +1,4 @@
-import Link from "next/link"
+import { Link } from "@tanstack/react-router"
 
 import { Button } from "@/shared/ui/button"
 import { LottiePlayer } from "@/shared/ui/lottie"
@@ -14,7 +14,7 @@ export function UnauthorizedPage() {
 				</p>
 			</div>
 			<Button asChild className="w-full" label="Попробовать снова">
-				<Link href="/" />
+				<Link to="/" />
 			</Button>
 		</div>
 	)

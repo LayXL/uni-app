@@ -1,8 +1,8 @@
 "use client"
 
 import { useQueryClient } from "@tanstack/react-query"
+import { useNavigate } from "@tanstack/react-router"
 import { format } from "date-fns"
-import { useRouter } from "next/navigation"
 import { useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
@@ -17,7 +17,7 @@ import { PageTitle } from "@/shared/ui/page-title"
 import { getClientTestNow } from "@/shared/utils/test-time"
 
 export default function AddHomeworkPage() {
-	const router = useRouter()
+	const navigate = useNavigate()
 	const queryClient = useQueryClient()
 	const { group } = useScheduleGroup()
 	const [error, setError] = useState<string | null>(null)
@@ -45,7 +45,11 @@ export default function AddHomeworkPage() {
 				),
 			})
 
-			router.replace(`/homework/${created.id}`)
+			void navigate({
+				to: "/homework/$id",
+				params: { id: created.id },
+				replace: true,
+			})
 		} catch {
 			setError("Не удалось создать домашнее задание")
 			throw error

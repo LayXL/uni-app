@@ -1,7 +1,7 @@
 "use client"
 
 import { useQueries } from "@tanstack/react-query"
-import { redirect } from "next/navigation"
+import { Navigate } from "@tanstack/react-router"
 
 import { orpc } from "@repo/orpc/react"
 import { getNextTwoWeeksDates } from "@repo/shared/lessons/get-next-two-weeks-dates"
@@ -80,7 +80,7 @@ export const SchedulePageContent = () => {
 	const user = useUser()
 	const { group } = useScheduleGroup()
 
-	if (!user.group) redirect("/onboarding")
+	if (!user.group) return <Navigate to="/onboarding" replace />
 	if (!group) return <SchedulePageSkeleton />
 
 	return <ScheduleData groupId={group.id} />

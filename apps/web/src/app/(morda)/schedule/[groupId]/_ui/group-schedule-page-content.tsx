@@ -1,7 +1,6 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { useParams } from "next/navigation"
 
 import { orpc } from "@repo/orpc/react"
 import { getTeacherGender } from "@repo/shared/groups/get-teacher-gender"
@@ -53,9 +52,12 @@ const GroupScheduleView = ({ group }: { group: ScheduleGroup }) => {
 	)
 }
 
-export const GroupSchedulePageContent = () => {
+export const GroupSchedulePageContent = ({
+	groupIdParam,
+}: {
+	groupIdParam: string
+}) => {
 	const isClient = useIsClient()
-	const { groupId: groupIdParam } = useParams<{ groupId: string }>()
 	const groupId = Number(groupIdParam)
 	const isValidGroupId = Number.isInteger(groupId)
 	const dates = getNextTwoWeeksDates()

@@ -1,6 +1,7 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import { useQueryClient } from "@tanstack/react-query"
+import { useNavigate } from "@tanstack/react-router"
 import { useEffect, useState } from "react"
 
 import { useUser } from "@/entities/user/hooks/useUser"
@@ -13,25 +14,26 @@ import {
 
 export const DebugTimeOffsetControl = () => {
 	const user = useUser()
-	const router = useRouter()
+	const navigate = useNavigate()
+	const queryClient = useQueryClient()
 	const [value, setValue] = useState("0")
 
 	useEffect(() => {
 		setValue(getClientTestTimeOffsetHours().toString())
 	}, [])
 
-	if (!user.isAdmin && process.env.NODE_ENV !== "development") return null
+	if (!user.isAdmin && !import.meta.env.DEV) return null
 
 	const applyOffset = () => {
 		setClientTestTimeOffsetHours(Number(value))
-		router.replace("/")
-		router.refresh()
+		void queryClient.invalidateQueries()
+		void navigate({ to: "/", replace: true })
 	}
 
 	const resetOffset = () => {
 		setClientTestTimeOffsetHours(0)
-		router.replace("/")
-		router.refresh()
+		void queryClient.invalidateQueries()
+		void navigate({ to: "/", replace: true })
 	}
 
 	return (

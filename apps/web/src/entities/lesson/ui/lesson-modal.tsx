@@ -1,4 +1,4 @@
-import Link from "next/link"
+import { Link } from "@tanstack/react-router"
 
 import { getTeacherGender } from "@repo/shared/groups/get-teacher-gender"
 import { transformToGroupName } from "@repo/shared/groups/transform-to-group-name"
@@ -54,7 +54,8 @@ export const LessonModal = ({
 				teachers.map((teacher) => (
 					<Touchable key={teacher.id}>
 						<Link
-							href={`/schedule/${teacher.id}`}
+							to="/schedule/$groupId"
+							params={{ groupId: String(teacher.id) }}
 							className="relative bg-card rounded-3xl p-4"
 						>
 							<LiquidBorder />

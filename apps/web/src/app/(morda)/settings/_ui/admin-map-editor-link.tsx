@@ -1,6 +1,6 @@
 "use client"
 
-import Link from "next/link"
+import { Link } from "@tanstack/react-router"
 
 import { useUser } from "@/entities/user/hooks/useUser"
 import { Button } from "@/shared/ui/button"
@@ -17,7 +17,7 @@ export const AdminMapEditorLink = () => {
 			leftIcon="iconify:material-symbols:map-outline"
 			label="Редактирование карты"
 		>
-			<Link href="/settings/map" />
+			<Link to="/settings/map" />
 		</Button>
 	)
 }

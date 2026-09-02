@@ -1,5 +1,4 @@
 import { ThemeProvider } from "next-themes"
-import { NuqsAdapter } from "nuqs/adapters/next/app"
 import { nestProviders } from "react-nest-providers"
 
 import { DialogProvider } from "@/shared/ui/confirm-dialog"
@@ -12,7 +11,6 @@ import { TmaProvider } from "./tma-provider"
 import { VkmaProvider } from "./vkma-provider"
 
 export default nestProviders()
-	.push(NuqsAdapter)
 	.push(ThemeProvider, { attribute: "class" })
 	.push(SentryProvider)
 	.push(QueryClientProvider)

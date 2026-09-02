@@ -1,20 +1,20 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import { useNavigate } from "@tanstack/react-router"
 
 import { useUser } from "@/entities/user/hooks/useUser"
 import { restoreUserFeedbackPrompt } from "@/features/schedule/lib/get-app-session-id"
 import { Button } from "@/shared/ui/button"
 
 export const RestoreUserFeedbackButton = () => {
-	const router = useRouter()
+	const navigate = useNavigate()
 	const user = useUser()
 
 	if (!user.isAdmin) return null
 
 	const handleRestore = () => {
 		restoreUserFeedbackPrompt()
-		router.push("/")
+		void navigate({ to: "/" })
 	}
 
 	return (

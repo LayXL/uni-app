@@ -5,9 +5,9 @@ import {
 	useQueryClient,
 	useSuspenseQuery,
 } from "@tanstack/react-query"
+import { useNavigate } from "@tanstack/react-router"
 import { format } from "date-fns"
 import { ru } from "date-fns/locale"
-import { useParams, useRouter } from "next/navigation"
 import type React from "react"
 import { useState } from "react"
 
@@ -63,9 +63,8 @@ export const HomeworkDetailSkeleton = () => (
 	</div>
 )
 
-export const HomeworkDetailPage = () => {
+export const HomeworkDetailPage = ({ id }: HomeworkDetailProps) => {
 	const isClient = useIsClient()
-	const { id } = useParams<{ id: string }>()
 	const homeworkQuery = useQuery({
 		...orpc.homeworks.getHomework.queryOptions({ input: { id } }),
 		enabled: isClient,
@@ -79,7 +78,7 @@ export const HomeworkDetailPage = () => {
 
 export function HomeworkDetail({ id }: HomeworkDetailProps) {
 	const user = useUser()
-	const router = useRouter()
+	const navigate = useNavigate()
 	const queryClient = useQueryClient()
 
 	const { data: hw } = useSuspenseQuery(
@@ -121,7 +120,7 @@ export function HomeworkDetail({ id }: HomeworkDetailProps) {
 			queryClient.invalidateQueries({
 				queryKey: orpc.homeworks.getHomeworks.queryKey(),
 			})
-			router.replace("/homework")
+			void navigate({ to: "/homework", replace: true })
 		} catch {
 			setIsDeleting(false)
 		}

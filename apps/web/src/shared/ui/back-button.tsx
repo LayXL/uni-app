@@ -1,6 +1,6 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import { useRouter } from "@tanstack/react-router"
 
 import { Icon } from "./icon"
 import { LiquidBorder } from "./liquid-border"
@@ -10,7 +10,7 @@ export function BackButton() {
 	const router = useRouter()
 
 	const handleClick = () => {
-		router.back()
+		router.history.back()
 	}
 
 	return (

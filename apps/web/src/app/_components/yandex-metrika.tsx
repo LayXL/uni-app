@@ -1,7 +1,6 @@
 "use client"
 
-import { usePathname, useSearchParams } from "next/navigation"
-import Script from "next/script"
+import { useLocation } from "@tanstack/react-router"
 import { useEffect, useRef } from "react"
 
 import { analytics } from "@/shared/lib/analytics"
@@ -11,11 +10,44 @@ import {
 } from "@/shared/lib/analytics/adapters/yandex-metrika"
 
 export function YandexMetrika() {
-	const pathname = usePathname()
-	const searchParams = useSearchParams()
+	const pageUrl = useLocation({ select: (location) => location.href })
 	const previousUrl = useRef<string | null>(null)
-	const search = searchParams.toString()
-	const pageUrl = search ? `${pathname}?${search}` : pathname
+
+	useEffect(() => {
+		type YmQueue = NonNullable<typeof window.ym> & {
+			a?: unknown[][]
+			l?: number
+		}
+
+		if (!window.ym) {
+			const ym: YmQueue = (...args: unknown[]) => {
+				if (!ym.a) ym.a = []
+				ym.a.push(args)
+			}
+			ym.l = Date.now()
+			window.ym = ym
+		}
+
+		if (!document.querySelector('script[data-yandex-metrika="true"]')) {
+			const script = document.createElement("script")
+			script.async = true
+			script.src = `https://mc.yandex.ru/metrika/tag.js?id=${YANDEX_METRIKA_COUNTER_ID}`
+			script.dataset.yandexMetrika = "true"
+			script.addEventListener("load", flushYandexMetrikaQueue, { once: true })
+			document.head.append(script)
+
+			window.ym?.(YANDEX_METRIKA_COUNTER_ID, "init", {
+				ssr: true,
+				webvisor: true,
+				clickmap: true,
+				ecommerce: "dataLayer",
+				referrer: document.referrer,
+				url: window.location.href,
+				accurateTrackBounce: true,
+				trackLinks: true,
+			})
+		}
+	}, [])
 
 	useEffect(() => {
 		const currentUrl = new URL(pageUrl, window.location.origin).href
@@ -32,31 +64,5 @@ export function YandexMetrika() {
 		analytics.trackPageView({ url: currentUrl, referer })
 	}, [pageUrl])
 
-	return (
-		<Script
-			id="yandex-metrika"
-			strategy="afterInteractive"
-			onReady={flushYandexMetrikaQueue}
-		>
-			{`
-				(function(m,e,t,r,i,k,a){
-					m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-					m[i].l=1*new Date();
-					for (var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return;}}
-					k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a);
-				})(window,document,"script","https://mc.yandex.ru/metrika/tag.js?id=${YANDEX_METRIKA_COUNTER_ID}","ym");
-
-				window.ym(${YANDEX_METRIKA_COUNTER_ID}, "init", {
-					ssr: true,
-					webvisor: true,
-					clickmap: true,
-					ecommerce: "dataLayer",
-					referrer: document.referrer,
-					url: window.location.href,
-					accurateTrackBounce: true,
-					trackLinks: true
-				});
-			`}
-		</Script>
-	)
+	return null
 }

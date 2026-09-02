@@ -1,8 +1,7 @@
 "use client"
 
+import { Link, useLocation } from "@tanstack/react-router"
 import { motion, useReducedMotion } from "motion/react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
 
 import { useRouteBuilder } from "@/features/map/hooks/use-route-builder"
 import { analytics } from "@/shared/lib/analytics"
@@ -12,7 +11,7 @@ import { cn } from "@/shared/utils/cn"
 import type { IconName } from "@/types/icon-name"
 
 type Tab = {
-	href: string
+	href: "/" | "/map" | "/homework"
 	label: string
 	activeIcon: IconName
 	inactiveIcon: IconName
@@ -44,7 +43,7 @@ const tabs: Tab[] = [
 ]
 
 export function MainTabBar() {
-	const pathname = usePathname()
+	const pathname = useLocation({ select: (location) => location.pathname })
 	const shouldReduceMotion = useReducedMotion()
 	const isRouteActive = useRouteBuilder((state) => state.isActive)
 	const isMainPage = tabs.some((tab) => tab.href === pathname)
@@ -70,7 +69,7 @@ export function MainTabBar() {
 						return (
 							<Touchable key={tab.href}>
 								<Link
-									href={tab.href}
+									to={tab.href}
 									aria-current={isActive ? "page" : undefined}
 									onClick={() => {
 										if (!currentTab) return

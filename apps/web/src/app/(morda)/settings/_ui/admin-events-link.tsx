@@ -1,6 +1,6 @@
 "use client"
 
-import Link from "next/link"
+import { Link } from "@tanstack/react-router"
 
 import { useUser } from "@/entities/user/hooks/useUser"
 import { Button } from "@/shared/ui/button"
@@ -17,7 +17,7 @@ export const AdminEventsLink = () => {
 			leftIcon="iconify:material-symbols:event-outline"
 			label="Управление событиями"
 		>
-			<Link href="/events" />
+			<Link to="/events" />
 		</Button>
 	)
 }

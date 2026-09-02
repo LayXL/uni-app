@@ -1,9 +1,9 @@
 "use client"
 
 import { useQueryClient } from "@tanstack/react-query"
+import { Link } from "@tanstack/react-router"
 import { addDays, format, isBefore, isSameDay } from "date-fns"
 import { ru } from "date-fns/locale"
-import Link from "next/link"
 import { useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
@@ -87,7 +87,8 @@ export function HomeworkCard({
 	return (
 		<Touchable>
 			<Link
-				href={`/homework/${id}`}
+				to="/homework/$id"
+				params={{ id }}
 				className={cn(
 					"relative bg-card rounded-3xl p-4 flex gap-3 items-start",
 					isCompleted && "opacity-60",

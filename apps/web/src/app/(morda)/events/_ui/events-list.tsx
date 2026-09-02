@@ -1,9 +1,9 @@
 "use client"
 
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query"
+import { Link } from "@tanstack/react-router"
 import { format } from "date-fns"
 import { ru } from "date-fns/locale"
-import Link from "next/link"
 import { useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
@@ -76,7 +76,8 @@ export function EventsList() {
 							<div className="flex gap-1 shrink-0">
 								<Touchable>
 									<Link
-										href={`/events/${event.id}/edit`}
+										to="/events/$id/edit"
+										params={{ id: String(event.id) }}
 										className="p-2 text-muted"
 									>
 										<Icon

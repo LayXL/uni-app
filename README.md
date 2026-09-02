@@ -3,7 +3,8 @@
 Монорепозиторий сервиса МИДИС с расписанием, картой помещений и построением
 маршрутов, домашними заданиями, событиями и Telegram-уведомлениями. Веб-клиент
 работает как Telegram Mini App и VK Mini App, а серверный API находится в том же
-Next.js-приложении и доступен через `/rpc`.
+TanStack Start-приложении и доступен через `/rpc`. Интерфейс работает в SPA-
+режиме, а серверные маршруты обслуживаются тем же процессом.
 
 ## Возможности
 
@@ -19,7 +20,7 @@ Next.js-приложении и доступен через `/rpc`.
 
 | Путь                         | Назначение                                        |
 | ---------------------------- | ------------------------------------------------- |
-| `apps/web`                   | Next.js 16, React 19, интерфейс и oRPC API        |
+| `apps/web`                   | TanStack Start SPA, React 19, интерфейс и oRPC API |
 | `apps/bot`                   | Telegram-бот на grammY и уведомления о расписании |
 | `apps/schedule-updater`      | синхронизация групп и занятий с Битрикс           |
 | `apps/proxy`                 | отдельный Bun reverse proxy для портала Битрикс   |
@@ -70,18 +71,16 @@ params, установит cookie сессии и вернет на главну
 | `DATABASE_URL`                                                         | строка подключения PostgreSQL                         | `postgresql://postgres:postgres@localhost:5432/schedule` |
 | `VK_CLIENT_SECRET`                                                     | проверка подписи VK Mini Apps в production            | обязательна                                              |
 | `S3_BUCKET`, `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | загрузка файлов домашних заданий и обложек событий    | опциональны вместе                                       |
-| `NEXT_PUBLIC_ORPC_URL`                                                 | публичный URL oRPC для браузера                       | `<origin>/rpc`                                           |
-| `SERVER_ORPC_URL`                                                      | URL oRPC для серверного рендеринга                    | `NEXT_PUBLIC_ORPC_URL` или `http://localhost:3000/rpc`   |
+| `VITE_ORPC_URL`                                                        | публичный URL oRPC для браузера                       | `<origin>/rpc`                                           |
+| `SERVER_ORPC_URL`                                                      | резервный URL oRPC для серверного окружения            | `VITE_ORPC_URL` или `http://localhost:3000/rpc`          |
 | `PROXY_TARGET`                                                         | адрес назначения reverse proxy                        | `https://portal.midis.info`                              |
 | `PORT`                                                                 | порт, который слушает запущенный напрямую proxy       | `3000`                                                   |
 | `PROXY_PORT`                                                           | порт proxy, публикуемый Docker Compose на хосте       | `3000`                                                   |
 | `TESTING_GROUP_ENABLED`                                                | включает встроенную тестовую группу и тестовые данные | `false`                                                  |
 | `TEST_TIME_OFFSET_HOURS`                                               | серверное смещение тестового времени в часах          | `0`                                                      |
-| `NEXT_PUBLIC_TEST_TIME_OFFSET_HOURS`                                   | начальное клиентское смещение тестового времени       | `0`                                                      |
 
-`TEST_TIME_OFFSET_DAYS` и `NEXT_PUBLIC_TEST_TIME_OFFSET_DAYS` пока поддерживаются
-как устаревшие аналоги смещения в днях. Для нового окружения используйте варианты
-с `*_HOURS`.
+`TEST_TIME_OFFSET_DAYS` пока поддерживается как устаревший аналог смещения в
+днях. Для нового окружения используйте `TEST_TIME_OFFSET_HOURS`.
 
 S3-переменные можно не задавать, пока не используется загрузка файлов. Для
 загрузки должны быть заданы сразу все четыре значения.

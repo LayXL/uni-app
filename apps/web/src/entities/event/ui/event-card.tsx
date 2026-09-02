@@ -1,7 +1,7 @@
 "use client"
 
+import { Link } from "@tanstack/react-router"
 import { format } from "date-fns"
-import Link from "next/link"
 import type { CSSProperties } from "react"
 
 import { useUser } from "@/entities/user/hooks/useUser"
@@ -131,7 +131,8 @@ export const EventCard = ({
 						{user.isAdmin && !hideEditButton && (
 							<Touchable>
 								<Link
-									href={`/events/${id}/edit`}
+									to="/events/$id/edit"
+									params={{ id: String(id) }}
 									className="inline-flex items-center gap-1.5 text-sm text-muted font-medium"
 									style={secondaryTextStyle}
 								>

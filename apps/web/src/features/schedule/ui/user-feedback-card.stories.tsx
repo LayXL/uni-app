@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/nextjs-vite"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { type ComponentProps, useState } from "react"
 
 import { ScheduleChannelBannerCard } from "./schedule-channel-banner"

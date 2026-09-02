@@ -1,6 +1,6 @@
 "use client"
 
-import Link from "next/link"
+import { Link } from "@tanstack/react-router"
 import { useEffect, useState } from "react"
 
 import { Icon } from "@/shared/ui/icon"
@@ -20,7 +20,7 @@ export function SettingsLink({ className }: { className?: string }) {
 	return (
 		<Touchable>
 			<Link
-				href="/settings"
+				to="/settings"
 				aria-label="Настройки"
 				className={cn(
 					"size-8 grid shrink-0 place-items-center rounded-3xl border border-border bg-background",

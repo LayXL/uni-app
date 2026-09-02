@@ -1,12 +1,12 @@
 "use client"
 
+import { useLocation } from "@tanstack/react-router"
 import { useSignal, viewport } from "@tma.js/sdk-react"
-import { usePathname } from "next/navigation"
 
 import { cn } from "../utils/cn"
 
 export const FullscreenSafeAreaGradient = () => {
-	const pathname = usePathname()
+	const pathname = useLocation({ select: (location) => location.pathname })
 	const isFullscreen = useSignal(viewport.isFullscreen, () => false)
 	const safeAreaInsetTop = useSignal(viewport.contentSafeAreaInsetTop, () => 0)
 	const isSchedulePage = pathname === "/"
