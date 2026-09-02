@@ -28,7 +28,7 @@ export default async function MapPage({ searchParams }: MapPageProps) {
 						Number.isInteger(initialRoomId) ? initialRoomId : undefined
 					}
 				/>
-				<div className="absolute bottom-[calc(var(--tab-bar-height)+var(--safe-area-inset-bottom)+1.5rem)] left-[calc(var(--safe-area-inset-left)+0.75rem)] z-10">
+				<div className="absolute bottom-[calc(var(--tab-bar-height)+var(--safe-area-inset-bottom)+1.5rem)] left-[calc(var(--safe-area-inset-left)+0.75rem)] z-20">
 					<MapBottomBar />
 				</div>
 				<SettingsButton />

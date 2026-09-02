@@ -2,42 +2,27 @@
 
 import { useSignal, viewport } from "@tma.js/sdk-react"
 import { usePathname } from "next/navigation"
-import { useEffect, useState } from "react"
 
-const isPastHomeThreshold = () => window.scrollY >= window.innerHeight
+import { cn } from "../utils/cn"
 
 export const FullscreenSafeAreaGradient = () => {
 	const pathname = usePathname()
 	const isFullscreen = useSignal(viewport.isFullscreen, () => false)
 	const safeAreaInsetTop = useSignal(viewport.contentSafeAreaInsetTop, () => 0)
-	const [isPastThreshold, setIsPastThreshold] = useState(false)
+	const isSchedulePage = pathname === "/"
 
-	useEffect(() => {
-		if (pathname !== "/") {
-			setIsPastThreshold(true)
-			return
-		}
+	if (pathname === "/map") return null
 
-		const updateVisibility = () => {
-			setIsPastThreshold(isPastHomeThreshold())
-		}
-
-		updateVisibility()
-		window.addEventListener("scroll", updateVisibility, { passive: true })
-		window.addEventListener("resize", updateVisibility)
-
-		return () => {
-			window.removeEventListener("scroll", updateVisibility)
-			window.removeEventListener("resize", updateVisibility)
-		}
-	}, [pathname])
-
-	const isVisible = isFullscreen && safeAreaInsetTop > 0 && isPastThreshold
+	const isVisible = isSchedulePage || (isFullscreen && safeAreaInsetTop > 0)
 
 	return (
 		<div
 			aria-hidden="true"
-			className="pointer-events-none fixed inset-x-0 top-0 z-40 h-[calc(var(--safe-area-inset-top)+1rem)] bg-linear-to-b from-background to-transparent transition-opacity duration-200 motion-reduce:transition-none"
+			className={cn(
+				"pointer-events-none fixed inset-x-0 top-0 z-40 h-[calc(var(--safe-area-inset-top)+1rem)] bg-linear-to-b from-background to-transparent",
+				!isSchedulePage &&
+					"transition-opacity duration-200 motion-reduce:transition-none",
+			)}
 			style={{ opacity: isVisible ? 1 : 0 }}
 		/>
 	)
