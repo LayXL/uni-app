@@ -6,6 +6,10 @@ const envSchema = z.object({
 	nodeEnv: z.enum(["development", "production"]).default("production"),
 	botToken: z.string(),
 	botEnv: z.enum(["test", "prod"]).default("prod"),
+	botForwardChatId: z
+		.string()
+		.regex(/^-?\d+$/)
+		.optional(),
 	webAppUrl: z.string().default("http://127.0.0.1:3000/auth"),
 	bitrixUrl: z.string().default("https://portal.midis.info/"),
 	bitrixLogin: z.string(),
@@ -36,6 +40,7 @@ export const env = envSchema.parse({
 	nodeEnv: processEnv.NODE_ENV,
 	botToken: processEnv.TELEGRAM_BOT_TOKEN,
 	botEnv: processEnv.TELEGRAM_BOT_ENV,
+	botForwardChatId: processEnv.TELEGRAM_FORWARD_CHAT_ID?.trim() || undefined,
 	webAppUrl: processEnv.WEB_APP_URL,
 	bitrixUrl: processEnv.BITRIX_URL,
 	bitrixLogin: processEnv.BITRIX_LOGIN,

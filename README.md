@@ -64,6 +64,7 @@ params, установит cookie сессии и вернет на главну
 | `NODE_ENV`                                                             | режим приложения: `development` или `production`      | `production`                                             |
 | `TELEGRAM_BOT_TOKEN`                                                   | токен Telegram-бота                                   | обязательна                                              |
 | `TELEGRAM_BOT_ENV`                                                     | API-среда grammY: `test` или `prod`                   | `prod`                                                   |
+| `TELEGRAM_FORWARD_CHAT_ID`                                             | ID чата для пересылки необработанных сообщений бота   | не задан — пересылка отключена                           |
 | `WEB_APP_URL`                                                          | URL Mini App в кнопках бота                           | `http://127.0.0.1:3000/auth`                             |
 | `BITRIX_URL`                                                           | базовый URL портала                                   | `https://portal.midis.info/`                             |
 | `BITRIX_LOGIN`, `BITRIX_PASSWORD`                                      | учетные данные для загрузки расписания                | обязательны                                              |

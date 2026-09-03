@@ -45,5 +45,5 @@ export const userMiddleware = async (ctx: Context, next: NextFunction) => {
 
 	ctx.user = user
 
-	next()
+	return next()
 }

@@ -2,6 +2,7 @@ import { Bot } from "grammy"
 
 import { env } from "@repo/env"
 
+import { forwardComposer } from "./composers/forward"
 import { notificationsComposer } from "./composers/notifications"
 import { setupComposer } from "./composers/setup"
 import { startComposer } from "./composers/start"
@@ -22,3 +23,4 @@ bot.use(userMiddleware)
 bot.use(startComposer)
 bot.use(notificationsComposer)
 bot.use(setupComposer)
+bot.use(forwardComposer)
