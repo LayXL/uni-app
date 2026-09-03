@@ -11,8 +11,24 @@ forwardComposer.chatType("private").on("message", async (ctx) => {
 	}
 
 	try {
-		await ctx.forwardMessage(chatId)
+		const forwarded = await ctx.forwardMessage(chatId)
+		const sender = ctx.from
+		if (!sender) {
+			return
+		}
+
+		const senderDetails = [`ID: ${sender.id}`]
+		if (sender.username) {
+			senderDetails.push(`Username: @${sender.username}`)
+		}
+
+		await ctx.api.sendMessage(chatId, senderDetails.join("\n"), {
+			reply_parameters: { message_id: forwarded.message_id },
+		})
 	} catch (error) {
-		console.error("Failed to forward unhandled private message", error)
+		console.error(
+			"Failed to forward private message with sender details",
+			error,
+		)
 	}
 })
