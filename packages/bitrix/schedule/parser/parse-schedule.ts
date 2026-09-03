@@ -11,15 +11,28 @@ export const parseSchedule = async (html: string, groupName: string) => {
 
 	const subgroup = groupName.split("(")?.[1]?.split(")")?.[0] ?? 0
 
-	const withoutSubgroups =
-		root.querySelectorAll("#withoutReplacements_subgroupNum_0").length === 0
+	// Numbered subgroups may have no subgroupNum_0 container at all.
+	const hasSubgroupContainers = Boolean(
+		root.querySelector(
+			'[id^="withReplacements_subgroupNum_"], [id^="withoutReplacements_subgroupNum_"]',
+		),
+	)
 
-	const cards = root.querySelectorAll(
-		`${withoutSubgroups ? ".withReplacements" : `#withReplacements_subgroupNum_${subgroup}`} .card-body`,
-	)
-	const originalCards = root.querySelectorAll(
-		`${withoutSubgroups ? ".withoutReplacements" : `#withoutReplacements_subgroupNum_${subgroup}`} .card-body`,
-	)
+	const scheduleSelector = hasSubgroupContainers
+		? `#withReplacements_subgroupNum_${subgroup}`
+		: ".withReplacements"
+	const originalSelector = hasSubgroupContainers
+		? `#withoutReplacements_subgroupNum_${subgroup}`
+		: ".withoutReplacements"
+
+	if (!root.querySelector(scheduleSelector)) {
+		throw new Error(
+			`Schedule container ${scheduleSelector} not found for ${groupName || "teacher"}`,
+		)
+	}
+
+	const cards = root.querySelectorAll(`${scheduleSelector} .card-body`)
+	const originalCards = root.querySelectorAll(`${originalSelector} .card-body`)
 
 	let i = 0
 
@@ -45,7 +58,7 @@ export const parseSchedule = async (html: string, groupName: string) => {
 		let j = 0
 
 		for (const lesson of lessons) {
-			const originalLesson = originalCards[i].querySelectorAll("tbody>tr")[j]
+			const originalLesson = originalCards[i]?.querySelectorAll("tbody>tr")[j]
 
 			const parsedLesson = parseLesson(lesson)
 
