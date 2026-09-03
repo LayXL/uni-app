@@ -22,7 +22,7 @@ forwardComposer.chatType("private").on("message", async (ctx) => {
 			senderDetails.push(`Username: @${sender.username}`)
 		}
 
-		await ctx.api.sendMessage(chatId, senderDetails.join("\n"), {
+		await ctx.api.sendMessage(chatId, senderDetails.join(" ・ "), {
 			reply_parameters: { message_id: forwarded.message_id },
 		})
 	} catch (error) {
