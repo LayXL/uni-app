@@ -30,6 +30,20 @@ const subgroupHtml = `
 	</div>
 `
 
+// School teachers have a weekly timetable without dates or replacement containers.
+const schoolHtml = `
+	<h4>Преподаватель Тестов Т.Т.</h4>
+	<h4>Расписание школы</h4>
+	<div class="row"><div class="col card-deck"><div class="card mb-3 bg-light">
+		<div class="card-body">
+			<h5 class="card-title">Понедельник</h5>
+			<table class="table table-sm"><tbody>
+				<tr><th>1</th><td>6б</td><td>История</td><td>212 МИДИС</td></tr>
+			</tbody></table>
+		</div>
+	</div></div></div>
+`
+
 describe("parseSchedule", () => {
 	test.each([
 		["Тд-26(1)", "История России", "117"],
@@ -74,6 +88,28 @@ describe("parseSchedule", () => {
 		expect(await parseSchedule(html, "")).toMatchObject([
 			{ order: 2, subject: "История России", classroom: "117" },
 		])
+	})
+
+	test("skips the undated school-only teacher timetable", async () => {
+		expect(await parseSchedule(schoolHtml, "")).toEqual([])
+	})
+
+	test("still reads dated lessons when a teacher also has a school timetable", async () => {
+		const html = `${schoolHtml}<div class="withReplacements">${card("История России")}</div>`
+
+		expect(await parseSchedule(html, "")).toMatchObject([
+			{ subject: "История России", order: 2 },
+		])
+	})
+
+	test("does not accept a school timetable in place of a student group", async () => {
+		await expect(parseSchedule(schoolHtml, "Тд-26")).rejects.toThrow("Тд-26")
+	})
+
+	test("rejects an unexpected teacher page", async () => {
+		await expect(
+			parseSchedule("<html><body>Авторизация</body></html>", ""),
+		).rejects.toThrow("teacher")
 	})
 
 	test.each([

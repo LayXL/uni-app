@@ -26,6 +26,16 @@ export const parseSchedule = async (html: string, groupName: string) => {
 		: ".withoutReplacements"
 
 	if (!root.querySelector(scheduleSelector)) {
+		// School-only teachers have an undated weekly timetable, not dated lessons.
+		const isSchoolTeacher =
+			!groupName &&
+			!hasSubgroupContainers &&
+			root
+				.querySelectorAll("h4")
+				.some((heading) => heading.innerText.trim() === "Расписание школы")
+
+		if (isSchoolTeacher) return []
+
 		throw new Error(
 			`Schedule container ${scheduleSelector} not found for ${groupName || "teacher"}`,
 		)
