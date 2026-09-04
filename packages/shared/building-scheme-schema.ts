@@ -30,6 +30,7 @@ const floorSchema = z.object({
 	position: coordinateSchema,
 	acronym: z.string().optional(),
 	wallsPosition: z.array(coordinateSchema).min(3),
+	holes: z.array(z.array(coordinateSchema).min(3)).optional(),
 	roads: z.array(roadSchema).optional(),
 	stairs: z.array(stairSchema).optional(),
 	photoPoints: z.array(photoPointSchema).optional(),
@@ -59,6 +60,7 @@ const roomSchema = baseEntitySchema.extend({
 const placeSchema = baseEntitySchema.extend({
 	type: z.literal("place"),
 	placeType: z.string().optional(),
+	hiddenOnMap: z.boolean().optional(),
 })
 
 export const buildingSchemeSchema: z.ZodType<BuildingScheme> = z

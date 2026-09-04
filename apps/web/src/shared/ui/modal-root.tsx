@@ -121,7 +121,7 @@ export const ModalRoot = ({
 				<div
 					ref={panelRef}
 					className={cn(
-						"absolute left-0 right-0 bottom-0 bg-background border-t border-border rounded-t-3xl p-4 pb-[calc(var(--safe-area-inset-bottom)+1rem)] transition-transform duration-300 ease-out",
+						"absolute left-0 right-0 bottom-0 mx-auto max-w-(--page-max-width) bg-background border-t border-border rounded-t-3xl p-4 pb-[calc(var(--safe-area-inset-bottom)+1rem)] transition-transform duration-300 ease-out",
 						isAnimating ? "translate-y-0" : "translate-y-full",
 						fullHeight && "h-dvh",
 						hideBackdrop && isOpen && "pointer-events-auto",

@@ -11,8 +11,16 @@ import { UnauthorizedPage } from "@/shared/ui/unauthorized-page"
 import { isUnauthorizedError } from "@/shared/utils/is-unauthorized-error"
 
 export const Route = createFileRoute("/_app")({
-	component: AuthenticatedApp,
+	component: AppLayout,
 })
+
+function AppLayout() {
+	return (
+		<div className="mx-auto w-full max-w-(--page-max-width)">
+			<AuthenticatedApp />
+		</div>
+	)
+}
 
 function MordaLoadingShell() {
 	return (

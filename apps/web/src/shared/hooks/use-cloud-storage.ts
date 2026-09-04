@@ -145,17 +145,23 @@ export const useCloudStorage = <T>(
 		queryFn: async () => {
 			const raw = await getCloudItem(key)
 			if (!raw) return defaultValue
-			return superjson.parse<T>(raw)
+			try {
+				return superjson.parse<T>(raw)
+			} catch {
+				return defaultValue
+			}
 		},
 	})
 
 	const mutation = useMutation({
+		scope: { id: `cloud-storage:${key}` },
 		mutationFn: async (value: T) => {
 			const raw = superjson.stringify(value)
 			await setCloudItem(key, raw)
 			return value
 		},
-		onMutate: (value) => {
+		onMutate: async (value) => {
+			await queryClient.cancelQueries({ queryKey })
 			queryClient.setQueryData(queryKey, value)
 		},
 	})

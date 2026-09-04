@@ -3,9 +3,10 @@ import { type RefObject, useEffect, useRef } from "react"
 
 import type { BuildingScheme, Place, Room } from "@repo/shared/building-scheme"
 import { isPlace, isRoom } from "@repo/shared/building-scheme"
+import { getFloorContours } from "@repo/shared/building-scheme-geometry"
 
 import { getMapColors } from "../lib/colors"
-import { clamp, getFloorPolygon, getRoomPolygon } from "../lib/geometry"
+import { clamp, getRoomPolygon } from "../lib/geometry"
 import type { ViewportState } from "../types"
 
 const iconImageCache = new Map<string, Promise<HTMLImageElement>>()
@@ -194,7 +195,7 @@ export const useFloorRender = ({
 					iconsToPreload.add(`/icons/${roomIcon}.svg`)
 				}
 			}
-			if (isPlace(entity)) {
+			if (isPlace(entity) && !entity.hiddenOnMap) {
 				const iconName = entity.icon || entity.placeType || "place"
 				iconsToPreload.add(`/icons/${iconName}.svg`)
 			}
@@ -231,7 +232,8 @@ export const useFloorRender = ({
 
 		const floorPlaces =
 			data?.entities.filter(
-				(e): e is Place => isPlace(e) && e.floorId === activeFloor,
+				(e): e is Place =>
+					isPlace(e) && e.floorId === activeFloor && !e.hiddenOnMap,
 			) ?? []
 
 		canvas.clear()
@@ -243,9 +245,14 @@ export const useFloorRender = ({
 		const colors = getMapColors()
 
 		const floorPolygon = new fabric.Path(
-			getRoundedPolygonPath(getFloorPolygon(floor)),
+			getFloorContours(floor)
+				.map((contour) =>
+					getRoundedPolygonPath(contour.map((p) => new fabric.Point(p.x, p.y))),
+				)
+				.join(" "),
 			{
 				fill: colors.floorFill,
+				fillRule: "evenodd",
 				stroke: colors.floorStroke,
 				strokeWidth: 2,
 				hoverCursor: "default",

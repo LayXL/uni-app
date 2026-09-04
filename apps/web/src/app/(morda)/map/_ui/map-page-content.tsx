@@ -25,7 +25,7 @@ export const MapPageSkeleton = () => (
 const MapPageView = ({ initialRoomId }: { initialRoomId?: number }) => (
 	<div className="fixed inset-0 bg-(--map-background)">
 		<MapViewer initialRoomId={initialRoomId} />
-		<div className="absolute bottom-[calc(var(--tab-bar-height)+var(--safe-area-inset-bottom)+1.5rem)] left-[calc(var(--safe-area-inset-left)+0.75rem)] z-20">
+		<div className="absolute bottom-[calc(var(--tab-bar-height)+var(--safe-area-inset-bottom)+1.5rem)] left-[max(0.75rem,var(--safe-area-inset-left))] right-[max(0.75rem,var(--safe-area-inset-right))] z-20 mx-auto max-w-lg">
 			<MapBottomBar />
 		</div>
 		<SettingsButton />

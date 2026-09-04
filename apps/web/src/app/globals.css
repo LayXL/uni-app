@@ -3,6 +3,23 @@
 :root {
 	--font-inter:
 		"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	--page-max-width: 36rem;
+	--page-slide-dur: 250ms;
+	--page-fade-dur: 250ms;
+	--page-slide-distance: 8px;
+	--page-blur: 3px;
+	--page-stagger: 0ms;
+	--page-exit-enabled: 1;
+	--page-slide-ease: cubic-bezier(0.22, 1, 0.36, 1);
+	--page-fade-ease: cubic-bezier(0.22, 1, 0.36, 1);
+	--resize-dur: 300ms;
+	--resize-ease: cubic-bezier(0.22, 1, 0.36, 1);
+	--tabs-dur: 250ms;
+	--tabs-ease: cubic-bezier(0.22, 1, 0.36, 1);
+	--tabs-text-muted: rgba(15, 15, 15, 0.8);
+	--tabs-text-active: #0f0f0f;
+	--tabs-bar-bg: #f1f1f1;
+	--tabs-pill-bg: #ffffff;
 }
 
 @theme inline {

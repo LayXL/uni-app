@@ -82,7 +82,7 @@ const FeaturesOverviewStep = ({ onNext }: StepProps) => {
 					description="Делись заданиями с&nbsp;одногруппниками и&nbsp;сдавай всё вовремя"
 				/>
 			</div>
-			<div className="fixed bottom-0 left-0 right-0 mb-(--safe-area-inset-bottom)">
+			<div className="fixed bottom-0 left-0 right-0 mx-auto max-w-(--page-max-width) mb-(--safe-area-inset-bottom)">
 				<div className="pointer-events-none absolute inset-0 -mt-8 bg-linear-to-t/srgb from-background from-50% to-background/0" />
 				<div className="p-3 grid">
 					<Button label="Поехали!" onClick={onNext} />
@@ -165,7 +165,7 @@ export default function OnboardingPage() {
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
 				exit={{ opacity: 0 }}
-				className="absolute inset-0 p-4 pt-(--safe-area-inset-top)"
+				className="absolute inset-0 mx-auto max-w-(--page-max-width) p-4 pt-(--safe-area-inset-top)"
 			>
 				<Step onNext={handleNext} />
 			</motion.div>

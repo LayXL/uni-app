@@ -16,6 +16,7 @@ import { useMapCanvas } from "../hooks/use-map-canvas"
 import { useMapData } from "../hooks/use-map-data"
 import { useMapInteractions } from "../hooks/use-map-interactions"
 import { useMapViewport } from "../hooks/use-map-viewport"
+import { usePersistedMapView } from "../hooks/use-persisted-map-view"
 import { useRouteBuilder } from "../hooks/use-route-builder"
 import { useSelectedRoom } from "../hooks/use-selected-room"
 import {
@@ -24,6 +25,7 @@ import {
 	createViewportMatrix,
 	getRoomWorldCenter,
 } from "../lib/geometry"
+import { restoreMapView } from "../lib/persisted-map-view"
 import type { ViewportState } from "../types"
 import { CursorPositionDebug } from "./cursor-position-debug"
 import { MapControls } from "./map-controls"
@@ -75,6 +77,8 @@ export const MapViewer = ({ initialRoomId }: MapViewerProps) => {
 	const iconBaseScaleRef = useRef(new WeakMap<fabric.Object, number>())
 	const [rotation, setRotation] = useState(0)
 	const [isCanvasReady, setIsCanvasReady] = useState(false)
+	const [isViewportReady, setIsViewportReady] = useState(false)
+	const savedView = usePersistedMapView(isViewportReady)
 	const [cursorCoords, setCursorCoords] = useState<{
 		screen: { x: number; y: number }
 		world: { x: number; y: number }
@@ -233,23 +237,56 @@ export const MapViewer = ({ initialRoomId }: MapViewerProps) => {
 				source: "schedule",
 			})
 			centeredRoomIdRef.current = initialRoom.id
-			hasCenteredDefaultRef.current = false
+			hasCenteredDefaultRef.current = true
+			setIsViewportReady(true)
 			return
 		}
 
+		if (centeredRoomIdRef.current !== null) {
+			centeredRoomIdRef.current = null
+			setSelectedRoomId(null)
+		}
 		if (hasCenteredDefaultRef.current) return
+		if (savedView === undefined) return
 
-		centerOnFloor(activeFloor)
+		const savedFloor = savedView
+			? mapData.floors.find((floor) => floor.id === savedView.floorId)
+			: undefined
+		if (savedView && savedFloor) {
+			if (activeFloor !== savedFloor.id) {
+				setActiveFloor(savedFloor.id)
+				return
+			}
+
+			const canvas = fabricRef.current
+			if (!canvas) return
+			applyViewport(
+				restoreMapView(savedView, canvas.getWidth(), canvas.getHeight()),
+			)
+		} else {
+			const defaultFloor =
+				mapData.floors.find((floor) => floor.id === activeFloor) ??
+				mapData.floors[0]
+			if (!defaultFloor) return
+			if (activeFloor !== defaultFloor.id) {
+				setActiveFloor(defaultFloor.id)
+				return
+			}
+			centerOnFloor(defaultFloor.id)
+		}
 		setSelectedRoomId(null)
 		centeredRoomIdRef.current = null
 		hasCenteredDefaultRef.current = true
+		setIsViewportReady(true)
 	}, [
 		activeFloor,
+		applyViewport,
 		centerOnFloor,
 		centerOnRoom,
 		initialRoom,
 		isCanvasReady,
 		mapData,
+		savedView,
 		setActiveFloor,
 		setSelectedRoomId,
 	])

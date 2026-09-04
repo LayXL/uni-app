@@ -169,6 +169,13 @@
       "when": 1788295611848,
       "tag": "0023_first_beyonder",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1788483778649,
+      "tag": "0024_update_building_map",
+      "breakpoints": true
     }
   ]
 }

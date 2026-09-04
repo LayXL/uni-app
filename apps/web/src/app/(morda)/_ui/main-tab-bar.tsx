@@ -56,7 +56,10 @@ export function MainTabBar() {
 		<>
 			<div
 				aria-hidden="true"
-				className="pointer-events-none fixed inset-x-0 bottom-0 z-10 h-[calc(var(--tab-bar-height)+var(--safe-area-inset-bottom)+2.25rem)] bg-linear-to-t from-background to-transparent"
+				className={cn(
+					"pointer-events-none fixed inset-x-0 bottom-0 z-10 h-[calc(var(--tab-bar-height)+var(--safe-area-inset-bottom)+2.25rem)] bg-linear-to-t to-transparent",
+					pathname === "/map" ? "from-(--map-background)" : "from-background",
+				)}
 			/>
 			<nav
 				aria-label="Основные разделы"
