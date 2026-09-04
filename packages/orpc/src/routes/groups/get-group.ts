@@ -6,6 +6,7 @@ import { env } from "@repo/env"
 import { testingGroup, testingTeacherGroups } from "@repo/shared/testing-group"
 
 import { publicProcedure } from "../../procedures/public"
+import { withAvatar } from "./with-avatar"
 
 export const getGroup = publicProcedure
 	.input(
@@ -19,7 +20,7 @@ export const getGroup = publicProcedure
 		)
 
 		if (env.testingGroupEnabled && testingGroupOrTeacher) {
-			return testingGroupOrTeacher
+			return withAvatar(testingGroupOrTeacher)
 		}
 
 		const group = await db
@@ -35,5 +36,5 @@ export const getGroup = publicProcedure
 			throw new ORPCError("NOT_FOUND")
 		}
 
-		return group
+		return withAvatar(group)
 	})

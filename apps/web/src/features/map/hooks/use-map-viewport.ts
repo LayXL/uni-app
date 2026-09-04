@@ -2,6 +2,7 @@ import * as fabric from "fabric"
 import { type RefObject, useCallback, useEffect, useMemo } from "react"
 
 import { clamp, createViewportMatrix } from "../lib/geometry"
+import { updateIconLabelVisibility } from "../lib/icon-label-visibility"
 import type { FabricMatrix, ViewportState } from "../types"
 import { useMapState } from "./use-map-state"
 
@@ -48,9 +49,7 @@ export const useMapViewport = ({
 				const height = canvas.getHeight()
 				const screenCenter = new fabric.Point(width / 2, height / 2)
 
-				const inverted = fabric.util.invertTransform(
-					createViewportMatrix(next),
-				)
+				const inverted = fabric.util.invertTransform(createViewportMatrix(next))
 				const worldCenter = fabric.util.transformPoint(screenCenter, inverted)
 
 				const padding = 200
@@ -98,6 +97,7 @@ export const useMapViewport = ({
 			})
 
 			iconObjectsRef.current.forEach((icon) => {
+				updateIconLabelVisibility(icon, next.zoom)
 				icon.set("angle", rotationDeg)
 				const baseScale =
 					iconBaseScaleRef.current.get(icon) ??
@@ -181,6 +181,7 @@ export const useMapViewport = ({
 			})
 
 			iconObjectsRef.current.forEach((icon) => {
+				updateIconLabelVisibility(icon, state.zoom)
 				icon.set("angle", rotationDeg)
 				const baseScaleX =
 					iconBaseScaleRef.current.get(icon) ??

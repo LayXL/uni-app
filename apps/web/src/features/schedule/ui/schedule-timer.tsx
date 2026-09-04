@@ -11,6 +11,7 @@ import { useNowInYekaterinburg } from "@/shared/hooks/use-now-in-yekaterinburg"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
 
 import { useScheduleGroup } from "../hooks/use-schedule-group"
+import { ScheduleTimerDigits } from "./schedule-timer-digits"
 
 const getOrdinal = (n: number) => `${n}-й`
 
@@ -233,9 +234,7 @@ const ScheduleTimerWithGroup = ({ group }: { group: number }) => {
 				<LiquidBorder />
 				<div className="text-center text-lg flex flex-col items-center justify-center">
 					{timerState.time && (
-						<span className="text-2xl font-semibold tabular-nums">
-							{timerState.time}
-						</span>
+						<ScheduleTimerDigits time={timerState.time} />
 					)}
 					<span className="text-sm text-muted font-medium">
 						{timerState.label}
@@ -243,7 +242,7 @@ const ScheduleTimerWithGroup = ({ group }: { group: number }) => {
 				</div>
 			</div>
 			{nextEvents.length > 0 && (
-				<div className="flex flex-col gap-1 px-4 mt-2">
+				<div className="flex flex-col gap-1 px-2 mt-2">
 					{nextEvents.map((event, i) => (
 						<div key={i} className="text-xs flex justify-between gap-2">
 							<span className="text-muted truncate">{event.label}</span>

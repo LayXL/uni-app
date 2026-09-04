@@ -12,6 +12,7 @@ import { analytics } from "@/shared/lib/analytics"
 import { useActiveFloor } from "../hooks/use-active-floor"
 import { useColorScheme } from "../hooks/use-color-scheme"
 import { useFloorRender } from "../hooks/use-floor-render"
+import { useFloorTransition } from "../hooks/use-floor-transition"
 import { useMapCanvas } from "../hooks/use-map-canvas"
 import { useMapData } from "../hooks/use-map-data"
 import { useMapInteractions } from "../hooks/use-map-interactions"
@@ -31,6 +32,8 @@ import { CursorPositionDebug } from "./cursor-position-debug"
 import { MapControls } from "./map-controls"
 import { RoomModal } from "./room-modal"
 import { RouteBuilderModal } from "./route-builder-modal"
+
+import "./floor-transition.css"
 
 type MapViewerProps = {
 	initialRoomId?: number
@@ -79,6 +82,13 @@ export const MapViewer = ({ initialRoomId }: MapViewerProps) => {
 	const [isCanvasReady, setIsCanvasReady] = useState(false)
 	const [isViewportReady, setIsViewportReady] = useState(false)
 	const savedView = usePersistedMapView(isViewportReady)
+	const { transitionRef, liveLayerRef, snapshotRef, onFloorReady } =
+		useFloorTransition({
+			activeFloor,
+			floors: mapData.floors,
+			canvasRef,
+			enabled: isViewportReady,
+		})
 	const [cursorCoords, setCursorCoords] = useState<{
 		screen: { x: number; y: number }
 		world: { x: number; y: number }
@@ -358,11 +368,28 @@ export const MapViewer = ({ initialRoomId }: MapViewerProps) => {
 		route: isActive ? routeData?.route : undefined,
 		enabled: isCanvasReady,
 		colorScheme,
+		onFloorReady,
 	})
 
 	return (
 		<div className="relative h-full w-full overflow-hidden bg-(--map-background)">
-			<canvas ref={canvasRef} className="size-full" />
+			<div
+				ref={transitionRef}
+				className="map-floor-transition t-page-slide"
+				data-page="1"
+			>
+				<div ref={liveLayerRef} className="t-page" data-page-id="1">
+					<canvas ref={canvasRef} className="size-full" />
+				</div>
+				<canvas
+					ref={snapshotRef}
+					className="t-page"
+					data-page-id="2"
+					aria-hidden="true"
+					tabIndex={-1}
+					inert
+				/>
+			</div>
 
 			{isDebug && cursorCoords && (
 				<CursorPositionDebug cursorCoords={cursorCoords} />

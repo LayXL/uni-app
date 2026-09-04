@@ -7,6 +7,13 @@ import { getFloorContours } from "@repo/shared/building-scheme-geometry"
 
 import { getMapColors } from "../lib/colors"
 import { clamp, getRoomPolygon } from "../lib/geometry"
+import { updateIconLabelVisibility } from "../lib/icon-label-visibility"
+import {
+	getMapIconColor,
+	MAP_ICON_LABEL_TOP,
+	MAP_ICON_RADIUS,
+	MAP_ICON_SIZE,
+} from "../lib/icon-style"
 import type { ViewportState } from "../types"
 
 const iconImageCache = new Map<string, Promise<HTMLImageElement>>()
@@ -17,7 +24,7 @@ const isToiletRoom = (room: Room) =>
 	room.name.trim().toLowerCase() === TOILET_ROOM_NAME
 
 const getRoomMapIcon = (room: Room) =>
-	isToiletRoom(room) ? TOILET_ROOM_ICON : room.icon
+	room.icon ?? (isToiletRoom(room) ? TOILET_ROOM_ICON : undefined)
 
 const getCachedIcon = (src: string) => {
 	if (!iconImageCache.has(src)) {
@@ -72,6 +79,7 @@ type UseFloorRenderParams = {
 	route?: RoutePoint[]
 	enabled?: boolean
 	colorScheme?: "light" | "dark"
+	onFloorReady?: (floorId: number) => void
 }
 
 type RoutePoint = {
@@ -175,6 +183,7 @@ export const useFloorRender = ({
 	route,
 	enabled = true,
 	colorScheme,
+	onFloorReady,
 }: UseFloorRenderParams) => {
 	const routeObjectsRef = useRef<fabric.Object[]>([])
 
@@ -386,6 +395,7 @@ export const useFloorRender = ({
 			imgEl: HTMLImageElement,
 			x: number,
 			y: number,
+			color: string,
 			extraObjects?: fabric.FabricObject[],
 			withShadow = false,
 		): fabric.Group => {
@@ -396,7 +406,7 @@ export const useFloorRender = ({
 				noScaleCache: true,
 			})
 
-			const targetSize = 14
+			const targetSize = MAP_ICON_SIZE
 			const scaleX = img.width && img.width > 0 ? targetSize / img.width : 1
 			const scaleY = img.height && img.height > 0 ? targetSize / img.height : 1
 
@@ -404,8 +414,8 @@ export const useFloorRender = ({
 
 			const groupObjects: fabric.FabricObject[] = [
 				new fabric.Circle({
-					radius: 10,
-					fill: colors.roomStroke,
+					radius: MAP_ICON_RADIUS,
+					fill: color,
 					originX: "center",
 					originY: "center",
 					objectCaching: false,
@@ -439,6 +449,7 @@ export const useFloorRender = ({
 		// Collect all icon tasks to process in batches
 		type IconTask = {
 			iconSrc: string
+			color: string
 			x: number
 			y: number
 			extraObjects?: fabric.FabricObject[]
@@ -452,6 +463,7 @@ export const useFloorRender = ({
 		floor.stairs?.forEach((stair) => {
 			iconTasks.push({
 				iconSrc: "/icons/stairs.svg",
+				color: getMapIconColor("stairs"),
 				x: floor.position.x + stair.position.x,
 				y: floor.position.y + stair.position.y,
 				angle: (-viewportRef.current.rotation * 180) / Math.PI,
@@ -464,6 +476,7 @@ export const useFloorRender = ({
 			const iconName = place.icon || place.placeType || "place"
 			iconTasks.push({
 				iconSrc: `/icons/${iconName}.svg`,
+				color: getMapIconColor(iconName),
 				x: floor.position.x + place.position.x,
 				y: floor.position.y + place.position.y,
 				angle: (-viewportRef.current.rotation * 180) / Math.PI,
@@ -503,7 +516,7 @@ export const useFloorRender = ({
 								fill: colors.roomLabel,
 								originX: "center",
 								originY: "top",
-								top: 14,
+								top: MAP_ICON_LABEL_TOP,
 								objectCaching: false,
 								noScaleCache: true,
 							}),
@@ -511,6 +524,7 @@ export const useFloorRender = ({
 
 				iconTasks.push({
 					iconSrc: `/icons/${roomIcon}.svg`,
+					color: getMapIconColor(roomIcon),
 					x: centerX,
 					y: centerY,
 					extraObjects,
@@ -553,6 +567,7 @@ export const useFloorRender = ({
 						iconData.imgEl,
 						iconData.x,
 						iconData.y,
+						iconData.color,
 						iconData.extraObjects,
 						iconData.withShadow,
 					)
@@ -572,6 +587,7 @@ export const useFloorRender = ({
 			const iconFontScale = clamp(1 / viewportRef.current.zoom ** 0.7, 0.75, 4)
 
 			markers.forEach((marker) => {
+				updateIconLabelVisibility(marker, viewportRef.current.zoom)
 				const baseScale = marker.scaleX ?? 1
 				iconBaseScaleRef.current.set(marker, baseScale)
 				iconObjectsRef.current.push(marker)
@@ -584,8 +600,9 @@ export const useFloorRender = ({
 				fabricRef.current?.add(marker)
 			})
 
-			// Single render call after all icons are added
-			fabricRef.current?.requestRenderAll()
+			// Paint before the transition reveals this floor.
+			fabricRef.current?.renderAll()
+			onFloorReady?.(activeFloor)
 		}
 
 		// Start icon loading asynchronously
@@ -606,6 +623,7 @@ export const useFloorRender = ({
 		isDebug,
 		enabled,
 		colorScheme,
+		onFloorReady,
 	])
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: colorScheme and isDebug rebuild the floor canvas, so the outline must be restored too.

@@ -176,6 +176,41 @@
       "when": 1788483778649,
       "tag": "0024_update_building_map",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1788564000000,
+      "tag": "0025_merge_first_floor_rooms",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1788564060000,
+      "tag": "0026_wardrobe_map_icon",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1788564120000,
+      "tag": "0027_hide_second_floor_printer",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1788564180000,
+      "tag": "0028_remove_typography",
+      "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1788564240000,
+      "tag": "0029_first_floor_toilet_icons",
+      "breakpoints": true
     }
   ]
 }

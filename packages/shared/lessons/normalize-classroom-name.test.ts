@@ -34,12 +34,33 @@ describe("normalizeClassroomName", () => {
 		"305Aкт",
 		"305Акт",
 		" 305AКТ ",
+		"акт.зал",
+		" АКТ.ЗАЛ ",
+		"акт. зал",
+		"акт зал",
+		"акт. зал.",
+		"актзал",
+		"305 Акт",
+		"305Акт.",
+		"305 Aкт.",
+		"акт.зал (1)",
+		" АКТ.  ЗАЛ. (2) ",
+		"305 Акт. (1)",
+		"Актовый зал (1)",
+		" АКТОВЫЙ   ЗАЛ ",
 	])("maps %s to the assembly hall", (classroom) => {
 		expect(normalizeClassroomName(classroom)).toBe("Актовый зал")
 	})
 
-	test("keeps other classroom names unchanged", () => {
-		expect(normalizeClassroomName("305")).toBe("305")
+	test.each([
+		"305",
+		"305а",
+		"Малый актовый зал",
+		"акт.зал отменено",
+		"акт.зал (ремонт)",
+		"124 шк (1)",
+	])("keeps %s unchanged", (classroom) => {
+		expect(normalizeClassroomName(classroom)).toBe(classroom)
 	})
 
 	test.each([
@@ -57,6 +78,11 @@ describe("normalizeClassroomName", () => {
 describe("mapClassroom", () => {
 	test.each([
 		["305Aкт", "Актовый зал", 10],
+		["акт.зал", "Актовый зал", 10],
+		["акт. зал.", "Актовый зал", 10],
+		["305 Акт.", "Актовый зал", 10],
+		["акт.зал (1)", "Актовый зал", 10],
+		["Актовый зал (2)", "Актовый зал", 10],
 		["122 А", "122А", 2],
 		["122 Б", "122Б", 3],
 		["122 биб.", "122", 1],
@@ -95,6 +121,12 @@ describe("getClassroomNamesForRoom", () => {
 			"Актовый зал",
 			"305Aкт",
 			"305Акт",
+			"акт.зал",
+			"акт. зал",
+			"акт зал",
+			"акт. зал.",
+			"305 Акт",
+			"305Акт.",
 		])
 	})
 

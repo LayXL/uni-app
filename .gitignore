@@ -122,3 +122,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local development artifacts
+.tanstack/
+debug-storybook.log

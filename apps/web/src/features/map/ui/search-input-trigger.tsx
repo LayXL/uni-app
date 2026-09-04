@@ -72,7 +72,7 @@ export const SearchInputTrigger = ({
 							onChange={handleChange}
 							filterFn={filterFn}
 							placeholder={placeholder}
-							maxSuggestions={8}
+							maxSuggestions={30}
 							emptyMessage="Место не найдено"
 							onBlur={() => setIsOpen(false)}
 						/>

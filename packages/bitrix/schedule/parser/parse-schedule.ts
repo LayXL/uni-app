@@ -45,13 +45,18 @@ export const parseSchedule = async (html: string, groupName: string) => {
 		let j = 0
 
 		for (const lesson of lessons) {
-			const originalLesson = originalCards[i].querySelectorAll("tbody>tr")[j]
+			const originalLesson = originalCards[i]?.querySelectorAll("tbody>tr")[j]
 
 			const parsedLesson = parseLesson(lesson)
 
-			const { isChanged: _, ...originalParsedLesson } = originalLesson
-				? parseLesson(originalLesson)
-				: { isChanged: false }
+			const originalParsed = originalLesson ? parseLesson(originalLesson) : null
+			const { isChanged: _, ...originalParsedLesson } = originalParsed ?? {
+				isChanged: false,
+			}
+
+			if (parsedLesson.isCancelled && originalParsed) {
+				parsedLesson.subject = originalParsed.subject
+			}
 
 			output.push({
 				date,

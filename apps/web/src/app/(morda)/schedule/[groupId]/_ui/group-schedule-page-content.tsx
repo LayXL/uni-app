@@ -3,19 +3,21 @@
 import { useQuery } from "@tanstack/react-query"
 
 import { orpc } from "@repo/orpc/react"
-import { getTeacherGender } from "@repo/shared/groups/get-teacher-gender"
-import { inclineTeacherName } from "@repo/shared/groups/incline-teacher-name"
 import { transformToGroupName } from "@repo/shared/groups/transform-to-group-name"
 import { getNextTwoWeeksDates } from "@repo/shared/lessons/get-next-two-weeks-dates"
 
 import { ScheduleViewerWithGroup } from "@/features/schedule/ui/schedule-viewer"
+import { TeacherScheduleProfile } from "@/features/schedule/ui/teacher-schedule-profile"
 import { useIsClient } from "@/shared/hooks/use-is-client"
+import { BackButton } from "@/shared/ui/back-button"
 import { PageTitle } from "@/shared/ui/page-title"
+import { isVK } from "@/shared/utils/is-vk"
 
 type ScheduleGroup = {
 	id: number
 	displayName: string
 	type: "teacher" | "studentsGroup"
+	avatarUrl: string | null
 }
 
 export const GroupScheduleSkeleton = () => (
@@ -33,17 +35,31 @@ export const GroupScheduleSkeleton = () => (
 )
 
 const GroupScheduleView = ({ group }: { group: ScheduleGroup }) => {
-	const title =
-		group.type === "teacher"
-			? `${getTeacherGender(group) === "female" ? "Преподавательницы" : "Преподавателя"} ${inclineTeacherName(group, "genitive")}`
-			: `Группы ${transformToGroupName(group)}`
-
 	return (
 		<div className="flex flex-col pt-[calc(var(--safe-area-inset-top)+1rem)]">
-			<div className="px-4">
-				<PageTitle title="Расписание" />
-			</div>
-			<p className="text-sm px-4 mb-4">{title}</p>
+			{group.type === "teacher" ? (
+				<>
+					{isVK() && (
+						<div className="px-4">
+							<BackButton />
+						</div>
+					)}
+					<TeacherScheduleProfile
+						displayName={group.displayName}
+						avatarUrl={group.avatarUrl}
+					/>
+					<h2 className="px-4 mb-4 text-xl font-bold">Расписание</h2>
+				</>
+			) : (
+				<>
+					<div className="px-4">
+						<PageTitle title="Расписание" />
+					</div>
+					<p className="text-sm px-4 mb-4">
+						Группы {transformToGroupName(group)}
+					</p>
+				</>
+			)}
 			<ScheduleViewerWithGroup
 				group={group.id}
 				isTeacherView={group.type === "teacher"}
