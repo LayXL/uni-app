@@ -1,5 +1,5 @@
 import type { Transition } from "motion/react"
-import { type ReactNode, useEffect, useState } from "react"
+import { type ReactNode, useEffect, useRef, useState } from "react"
 
 import { useDisableScroll } from "../hooks/use-disable-scroll"
 import { cn } from "../utils/cn"
@@ -38,6 +38,7 @@ export const ModalRoot = ({
 	const handleClose = onClose ?? close ?? (() => {})
 	const [shouldRender, setShouldRender] = useState(isOpen)
 	const [isAnimating, setIsAnimating] = useState(false)
+	const panelRef = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
 		if (isOpen) {
@@ -56,14 +57,56 @@ export const ModalRoot = ({
 		}
 	}, [isOpen])
 
-	useDisableScroll(isOpen)
+	useEffect(() => {
+		if (!isOpen || !hideBackdrop) return
+
+		const handleOutsideInteraction = (event: Event) => {
+			// Interacting with another modal must not dismiss the one underneath.
+			if (
+				event.target instanceof Element &&
+				event.target.closest("[data-modal-root]")
+			) {
+				return
+			}
+
+			if (
+				panelRef.current &&
+				event.target instanceof Node &&
+				!panelRef.current.contains(event.target)
+			) {
+				handleClose()
+			}
+		}
+
+		// Close before the map handles the same interaction, without consuming it.
+		const options = { capture: true, passive: true }
+		document.addEventListener("pointerdown", handleOutsideInteraction, options)
+		document.addEventListener("wheel", handleOutsideInteraction, options)
+
+		return () => {
+			document.removeEventListener(
+				"pointerdown",
+				handleOutsideInteraction,
+				true,
+			)
+			document.removeEventListener("wheel", handleOutsideInteraction, true)
+		}
+	}, [isOpen, hideBackdrop, handleClose])
+
+	useDisableScroll(isOpen && !hideBackdrop)
 	usePopupClose(isOpen, handleClose)
 
 	if (!shouldRender) return null
 
 	return (
 		<Portal>
-			<div className="fixed inset-0 z-50">
+			<div
+				data-modal-root
+				className={cn(
+					"fixed inset-0 z-50",
+					hideBackdrop && "pointer-events-none",
+				)}
+			>
 				{!hideBackdrop && (
 					<div
 						role="button"
@@ -76,10 +119,12 @@ export const ModalRoot = ({
 					/>
 				)}
 				<div
+					ref={panelRef}
 					className={cn(
 						"absolute left-0 right-0 bottom-0 bg-background border-t border-border rounded-t-3xl p-4 pb-[calc(var(--safe-area-inset-bottom)+1rem)] transition-transform duration-300 ease-out",
 						isAnimating ? "translate-y-0" : "translate-y-full",
 						fullHeight && "h-dvh",
+						hideBackdrop && isOpen && "pointer-events-auto",
 					)}
 				>
 					{showCloseButton && (

@@ -310,6 +310,7 @@ export const MapViewer = ({ initialRoomId }: MapViewerProps) => {
 		fabricRef,
 		data: mapData,
 		activeFloor,
+		selectedRoomId,
 		applyViewport,
 		viewportRef,
 		textObjectsRef,
@@ -331,6 +332,7 @@ export const MapViewer = ({ initialRoomId }: MapViewerProps) => {
 			)}
 
 			<MapControls
+				hidden={selectedRoomId != null}
 				activeFloor={activeFloor}
 				onChangeFloor={(floorId) => {
 					setActiveFloor(floorId)

@@ -60,6 +60,7 @@ type UseFloorRenderParams = {
 	fabricRef: RefObject<fabric.Canvas | null>
 	data: BuildingScheme | undefined
 	activeFloor: number
+	selectedRoomId?: number | null
 	applyViewport?: (next: ViewportState) => void
 	viewportRef: RefObject<ViewportState>
 	textObjectsRef: RefObject<fabric.Text[]>
@@ -163,6 +164,7 @@ export const useFloorRender = ({
 	fabricRef,
 	data,
 	activeFloor,
+	selectedRoomId,
 	viewportRef,
 	textObjectsRef,
 	labelBaseSizeRef,
@@ -597,6 +599,45 @@ export const useFloorRender = ({
 		isDebug,
 		enabled,
 		colorScheme,
+	])
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: colorScheme and isDebug rebuild the floor canvas, so the outline must be restored too.
+	useEffect(() => {
+		const canvas = fabricRef.current
+		if (!enabled || !canvas || selectedRoomId == null) return
+
+		const floor = data?.floors.find((floor) => floor.id === activeFloor)
+		const room = data?.entities.find((entity) => entity.id === selectedRoomId)
+		if (!floor || !room || !isRoom(room) || room.floorId !== activeFloor) return
+
+		const outline = new fabric.Path(
+			getRoundedPolygonPath(getRoomPolygon(room, floor.position)),
+			{
+				fill: undefined,
+				stroke: getMapColors().selectedRoomStroke,
+				strokeWidth: 6,
+				strokeUniform: true,
+				selectable: false,
+				evented: false,
+				objectCaching: false,
+			},
+		)
+
+		canvas.add(outline)
+		canvas.requestRenderAll()
+
+		return () => {
+			canvas.remove(outline)
+			canvas.requestRenderAll()
+		}
+	}, [
+		activeFloor,
+		colorScheme,
+		data,
+		enabled,
+		fabricRef,
+		isDebug,
+		selectedRoomId,
 	])
 
 	useEffect(() => {

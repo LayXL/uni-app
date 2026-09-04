@@ -11,23 +11,14 @@ import { useScheduleGroup } from "@/features/schedule/hooks/use-schedule-group"
 import { ScheduleHeader } from "@/features/schedule/ui/schedule-header"
 import { ScheduleTimer } from "@/features/schedule/ui/schedule-timer"
 import { useIsClient } from "@/shared/hooks/use-is-client"
+import { PageSkeleton } from "@/shared/ui/page-skeleton"
 import { SaveCurrentGroupAsUser } from "@/widgets/save-current-group-as-user"
 import { ScheduleWithMapNavigation } from "@/widgets/schedule-with-map-navigation"
 
 import { SettingsLink } from "./settings-button"
 
 export const SchedulePageSkeleton = () => (
-	<div role="status" aria-busy="true" aria-label="Загрузка расписания">
-		<div className="flex h-16 items-center justify-between pl-4 pr-2">
-			<h2 className="text-2xl font-semibold">Расписание</h2>
-			<div className="h-10 min-w-26 animate-pulse rounded-3xl bg-card" />
-		</div>
-		<div className="flex animate-pulse flex-col gap-4 px-2">
-			<div className="h-24 rounded-3xl bg-card" />
-			<div className="h-40 rounded-3xl bg-card" />
-			<div className="h-40 rounded-3xl bg-card" />
-		</div>
-	</div>
+	<PageSkeleton title="Расписание" label="Загрузка расписания" />
 )
 
 const SchedulePageView = () => (

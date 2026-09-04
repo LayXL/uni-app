@@ -1,7 +1,10 @@
+import { cn } from "@/shared/utils/cn"
+
 import { FloorControls } from "./floor-control"
 import { PositionControls } from "./position-controls"
 
 type MapControlsProps = {
+	hidden?: boolean
 	activeFloor: number
 	onChangeFloor: (floorId: number) => void
 	zoomByStep: (deltaZoom: number) => void
@@ -10,6 +13,7 @@ type MapControlsProps = {
 }
 
 export const MapControls = ({
+	hidden = false,
 	activeFloor,
 	onChangeFloor,
 	zoomByStep,
@@ -17,15 +21,21 @@ export const MapControls = ({
 	resetRotation,
 }: MapControlsProps) => {
 	return (
-		<div className="pointer-events-none absolute inset-x-0 top-1/2 flex -translate-y-1/2 items-center justify-between px-3">
-			<div className="pointer-events-auto">
+		<div
+			inert={hidden}
+			className={cn(
+				"pointer-events-none absolute inset-x-0 top-1/2 flex -translate-y-1/2 items-center justify-between px-3 transition-opacity duration-300 ease-in-out motion-reduce:transition-none",
+				hidden ? "opacity-0" : "opacity-100",
+			)}
+		>
+			<div className={hidden ? "pointer-events-none" : "pointer-events-auto"}>
 				<FloorControls
 					activeFloor={activeFloor}
 					onChangeFloor={onChangeFloor}
 				/>
 			</div>
 
-			<div className="pointer-events-auto">
+			<div className={hidden ? "pointer-events-none" : "pointer-events-auto"}>
 				<PositionControls
 					zoomByStep={zoomByStep}
 					rotation={rotation}
