@@ -6,16 +6,45 @@ import { and, classesTable, db, eq, groupsTable, gt, gte } from "@repo/drizzle"
 import { env } from "@repo/env"
 import { getSubjectIdByName } from "@repo/shared/get-subject-id-by-name"
 
+import { getParsingTimeRemaining } from "./parsing-window"
+
 const REQUEST_DELAY_MS = 100
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export const updateScheduleInDatabase = async () => {
+	const timeRemaining = getParsingTimeRemaining()
+	if (timeRemaining === 0) {
+		console.info(
+			"Skipping schedule update outside 05:00–19:00 Asia/Yekaterinburg",
+		)
+		return
+	}
+
+	const controller = new AbortController()
+	const deadline = setTimeout(() => controller.abort(), timeRemaining)
+	try {
+		await parseAndSaveSchedule(controller.signal)
+	} catch (error) {
+		if (!controller.signal.aborted) throw error
+		console.info(
+			"Schedule parsing stopped at 19:00 Asia/Yekaterinburg; incomplete update discarded",
+		)
+	} finally {
+		clearTimeout(deadline)
+	}
+}
+
+const parseAndSaveSchedule = async (signal: AbortSignal) => {
 	console.info("Updating schedule in database")
 
-	const { cookie } = await getSession(env.bitrixLogin, env.bitrixPassword)
+	const { cookie } = await getSession(
+		env.bitrixLogin,
+		env.bitrixPassword,
+		signal,
+	)
 
-	const groups = await getGroups(cookie)
+	const groups = await getGroups(cookie, signal)
 
 	const newClasses: (typeof classesTable.$inferSelect)[] = []
 
@@ -25,6 +54,7 @@ export const updateScheduleInDatabase = async () => {
 		if (i > 0) {
 			await sleep(REQUEST_DELAY_MS)
 		}
+		signal.throwIfAborted()
 
 		console.info(
 			`[${i + 1}/${groups.length}] Parsing ${group.id} — ${group.displayName}`,
@@ -32,12 +62,13 @@ export const updateScheduleInDatabase = async () => {
 
 		const data =
 			group.type === "teacher"
-				? await getTeacherSchedule(group.bitrixId, cookie)
-				: await getSchedule(group.displayName, cookie)
+				? await getTeacherSchedule(group.bitrixId, cookie, signal)
+				: await getSchedule(group.displayName, cookie, signal)
 
 		if (!data) continue
 
 		for (const scheduleItem of data) {
+			signal.throwIfAborted()
 			const subjectId = await getSubjectIdByName(scheduleItem.subject)
 
 			const existingClassIndex = newClasses.findIndex(
@@ -80,14 +111,16 @@ export const updateScheduleInDatabase = async () => {
 	}
 
 	await db.transaction(async (tx) => {
+		signal.throwIfAborted()
 		await tx.delete(classesTable).where(gte(classesTable.date, minDate))
 		await tx.insert(classesTable).values(newClasses)
+		signal.throwIfAborted()
 	})
 
 	console.info("Schedule in database updated")
 }
 
-const getGroups = async (cookie: string) => {
+const getGroups = async (cookie: string, signal: AbortSignal) => {
 	const groups = await db
 		.select()
 		.from(groupsTable)
@@ -96,7 +129,8 @@ const getGroups = async (cookie: string) => {
 	if (groups.length === 0) {
 		console.info("No groups found in database, fetching from Bitrix")
 
-		const newGroups = await getAllGroups(cookie)
+		const newGroups = await getAllGroups(cookie, signal)
+		signal.throwIfAborted()
 
 		return db.insert(groupsTable).values(newGroups).returning()
 	}

@@ -29,9 +29,14 @@ const mapSequentially = async <Input, Output>(
 	return results
 }
 
-const getGroupsForGrade = async (grade: number, cookie: string) => {
+const getGroupsForGrade = async (
+	grade: number,
+	cookie: string,
+	signal?: AbortSignal,
+) => {
 	const data = await bitrix
 		.post("local/handlers/schedule/groups.php", {
+			signal,
 			body: `gradeLevel=${grade}`,
 			headers: {
 				Cookie: cookie,
@@ -46,11 +51,13 @@ const getGroupsForGrade = async (grade: number, cookie: string) => {
 const parseStudentGroup = async (
 	group: BitrixGroup,
 	cookie: string,
+	signal?: AbortSignal,
 ): Promise<Group[]> => {
 	try {
 		const groupSchedule = await getBitrixTextWithRecovery(
 			"mobile/teacher/schedule/spo_and_vo.php",
 			{
+				signal,
 				searchParams: { name: group.GROUP_NAME },
 				headers: {
 					Cookie: cookie,
@@ -92,10 +99,12 @@ const parseStudentGroup = async (
 const getTeachersForDepartment = async (
 	department: string,
 	cookie: string,
+	signal?: AbortSignal,
 ): Promise<Group[]> => {
 	try {
 		const data = await bitrix
 			.post("local/handlers/schedule/users.php", {
+				signal,
 				body: `gradeLevel=57&group=${department}`,
 				headers: {
 					Cookie: cookie,
@@ -117,10 +126,10 @@ const getTeachersForDepartment = async (
 	}
 }
 
-export async function getAllGroups(cookie: string) {
+export async function getAllGroups(cookie: string, signal?: AbortSignal) {
 	const startedAt = Date.now()
 	const groupsByGrade = await mapSequentially([3, 4], (grade) =>
-		getGroupsForGrade(grade, cookie),
+		getGroupsForGrade(grade, cookie, signal),
 	)
 	const fetchedStudentGroups = groupsByGrade.flat()
 	const studentGroupSources = [
@@ -133,15 +142,15 @@ export async function getAllGroups(cookie: string) {
 	]
 	const studentGroups = (
 		await mapSequentially(studentGroupSources, (group) =>
-			parseStudentGroup(group, cookie),
+			parseStudentGroup(group, cookie, signal),
 		)
 	).flat()
 
-	const departments = [...new Set(await getAllDepartments(cookie))]
+	const departments = [...new Set(await getAllDepartments(cookie, signal))]
 	await sleep(BITRIX_REQUEST_COOLDOWN_MS)
 	const teachers = (
 		await mapSequentially(departments, (department) =>
-			getTeachersForDepartment(department, cookie),
+			getTeachersForDepartment(department, cookie, signal),
 		)
 	).flat()
 
@@ -159,9 +168,13 @@ export async function getAllGroups(cookie: string) {
 	return [...studentGroups, ...teachers]
 }
 
-async function getAllDepartments(cookie: string): Promise<string[]> {
+async function getAllDepartments(
+	cookie: string,
+	signal?: AbortSignal,
+): Promise<string[]> {
 	const data = await bitrix
 		.post("local/handlers/schedule/groups.php", {
+			signal,
 			body: "gradeLevel=57",
 			headers: {
 				Cookie: cookie,

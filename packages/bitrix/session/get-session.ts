@@ -12,8 +12,10 @@ export type Session = {
 export async function getSession(
 	login: string,
 	password: string,
+	signal?: AbortSignal,
 ): Promise<Session> {
 	const authResponse = await bitrix.post("auth/index.php?login=yes", {
+		signal,
 		body: objectToQuery({
 			AUTH_FORM: "Y",
 			TYPE: "AUTH",
