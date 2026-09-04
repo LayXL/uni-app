@@ -7,9 +7,12 @@ import { orpc } from "@repo/orpc/react"
 import { getNextTwoWeeksDates } from "@repo/shared/lessons/get-next-two-weeks-dates"
 
 import { useUser } from "@/entities/user/hooks/useUser"
+import { useInitializeScheduleSplash } from "@/features/schedule/hooks/use-initialize-schedule-splash"
 import { useScheduleGroup } from "@/features/schedule/hooks/use-schedule-group"
+import { useScheduleSplash } from "@/features/schedule/hooks/use-schedule-splash"
 import { ScheduleHeader } from "@/features/schedule/ui/schedule-header"
 import { ScheduleTimer } from "@/features/schedule/ui/schedule-timer"
+import { ScheduleTitle } from "@/features/schedule/ui/schedule-title"
 import { useIsClient } from "@/shared/hooks/use-is-client"
 import { PageSkeleton } from "@/shared/ui/page-skeleton"
 import { SaveCurrentGroupAsUser } from "@/widgets/save-current-group-as-user"
@@ -17,9 +20,15 @@ import { ScheduleWithMapNavigation } from "@/widgets/schedule-with-map-navigatio
 
 import { SettingsLink } from "./settings-button"
 
-export const SchedulePageSkeleton = () => (
-	<PageSkeleton title="Расписание" label="Загрузка расписания" />
-)
+export const SchedulePageSkeleton = () => {
+	const title = useScheduleSplash()
+	return (
+		<PageSkeleton
+			title={title ? <ScheduleTitle /> : undefined}
+			label="Загрузка расписания"
+		/>
+	)
+}
 
 const SchedulePageView = () => (
 	<>
@@ -70,6 +79,7 @@ const ScheduleData = ({ groupId }: { groupId: number }) => {
 export const SchedulePageContent = () => {
 	const user = useUser()
 	const { group } = useScheduleGroup()
+	useInitializeScheduleSplash(user.group)
 
 	if (!user.group) return <Navigate to="/onboarding" replace />
 	if (!group) return <SchedulePageSkeleton />
