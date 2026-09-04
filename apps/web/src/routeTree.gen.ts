@@ -26,6 +26,7 @@ import { Route as AppHomeworkIdRouteImport } from './routes/_app/homework/$id'
 import { Route as AppHomeworkAddRouteImport } from './routes/_app/homework/add'
 import { Route as AppScheduleGroupIdRouteImport } from './routes/_app/schedule/$groupId'
 import { Route as AppSettingsIndexRouteImport } from './routes/_app/settings/index'
+import { Route as AppSettingsAdminRouteImport } from './routes/_app/settings/admin'
 import { Route as AppSettingsMapRouteImport } from './routes/_app/settings/map'
 import { Route as AppEventsIdEditRouteImport } from './routes/_app/events/$id/edit'
 
@@ -113,6 +114,11 @@ const AppSettingsIndexRoute = AppSettingsIndexRouteImport.update({
   path: '/settings/',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppSettingsAdminRoute = AppSettingsAdminRouteImport.update({
+  id: '/settings/admin',
+  path: '/settings/admin',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppSettingsMapRoute = AppSettingsMapRouteImport.update({
   id: '/settings/map',
   path: '/settings/map',
@@ -138,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/homework/$id': typeof AppHomeworkIdRoute
   '/homework/add': typeof AppHomeworkAddRoute
   '/schedule/$groupId': typeof AppScheduleGroupIdRoute
+  '/settings/admin': typeof AppSettingsAdminRoute
   '/settings/map': typeof AppSettingsMapRoute
   '/events/': typeof AppEventsIndexRoute
   '/homework/': typeof AppHomeworkIndexRoute
@@ -158,6 +165,7 @@ export interface FileRoutesByTo {
   '/homework/$id': typeof AppHomeworkIdRoute
   '/homework/add': typeof AppHomeworkAddRoute
   '/schedule/$groupId': typeof AppScheduleGroupIdRoute
+  '/settings/admin': typeof AppSettingsAdminRoute
   '/settings/map': typeof AppSettingsMapRoute
   '/events': typeof AppEventsIndexRoute
   '/homework': typeof AppHomeworkIndexRoute
@@ -180,6 +188,7 @@ export interface FileRoutesById {
   '/_app/homework/$id': typeof AppHomeworkIdRoute
   '/_app/homework/add': typeof AppHomeworkAddRoute
   '/_app/schedule/$groupId': typeof AppScheduleGroupIdRoute
+  '/_app/settings/admin': typeof AppSettingsAdminRoute
   '/_app/settings/map': typeof AppSettingsMapRoute
   '/_app/events/': typeof AppEventsIndexRoute
   '/_app/homework/': typeof AppHomeworkIndexRoute
@@ -202,6 +211,7 @@ export interface FileRouteTypes {
     | '/homework/$id'
     | '/homework/add'
     | '/schedule/$groupId'
+    | '/settings/admin'
     | '/settings/map'
     | '/events/'
     | '/homework/'
@@ -222,6 +232,7 @@ export interface FileRouteTypes {
     | '/homework/$id'
     | '/homework/add'
     | '/schedule/$groupId'
+    | '/settings/admin'
     | '/settings/map'
     | '/events'
     | '/homework'
@@ -243,6 +254,7 @@ export interface FileRouteTypes {
     | '/_app/homework/$id'
     | '/_app/homework/add'
     | '/_app/schedule/$groupId'
+    | '/_app/settings/admin'
     | '/_app/settings/map'
     | '/_app/events/'
     | '/_app/homework/'
@@ -379,6 +391,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSettingsIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/settings/admin': {
+      id: '/_app/settings/admin'
+      path: '/settings/admin'
+      fullPath: '/settings/admin'
+      preLoaderRoute: typeof AppSettingsAdminRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/_app/settings/map': {
       id: '/_app/settings/map'
       path: '/settings/map'
@@ -405,6 +424,7 @@ interface AppRouteRouteChildren {
   AppHomeworkIdRoute: typeof AppHomeworkIdRoute
   AppHomeworkAddRoute: typeof AppHomeworkAddRoute
   AppScheduleGroupIdRoute: typeof AppScheduleGroupIdRoute
+  AppSettingsAdminRoute: typeof AppSettingsAdminRoute
   AppSettingsMapRoute: typeof AppSettingsMapRoute
   AppEventsIndexRoute: typeof AppEventsIndexRoute
   AppHomeworkIndexRoute: typeof AppHomeworkIndexRoute
@@ -421,6 +441,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppHomeworkIdRoute: AppHomeworkIdRoute,
   AppHomeworkAddRoute: AppHomeworkAddRoute,
   AppScheduleGroupIdRoute: AppScheduleGroupIdRoute,
+  AppSettingsAdminRoute: AppSettingsAdminRoute,
   AppSettingsMapRoute: AppSettingsMapRoute,
   AppEventsIndexRoute: AppEventsIndexRoute,
   AppHomeworkIndexRoute: AppHomeworkIndexRoute,
