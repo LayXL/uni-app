@@ -15,6 +15,7 @@ import { Route as RpcRouteImport } from './routes/rpc'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppMapRouteImport } from './routes/_app/map'
 import { Route as AppOnboardingRouteImport } from './routes/_app/onboarding'
+import { Route as AppPremiumRouteImport } from './routes/_app/premium'
 import { Route as AuthTelegramRouteImport } from './routes/auth/telegram'
 import { Route as AuthVkRouteImport } from './routes/auth/vk'
 import { Route as RpcSplatRouteImport } from './routes/rpc/$'
@@ -55,6 +56,11 @@ const AppMapRoute = AppMapRouteImport.update({
 const AppOnboardingRoute = AppOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppPremiumRoute = AppPremiumRouteImport.update({
+  id: '/premium',
+  path: '/premium',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AuthTelegramRoute = AuthTelegramRouteImport.update({
@@ -124,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/rpc': typeof RpcRouteWithChildren
   '/map': typeof AppMapRoute
   '/onboarding': typeof AppOnboardingRoute
+  '/premium': typeof AppPremiumRoute
   '/auth/telegram': typeof AuthTelegramRoute
   '/auth/vk': typeof AuthVkRoute
   '/rpc/$': typeof RpcSplatRoute
@@ -142,6 +149,7 @@ export interface FileRoutesByTo {
   '/rpc': typeof RpcRouteWithChildren
   '/map': typeof AppMapRoute
   '/onboarding': typeof AppOnboardingRoute
+  '/premium': typeof AppPremiumRoute
   '/auth/telegram': typeof AuthTelegramRoute
   '/auth/vk': typeof AuthVkRoute
   '/rpc/$': typeof RpcSplatRoute
@@ -163,6 +171,7 @@ export interface FileRoutesById {
   '/rpc': typeof RpcRouteWithChildren
   '/_app/map': typeof AppMapRoute
   '/_app/onboarding': typeof AppOnboardingRoute
+  '/_app/premium': typeof AppPremiumRoute
   '/auth/telegram': typeof AuthTelegramRoute
   '/auth/vk': typeof AuthVkRoute
   '/rpc/$': typeof RpcSplatRoute
@@ -185,6 +194,7 @@ export interface FileRouteTypes {
     | '/rpc'
     | '/map'
     | '/onboarding'
+    | '/premium'
     | '/auth/telegram'
     | '/auth/vk'
     | '/rpc/$'
@@ -203,6 +213,7 @@ export interface FileRouteTypes {
     | '/rpc'
     | '/map'
     | '/onboarding'
+    | '/premium'
     | '/auth/telegram'
     | '/auth/vk'
     | '/rpc/$'
@@ -223,6 +234,7 @@ export interface FileRouteTypes {
     | '/rpc'
     | '/_app/map'
     | '/_app/onboarding'
+    | '/_app/premium'
     | '/auth/telegram'
     | '/auth/vk'
     | '/rpc/$'
@@ -288,6 +300,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof AppOnboardingRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/premium': {
+      id: '/_app/premium'
+      path: '/premium'
+      fullPath: '/premium'
+      preLoaderRoute: typeof AppPremiumRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/auth/telegram': {
@@ -380,6 +399,7 @@ declare module '@tanstack/react-router' {
 interface AppRouteRouteChildren {
   AppMapRoute: typeof AppMapRoute
   AppOnboardingRoute: typeof AppOnboardingRoute
+  AppPremiumRoute: typeof AppPremiumRoute
   AppIndexRoute: typeof AppIndexRoute
   AppEventsNewRoute: typeof AppEventsNewRoute
   AppHomeworkIdRoute: typeof AppHomeworkIdRoute
@@ -395,6 +415,7 @@ interface AppRouteRouteChildren {
 const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppMapRoute: AppMapRoute,
   AppOnboardingRoute: AppOnboardingRoute,
+  AppPremiumRoute: AppPremiumRoute,
   AppIndexRoute: AppIndexRoute,
   AppEventsNewRoute: AppEventsNewRoute,
   AppHomeworkIdRoute: AppHomeworkIdRoute,
