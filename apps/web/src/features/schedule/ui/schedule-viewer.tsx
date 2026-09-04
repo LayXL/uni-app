@@ -16,6 +16,7 @@ import { useNowInYekaterinburg } from "@/shared/hooks/use-now-in-yekaterinburg"
 
 import { useScheduleGroup } from "../hooks/use-schedule-group"
 import { useUserFeedbackPrompt } from "../hooks/use-user-feedback-prompt"
+import { mergeConsecutiveLessons } from "../lib/merge-consecutive-lessons"
 import { ScheduleChannelBanner } from "./schedule-channel-banner"
 import { ScheduleDayChanges } from "./schedule-day-changes"
 import { ScheduleEnd } from "./schedule-end"
@@ -98,6 +99,9 @@ export const ScheduleViewerWithGroup = ({
 				if (!lastDay) return null
 				const { date, lessons } = lastDay
 				const dayEvents = eventsByDate.get(date) ?? []
+				const lessonCards = isTeacherView
+					? lessons.map((lesson) => [lesson])
+					: mergeConsecutiveLessons(lessons)
 
 				return (
 					<Fragment key={date}>
@@ -153,16 +157,22 @@ export const ScheduleViewerWithGroup = ({
 										isTeacherView={isTeacherView}
 									/>
 								)}
-								{lessons.map((lesson, i) => (
-									<LessonCard
-										key={i}
-										group={group}
-										lesson={lesson}
-										isActive={isLessonActive(lesson, now)}
-										onClassroomClick={onClassroomClick}
-										isTeacherView={isTeacherView}
-									/>
-								))}
+								{lessonCards.map(
+									([lesson, ...followingLessons], i) =>
+										lesson && (
+											<LessonCard
+												key={i}
+												group={group}
+												lesson={lesson}
+												followingLessons={followingLessons}
+												isActive={[lesson, ...followingLessons].some((item) =>
+													isLessonActive(item, now),
+												)}
+												onClassroomClick={onClassroomClick}
+												isTeacherView={isTeacherView}
+											/>
+										),
+								)}
 							</div>
 						</div>
 						{startIndex === 0 &&

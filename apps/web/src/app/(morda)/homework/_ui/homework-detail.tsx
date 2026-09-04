@@ -13,6 +13,7 @@ import { useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
 
+import { useHomeworkCompletion } from "@/entities/homework/hooks/use-homework-completion"
 import type { HomeworkFile } from "@/entities/homework/types"
 import { FileList } from "@/entities/homework/ui/file-list"
 import { useUser } from "@/entities/user/hooks/useUser"
@@ -88,22 +89,11 @@ export function HomeworkDetail({ id }: HomeworkDetailProps) {
 	const isAuthor = hw.author === user.id
 	const [isEditing, setIsEditing] = useState(false)
 	const [isDeleting, setIsDeleting] = useState(false)
-	const [isCompleted, setIsCompleted] = useState(hw.isCompleted)
+	const { isCompleted, isPending, toggle } = useHomeworkCompletion(
+		id,
+		hw.isCompleted,
+	)
 	const confirm = useConfirmDialog()
-
-	const handleToggleComplete = async () => {
-		const next = !isCompleted
-		setIsCompleted(next)
-		try {
-			await orpc.homeworks.toggleCompletion.call({
-				homeworkId: id,
-				completed: next,
-			})
-			invalidate()
-		} catch {
-			setIsCompleted(!next)
-		}
-	}
 
 	const handleDelete = async () => {
 		const confirmed = await confirm({
@@ -199,9 +189,11 @@ export function HomeworkDetail({ id }: HomeworkDetailProps) {
 				<Touchable>
 					<button
 						type="button"
-						onClick={handleToggleComplete}
+						onClick={toggle}
+						disabled={isPending}
+						aria-pressed={isCompleted}
 						className={cn(
-							"relative bg-card rounded-3xl p-4 flex items-center gap-3",
+							"relative bg-card rounded-3xl p-4 flex items-center gap-3 disabled:cursor-wait",
 							isCompleted && "opacity-80",
 						)}
 					>

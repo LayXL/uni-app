@@ -43,9 +43,11 @@ export function useSubjectItems(extraSubjects?: ExtraSubject[]) {
 			}
 		}
 
-		return Array.from(seen.entries()).map(([id, name]) => ({
-			key: id,
-			value: name,
-		}))
+		return Array.from(seen.entries())
+			.filter(([, name]) => name.trim().toLowerCase() !== "занятие отменено")
+			.map(([id, name]) => ({
+				key: id,
+				value: name,
+			}))
 	}, [schedule.data, extraSubjects])
 }

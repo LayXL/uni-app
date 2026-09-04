@@ -66,8 +66,10 @@ export function HomeworkList() {
 							key={hw.id}
 							id={hw.id}
 							title={hw.title}
+							description={hw.description}
 							deadline={hw.deadline}
 							subjectName={hw.subject?.name}
+							authorName={hw.authorFirstName}
 							isSharedWithWholeGroup={hw.isSharedWithWholeGroup}
 							filesCount={(hw.files as unknown[]).length}
 							isCompleted={hw.isCompleted}

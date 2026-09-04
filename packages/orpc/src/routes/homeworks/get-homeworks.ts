@@ -11,6 +11,7 @@ import {
 	or,
 	sql,
 	subjectsTable,
+	usersTable,
 } from "@repo/drizzle"
 
 import { getContextTestNow } from "../../lib/test-time"
@@ -51,6 +52,7 @@ export const getHomeworks = privateProcedure
 				createdAt: homeworksTable.createdAt,
 				deadline: homeworksTable.deadline,
 				author: homeworksTable.author,
+				authorFirstName: usersTable.firstName,
 				group: homeworksTable.group,
 				title: homeworksTable.title,
 				description: homeworksTable.description,
@@ -60,6 +62,7 @@ export const getHomeworks = privateProcedure
 			})
 			.from(homeworksTable)
 			.leftJoin(subjectsTable, eq(homeworksTable.subject, subjectsTable.id))
+			.leftJoin(usersTable, eq(homeworksTable.author, usersTable.id))
 			.leftJoin(
 				homeworkCompletionsTable,
 				and(
