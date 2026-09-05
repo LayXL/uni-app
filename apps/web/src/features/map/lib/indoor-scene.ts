@@ -240,7 +240,17 @@ export function createIndoorScene(
 		if (label.floorId != null) callbacks.onFloor(label.floorId)
 		else if (label.entityId != null) callbacks.onSelect(label.entityId)
 	}
+	const clearLabels = () => {
+		for (const node of labelNodes.values()) {
+			clearTimeout(node.removalTimer)
+			node.anchor.remove()
+		}
+		labelNodes.clear()
+		labels = []
+	}
 	const rebuildLabels = () => {
+		// The session keeps the scene mounted while the map page is hidden.
+		if (!active) return
 		const activeKeys = new Set<string>()
 		labels = [...(routeModel?.labels ?? []), ...(model?.labels ?? [])]
 			.map((label) => ({ ...label, selected: label.entityId === selectedId }))
@@ -523,10 +533,12 @@ export function createIndoorScene(
 			active = next
 			controls.enabled = next
 			if (next) {
+				rebuildLabels()
 				resize()
 				animateRouteShine()
 				return
 			}
+			clearLabels()
 			touchRotation.stop()
 			pointers.clear()
 			down = undefined
@@ -623,8 +635,7 @@ export function createIndoorScene(
 			renderer.dispose()
 			light.shadow.dispose()
 			canvas.remove()
-			for (const node of labelNodes.values()) clearTimeout(node.removalTimer)
-			labelNodes.clear()
+			clearLabels()
 			labelLayer.remove()
 		},
 	}
