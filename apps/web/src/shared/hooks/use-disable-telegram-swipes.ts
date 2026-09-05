@@ -1,7 +1,7 @@
 import { swipeBehavior, useSignal } from "@tma.js/sdk-react"
 import { useEffect } from "react"
 
-export function usePremiumTelegramSwipes() {
+export function useDisableTelegramSwipes() {
 	// Becomes available after SDK initialization, only in supported Telegram clients.
 	const isAvailable = useSignal(swipeBehavior.mount.isAvailable, () => false)
 

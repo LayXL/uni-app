@@ -22,30 +22,35 @@ export const MapPageSkeleton = () => (
 	</div>
 )
 
-const MapPageView = ({ initialRoomId }: { initialRoomId?: number }) => (
+type MapPageProps = { initialRoomId?: number; active?: boolean }
+
+const MapPageView = ({ initialRoomId, active = true }: MapPageProps) => (
 	<div className="fixed inset-0 bg-(--map-background)">
-		<MapViewer initialRoomId={initialRoomId} />
-		<div className="absolute bottom-[calc(var(--tab-bar-height)+var(--safe-area-inset-bottom)+1.5rem)] left-[max(0.75rem,var(--safe-area-inset-left))] right-[max(0.75rem,var(--safe-area-inset-right))] z-20 mx-auto max-w-lg">
-			<MapBottomBar />
-		</div>
-		<SettingsButton />
-		<RouteNavigation />
+		<MapViewer initialRoomId={initialRoomId} active={active} />
+		{active && (
+			<>
+				<div className="absolute bottom-[calc(var(--tab-bar-height)+var(--safe-area-inset-bottom)+1.5rem)] left-[max(0.75rem,var(--safe-area-inset-left))] right-[max(0.75rem,var(--safe-area-inset-right))] z-20 mx-auto max-w-lg">
+					<MapBottomBar />
+				</div>
+				<SettingsButton />
+				<RouteNavigation />
+			</>
+		)}
 	</div>
 )
 
 export const MapPageContent = ({
 	initialRoomId,
-}: {
-	initialRoomId?: number
-}) => {
+	active = true,
+}: MapPageProps) => {
 	const isClient = useIsClient()
 	const mapQuery = useQuery({
 		...orpc.map.getMap.queryOptions(),
-		enabled: isClient,
+		enabled: isClient && active,
 	})
 
 	if (mapQuery.error) throw mapQuery.error
 	if (!isClient || mapQuery.isPending) return <MapPageSkeleton />
 
-	return <MapPageView initialRoomId={initialRoomId} />
+	return <MapPageView initialRoomId={initialRoomId} active={active} />
 }

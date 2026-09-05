@@ -8,8 +8,10 @@ type MapControlsProps = {
 	activeFloor: number
 	onChangeFloor: (floorId: number) => void
 	zoomByStep: (deltaZoom: number) => void
-	rotation: number
-	resetRotation: () => void
+	rotation?: number
+	resetRotation?: () => void
+	view?: "3d" | "top"
+	onToggleView?: () => void
 }
 
 export const MapControls = ({
@@ -17,8 +19,10 @@ export const MapControls = ({
 	activeFloor,
 	onChangeFloor,
 	zoomByStep,
-	rotation,
+	rotation = 0,
 	resetRotation,
+	view,
+	onToggleView,
 }: MapControlsProps) => {
 	return (
 		<div
@@ -40,6 +44,8 @@ export const MapControls = ({
 					zoomByStep={zoomByStep}
 					rotation={rotation}
 					resetRotation={resetRotation}
+					view={view}
+					onToggleView={onToggleView}
 				/>
 			</div>
 		</div>

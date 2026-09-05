@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { Icon } from "@/shared/ui/icon"
 import { Touchable } from "@/shared/ui/touchable"
@@ -25,6 +25,14 @@ export const FloorControls = ({
 	const schoolFloors = useFilteredFloors(mapData, 1)
 	const campuses = [midisFloors, schoolFloors]
 	const floorCount = campuses[activeCampus]?.length ?? 0
+	const floorCampus = mapData.floors
+		.find((floor) => floor.id === activeFloor)
+		?.name.includes("школы")
+		? 1
+		: 0
+	useEffect(() => {
+		setActiveCampus(floorCampus)
+	}, [floorCampus])
 
 	return (
 		<div

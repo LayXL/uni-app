@@ -17,6 +17,21 @@ export default defineConfig({
 		react({ compiler: true }),
 		nitro({
 			traceDeps: ["sharp*"],
+			rolldownConfig: {
+				output: {
+					codeSplitting: {
+						groups: [
+							{
+								// Keep Vite's SSR helpers out of application chunks: a router
+								// cycle can otherwise call __exportAll before it is initialized.
+								name: "ssr-rolldown-runtime",
+								test: /\/rolldown-runtime-[^/]+\.js$/,
+								priority: 100,
+							},
+						],
+					},
+				},
+			},
 			routeRules: {
 				"/**": {
 					headers: {

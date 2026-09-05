@@ -1,10 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { Suspense } from "react"
 
-import {
-	MapPageContent,
-	MapPageSkeleton,
-} from "@/app/(morda)/map/_ui/map-page-content"
+import { useDisableTelegramSwipes } from "@/shared/hooks/use-disable-telegram-swipes"
 
 type MapSearch = {
 	room?: number
@@ -19,11 +15,7 @@ export const Route = createFileRoute("/_app/map")({
 })
 
 function MapPage() {
-	const { room } = Route.useSearch()
-
-	return (
-		<Suspense fallback={<MapPageSkeleton />}>
-			<MapPageContent initialRoomId={room} />
-		</Suspense>
-	)
+	useDisableTelegramSwipes()
+	// The session layer owns the map so route changes do not destroy its canvas.
+	return null
 }

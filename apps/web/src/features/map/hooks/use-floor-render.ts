@@ -6,6 +6,7 @@ import { isPlace, isRoom } from "@repo/shared/building-scheme"
 import { getFloorContours } from "@repo/shared/building-scheme-geometry"
 
 import { getMapColors } from "../lib/colors"
+import { getFloorColor } from "../lib/floor-colors"
 import { clamp, getRoomPolygon } from "../lib/geometry"
 import { updateIconLabelVisibility } from "../lib/icon-label-visibility"
 import {
@@ -218,7 +219,6 @@ export const useFloorRender = ({
 		})
 	}, [data])
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: colorScheme triggers re-render to update CSS-based colors from getMapColors()
 	useEffect(() => {
 		if (!enabled) return
 
@@ -260,7 +260,7 @@ export const useFloorRender = ({
 				)
 				.join(" "),
 			{
-				fill: colors.floorFill,
+				fill: getFloorColor(floor, colorScheme ?? "light", colors.floorFill),
 				fillRule: "evenodd",
 				stroke: colors.floorStroke,
 				strokeWidth: 2,

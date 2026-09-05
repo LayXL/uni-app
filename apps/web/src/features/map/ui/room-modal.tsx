@@ -40,14 +40,11 @@ export const RoomModal = ({ roomId, onClose }: RoomModalProps) => {
 		)
 	const data = useMapData()
 
-	const room = useMemo(() => {
-		if (!roomId) return null
-
-		const entity = data.entities.find((e) => e.id === roomId)
-		if (!entity || !isRoom(entity)) return null
-
-		return entity
+	const entity = useMemo(() => {
+		if (roomId == null) return null
+		return data.entities.find((e) => e.id === roomId) ?? null
 	}, [data, roomId])
+	const room = entity && isRoom(entity) ? entity : null
 
 	const { data: hasSchedule } = useQuery({
 		...orpc.schedule.getSchedule.queryOptions({
@@ -66,20 +63,20 @@ export const RoomModal = ({ roomId, onClose }: RoomModalProps) => {
 	})
 
 	const handleRouteSelect = (destination: "start" | "end") => {
-		if (!room) return
+		if (!entity) return
 
-		const door = room.doorsPosition?.[0]
+		const door = room?.doorsPosition?.[0]
 		const point = {
-			floor: room.floorId,
-			x: door ? room.position.x + door.x : room.position.x,
-			y: door ? room.position.y + door.y : room.position.y,
+			floor: entity.floorId,
+			x: entity.position.x + (door?.x ?? 0),
+			y: entity.position.y + (door?.y ?? 0),
 		}
 
 		if (destination === "start") {
-			setStartRoomId(room.id)
+			setStartRoomId(entity.id)
 			setStart(point)
 		} else {
-			setEndRoomId(room.id)
+			setEndRoomId(entity.id)
 			setEnd(point)
 		}
 
@@ -89,11 +86,13 @@ export const RoomModal = ({ roomId, onClose }: RoomModalProps) => {
 
 	return (
 		<>
-			<ModalRoot isOpen={roomId != null} onClose={onClose} hideBackdrop>
+			<ModalRoot isOpen={entity != null} onClose={onClose} hideBackdrop>
 				<div className="flex flex-col gap-4">
 					<div className="flex flex-col gap-2">
-						{room?.name && <p className="text-2xl font-medium">{room.name}</p>}
-						{room?.description && <p>{room.description}</p>}
+						{entity?.name && (
+							<p className="text-2xl font-medium">{entity.name}</p>
+						)}
+						{entity?.description && <p>{entity.description}</p>}
 					</div>
 
 					<RoomOpeningHours roomId={room?.id} />

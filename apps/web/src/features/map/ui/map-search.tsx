@@ -11,8 +11,8 @@ import { useActiveFloor } from "../hooks/use-active-floor"
 import { useMapData } from "../hooks/use-map-data"
 import { useMapState } from "../hooks/use-map-state"
 import { useSelectedRoom } from "../hooks/use-selected-room"
-import { getRoomWorldCenter } from "../lib/geometry"
 import { getEntitySearchDescription } from "../lib/get-entity-search-description"
+import { entityCenter } from "../lib/indoor-geometry"
 import { SearchInputTrigger } from "./search-input-trigger"
 
 export const MapSearch = () => {
@@ -77,15 +77,8 @@ export const MapSearch = () => {
 		})
 
 		setZoom(0.5)
-		if (isRoom(entity)) {
-			const center = getRoomWorldCenter(entity, floor)
-			moveTo(center.x, center.y)
-		} else {
-			moveTo(
-				floor.position.x + entity.position.x,
-				floor.position.y + entity.position.y,
-			)
-		}
+		const center = entityCenter(entity, floor)
+		moveTo(center.x, center.y)
 	}
 
 	return (

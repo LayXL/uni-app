@@ -169,7 +169,11 @@ export const RouteNavigation = () => {
 
 		if (step) {
 			setActiveFloor(step.floor)
-			moveTo(step.x, step.y)
+			const floor = mapData.floors.find((f) => f.id === step.floor)
+			moveTo(
+				step.x + (floor?.position.x ?? 0),
+				step.y + (floor?.position.y ?? 0),
+			)
 		}
 	}, [steps, isActive])
 
@@ -198,7 +202,13 @@ export const RouteNavigation = () => {
 											onClick={() => {
 												setCurrentStep(i)
 												setActiveFloor(step.floor)
-												moveTo(step.x, step.y)
+												const floor = mapData.floors.find(
+													(f) => f.id === step.floor,
+												)
+												moveTo(
+													step.x + (floor?.position.x ?? 0),
+													step.y + (floor?.position.y ?? 0),
+												)
 											}}
 										>
 											<div

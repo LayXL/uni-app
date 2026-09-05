@@ -1,8 +1,8 @@
+import { useDisableTelegramSwipes } from "@/shared/hooks/use-disable-telegram-swipes"
 import { Button } from "@/shared/ui/button"
 import { Icon } from "@/shared/ui/icon"
 import type { IconName } from "@/types/icon-name"
 
-import { usePremiumTelegramSwipes } from "../lib/use-premium-telegram-swipes"
 import { PremiumStar } from "./premium-star"
 import "./premium.css"
 
@@ -39,7 +39,7 @@ const features = [
 }[]
 
 export function PremiumPage({ onDismiss }: { onDismiss: () => void }) {
-	usePremiumTelegramSwipes()
+	useDisableTelegramSwipes()
 
 	return (
 		<main className="premium-page">

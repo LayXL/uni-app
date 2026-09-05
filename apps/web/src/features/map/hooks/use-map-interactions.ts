@@ -7,6 +7,7 @@ import { getPointerCoords } from "../lib/pointer"
 import type { PointerInfo, ViewportState } from "../types"
 
 type UseMapInteractionsParams = {
+	enabled?: boolean
 	fabricRef: React.MutableRefObject<fabric.Canvas | null>
 	zoomAtPoint: (screenPoint: fabric.Point, deltaZoom: number) => void
 	rotateAtCenter: (deltaRadians: number) => void
@@ -32,6 +33,7 @@ type GestureNativeEvent = TouchEvent & {
 }
 
 export const useMapInteractions = ({
+	enabled = true,
 	fabricRef,
 	zoomAtPoint,
 	rotateAtCenter,
@@ -347,6 +349,7 @@ export const useMapInteractions = ({
 	}, [])
 
 	useEffect(() => {
+		if (!enabled) return
 		const canvas = fabricRef.current
 		if (!canvas) return
 
@@ -471,6 +474,7 @@ export const useMapInteractions = ({
 			}
 		}
 	}, [
+		enabled,
 		handleMouseMove,
 		fabricRef,
 		onGesture,
@@ -483,6 +487,7 @@ export const useMapInteractions = ({
 	])
 
 	useEffect(() => {
+		if (!enabled) return
 		const handleMove = (event: MouseEvent | TouchEvent) => {
 			continueDragGlobal(event)
 		}
@@ -500,9 +505,15 @@ export const useMapInteractions = ({
 			window.removeEventListener("touchend", stopDrag)
 			window.removeEventListener("touchcancel", stopDrag)
 		}
-	}, [continueDragGlobal, stopDrag])
+	}, [enabled, continueDragGlobal, stopDrag])
 
 	useEffect(() => {
+		if (!enabled) {
+			isDraggingRef.current = false
+			dragLastRef.current = null
+			gestureRef.current = null
+			nativeGestureRef.current = null
+		}
 		return () => stopMomentum()
-	}, [stopMomentum])
+	}, [enabled, stopMomentum])
 }
