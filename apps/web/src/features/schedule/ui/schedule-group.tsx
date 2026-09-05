@@ -63,7 +63,7 @@ export const ScheduleGroup = () => {
 				<Portal>
 					<div
 						role="dialog"
-						className="fixed inset-0 bg-background z-50 p-4 pt-[calc(var(--safe-area-inset-top)+1rem)] flex flex-col gap-4"
+						className="fixed inset-0 bg-background z-50 p-4 px-[max(1rem,calc((100%_-_var(--page-max-width))/2_+_1rem))] pt-[calc(var(--safe-area-inset-top)+1rem)] flex flex-col gap-4"
 						onPointerDown={(event) => {
 							if (event.target !== event.currentTarget) return
 							setIsOpen(false)

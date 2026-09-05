@@ -1,7 +1,8 @@
 "use client"
 
-import bridge from "@vkontakte/vk-bridge"
 import { type ReactNode, useEffect } from "react"
+
+import bridge from "@/shared/lib/vk-bridge"
 
 export const VkmaProvider = ({ children }: { children: ReactNode }) => {
 	useEffect(() => {

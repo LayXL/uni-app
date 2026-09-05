@@ -1,10 +1,11 @@
-import parse from "node-html-parser"
-
 import { bitrix } from "../ky"
+import { parseUserData } from "./parse-user-data"
 
 export async function getUserData(userId: number, cookie: string) {
 	const response = await bitrix
 		.get(`mobile/users/?user_id=${userId}`, {
+			timeout: 30_000,
+			retry: 1,
 			headers: {
 				Cookie: cookie,
 				"Content-Type": "application/x-www-form-urlencoded",
@@ -12,11 +13,5 @@ export async function getUserData(userId: number, cookie: string) {
 		})
 		.text()
 
-	const root = parse(response)
-
-	const name = root.querySelector(".emp-profile-name")?.innerText
-
-	return {
-		name,
-	}
+	return parseUserData(response)
 }

@@ -10,6 +10,7 @@ const envSchema = z.object({
 		.string()
 		.regex(/^-?\d+$/)
 		.optional(),
+	telegramFeedbackChatId: z.string().optional(),
 	webAppUrl: z.string().default("http://127.0.0.1:3000/auth"),
 	bitrixUrl: z.string().default("https://portal.midis.info/"),
 	bitrixLogin: z.string(),
@@ -41,6 +42,7 @@ export const env = envSchema.parse({
 	botToken: processEnv.TELEGRAM_BOT_TOKEN,
 	botEnv: processEnv.TELEGRAM_BOT_ENV,
 	botForwardChatId: processEnv.TELEGRAM_FORWARD_CHAT_ID?.trim() || undefined,
+	telegramFeedbackChatId: processEnv.TELEGRAM_FEEDBACK_CHAT_ID,
 	webAppUrl: processEnv.WEB_APP_URL,
 	bitrixUrl: processEnv.BITRIX_URL,
 	bitrixLogin: processEnv.BITRIX_LOGIN,

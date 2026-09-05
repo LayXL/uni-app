@@ -3,6 +3,7 @@ import { create } from "zustand"
 import type { ViewportState } from "../types"
 
 type MapState = ViewportState & {
+	focusRequest: { x: number; y: number } | null
 	canvasWidth: number
 	canvasHeight: number
 	setViewport: (viewport: ViewportState) => void
@@ -15,6 +16,7 @@ type MapState = ViewportState & {
 }
 
 export const useMapState = create<MapState>((set, get) => ({
+	focusRequest: null,
 	zoom: 1,
 	rotation: 0,
 	translateX: 0,
@@ -49,6 +51,6 @@ export const useMapState = create<MapState>((set, get) => ({
 		const translateX = targetScreenX - (a * x + c * y)
 		const translateY = targetScreenY - (b * x + d * y)
 
-		set({ translateX, translateY })
+		set({ translateX, translateY, focusRequest: { x, y } })
 	},
 }))

@@ -1,17 +1,17 @@
 "use client"
 
+import { useLocation } from "@tanstack/react-router"
 import { useSignal, viewport } from "@tma.js/sdk-react"
-import { usePathname } from "next/navigation"
 
 import { cn } from "../utils/cn"
 
 export const FullscreenSafeAreaGradient = () => {
-	const pathname = usePathname()
+	const pathname = useLocation({ select: (location) => location.pathname })
 	const isFullscreen = useSignal(viewport.isFullscreen, () => false)
 	const safeAreaInsetTop = useSignal(viewport.contentSafeAreaInsetTop, () => 0)
 	const isSchedulePage = pathname === "/"
-
-	if (pathname === "/map") return null
+	const isMapPage = pathname === "/map"
+	const isPremiumPage = pathname === "/premium"
 
 	const isVisible = isSchedulePage || (isFullscreen && safeAreaInsetTop > 0)
 
@@ -19,7 +19,10 @@ export const FullscreenSafeAreaGradient = () => {
 		<div
 			aria-hidden="true"
 			className={cn(
-				"pointer-events-none fixed inset-x-0 top-0 z-40 h-[calc(var(--safe-area-inset-top)+1rem)] bg-linear-to-b from-background to-transparent",
+				"pointer-events-none fixed inset-x-0 top-0 z-40 h-[calc(var(--safe-area-inset-top)+1rem)] bg-linear-to-b to-transparent",
+				isMapPage && "from-(--map-background)",
+				isPremiumPage && "from-black",
+				!isMapPage && !isPremiumPage && "from-background",
 				!isSchedulePage &&
 					"transition-opacity duration-200 motion-reduce:transition-none",
 			)}

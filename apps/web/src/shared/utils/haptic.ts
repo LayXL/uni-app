@@ -1,5 +1,6 @@
 import { hapticFeedback } from "@tma.js/sdk-react"
-import bridge from "@vkontakte/vk-bridge"
+
+import bridge from "@/shared/lib/vk-bridge"
 
 import { isTelegram } from "./is-telegram"
 

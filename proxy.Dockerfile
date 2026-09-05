@@ -5,6 +5,7 @@ WORKDIR /app
 # Копируем файлы прокси-приложения
 COPY apps/proxy/package.json apps/proxy/
 COPY apps/proxy/index.ts apps/proxy/
+COPY apps/proxy/proxy.ts apps/proxy/
 
 # Устанавливаем зависимости
 WORKDIR /app/apps/proxy

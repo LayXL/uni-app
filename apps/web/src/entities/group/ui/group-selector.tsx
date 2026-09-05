@@ -21,24 +21,37 @@ export const GroupSelector = ({
 
 	const searchItems = useMemo<SearchInputItem<number>[]>(() => {
 		if (!groups.data) return []
-		return groups.data.map((group) => ({
-			key: group.id,
-			value: group.displayName,
-		}))
+		return groups.data.map((group) => {
+			const teacherName =
+				group.type === "teacher"
+					? group.displayName.match(/^(.+?)\s*\((.+)\)\s*$/)
+					: null
+
+			return {
+				key: group.id,
+				value: teacherName ? teacherName[1].trim() : group.displayName,
+				description: teacherName?.[2].trim(),
+			}
+		})
 	}, [groups.data])
 
 	const handleChange = (groupId: number) => {
-		const group = searchItems.find((item) => item.key === groupId)
+		const group = groups.data?.find((item) => item.id === groupId)
 		if (!group) return
 
-		onChange(groupId, group.value)
+		onChange(groupId, group.displayName)
 	}
 
 	return (
 		<SearchInput
 			placeholder="Введите название группы"
 			items={searchItems}
-			filterFn={(item, query) => isInsensitiveMatch(item.value, query)}
+			filterFn={(item, query) =>
+				isInsensitiveMatch(
+					item.description ? `${item.value} (${item.description})` : item.value,
+					query,
+				)
+			}
 			onChange={handleChange}
 			maxSuggestions={searchItems.length}
 			onBlur={onBlur}

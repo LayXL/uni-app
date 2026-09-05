@@ -30,6 +30,27 @@ export const createViewportMatrix = (state: ViewportState): FabricMatrix => {
 const toCanvasPoint = (coord: Coordinate, offset?: Coordinate): fabric.Point =>
 	new fabric.Point(coord.x + (offset?.x ?? 0), coord.y + (offset?.y ?? 0))
 
+const getBounds = (points: Coordinate[]) => {
+	if (points.length === 0) {
+		return { minX: 0, maxX: 1, minY: 0, maxY: 1 }
+	}
+
+	return points.reduce(
+		(acc, point) => ({
+			minX: Math.min(acc.minX, point.x),
+			maxX: Math.max(acc.maxX, point.x),
+			minY: Math.min(acc.minY, point.y),
+			maxY: Math.max(acc.maxY, point.y),
+		}),
+		{
+			minX: Number.POSITIVE_INFINITY,
+			maxX: Number.NEGATIVE_INFINITY,
+			minY: Number.POSITIVE_INFINITY,
+			maxY: Number.NEGATIVE_INFINITY,
+		},
+	)
+}
+
 export const getRoomPolygon = (
 	room: Room,
 	floorOffset: Coordinate,
@@ -40,6 +61,24 @@ export const getRoomPolygon = (
 			y: floorOffset.y + room.position.y,
 		}),
 	)
+
+export const getRoomWorldCenter = (room: Room, floor: Floor): Coordinate => {
+	const points = getRoomPolygon(room, floor.position)
+
+	if (points.length === 0) {
+		return {
+			x: floor.position.x + room.position.x,
+			y: floor.position.y + room.position.y,
+		}
+	}
+
+	const bounds = getBounds(points)
+
+	return {
+		x: (bounds.minX + bounds.maxX) / 2,
+		y: (bounds.minY + bounds.maxY) / 2,
+	}
+}
 
 export const getFloorPolygon = (floor: Floor): fabric.Point[] =>
 	floor.wallsPosition.map((p) => toCanvasPoint(p, floor.position))
@@ -61,22 +100,5 @@ export const collectBounds = (floor: Floor, entities: MapEntity[]) => {
 		})
 	})
 
-	if (points.length === 0) {
-		return { minX: 0, maxX: 1, minY: 0, maxY: 1 }
-	}
-
-	return points.reduce(
-		(acc, p) => ({
-			minX: Math.min(acc.minX, p.x),
-			maxX: Math.max(acc.maxX, p.x),
-			minY: Math.min(acc.minY, p.y),
-			maxY: Math.max(acc.maxY, p.y),
-		}),
-		{
-			minX: Number.POSITIVE_INFINITY,
-			maxX: Number.NEGATIVE_INFINITY,
-			minY: Number.POSITIVE_INFINITY,
-			maxY: Number.NEGATIVE_INFINITY,
-		},
-	)
+	return getBounds(points)
 }

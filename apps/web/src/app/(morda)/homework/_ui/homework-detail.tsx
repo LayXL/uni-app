@@ -1,14 +1,19 @@
 "use client"
 
-import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query"
+import {
+	useQuery,
+	useQueryClient,
+	useSuspenseQuery,
+} from "@tanstack/react-query"
+import { useNavigate } from "@tanstack/react-router"
 import { format } from "date-fns"
 import { ru } from "date-fns/locale"
-import { useRouter } from "next/navigation"
 import type React from "react"
 import { useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
 
+import { useHomeworkCompletion } from "@/entities/homework/hooks/use-homework-completion"
 import type { HomeworkFile } from "@/entities/homework/types"
 import { FileList } from "@/entities/homework/ui/file-list"
 import { useUser } from "@/entities/user/hooks/useUser"
@@ -16,6 +21,7 @@ import {
 	HomeworkForm,
 	type HomeworkFormValues,
 } from "@/features/homework/ui/homework-form"
+import { useIsClient } from "@/shared/hooks/use-is-client"
 import { Button } from "@/shared/ui/button"
 import { useConfirmDialog } from "@/shared/ui/confirm-dialog"
 import { Icon } from "@/shared/ui/icon"
@@ -45,9 +51,35 @@ type HomeworkDetailProps = {
 	id: string
 }
 
+export const HomeworkDetailSkeleton = () => (
+	<div
+		role="status"
+		aria-busy="true"
+		aria-label="Загрузка домашнего задания"
+		className="flex animate-pulse flex-col gap-4 px-4 pt-[calc(var(--safe-area-inset-top)+1rem)]"
+	>
+		<div className="h-8 w-2/3 rounded-xl bg-card" />
+		<div className="h-24 rounded-3xl bg-card" />
+		<div className="h-12 w-1/2 rounded-2xl bg-card" />
+	</div>
+)
+
+export const HomeworkDetailPage = ({ id }: HomeworkDetailProps) => {
+	const isClient = useIsClient()
+	const homeworkQuery = useQuery({
+		...orpc.homeworks.getHomework.queryOptions({ input: { id } }),
+		enabled: isClient,
+	})
+
+	if (homeworkQuery.error) throw homeworkQuery.error
+	if (!isClient || homeworkQuery.isPending) return <HomeworkDetailSkeleton />
+
+	return <HomeworkDetail id={id} />
+}
+
 export function HomeworkDetail({ id }: HomeworkDetailProps) {
 	const user = useUser()
-	const router = useRouter()
+	const navigate = useNavigate()
 	const queryClient = useQueryClient()
 
 	const { data: hw } = useSuspenseQuery(
@@ -57,22 +89,11 @@ export function HomeworkDetail({ id }: HomeworkDetailProps) {
 	const isAuthor = hw.author === user.id
 	const [isEditing, setIsEditing] = useState(false)
 	const [isDeleting, setIsDeleting] = useState(false)
-	const [isCompleted, setIsCompleted] = useState(hw.isCompleted)
+	const { isCompleted, isPending, toggle } = useHomeworkCompletion(
+		id,
+		hw.isCompleted,
+	)
 	const confirm = useConfirmDialog()
-
-	const handleToggleComplete = async () => {
-		const next = !isCompleted
-		setIsCompleted(next)
-		try {
-			await orpc.homeworks.toggleCompletion.call({
-				homeworkId: id,
-				completed: next,
-			})
-			invalidate()
-		} catch {
-			setIsCompleted(!next)
-		}
-	}
 
 	const handleDelete = async () => {
 		const confirmed = await confirm({
@@ -89,7 +110,7 @@ export function HomeworkDetail({ id }: HomeworkDetailProps) {
 			queryClient.invalidateQueries({
 				queryKey: orpc.homeworks.getHomeworks.queryKey(),
 			})
-			router.replace("/homework")
+			void navigate({ to: "/homework", replace: true })
 		} catch {
 			setIsDeleting(false)
 		}
@@ -168,9 +189,11 @@ export function HomeworkDetail({ id }: HomeworkDetailProps) {
 				<Touchable>
 					<button
 						type="button"
-						onClick={handleToggleComplete}
+						onClick={toggle}
+						disabled={isPending}
+						aria-pressed={isCompleted}
 						className={cn(
-							"relative bg-card rounded-3xl p-4 flex items-center gap-3",
+							"relative bg-card rounded-3xl p-4 flex items-center gap-3 disabled:cursor-wait",
 							isCompleted && "opacity-80",
 						)}
 					>

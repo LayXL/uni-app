@@ -1,7 +1,8 @@
 "use client"
 
+import { useQueryClient } from "@tanstack/react-query"
+import { useNavigate } from "@tanstack/react-router"
 import { AnimatePresence, motion } from "motion/react"
-import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
@@ -81,7 +82,7 @@ const FeaturesOverviewStep = ({ onNext }: StepProps) => {
 					description="Делись заданиями с&nbsp;одногруппниками и&nbsp;сдавай всё вовремя"
 				/>
 			</div>
-			<div className="fixed bottom-0 left-0 right-0 mb-(--safe-area-inset-bottom)">
+			<div className="fixed bottom-0 left-0 right-0 mx-auto max-w-(--page-max-width) mb-(--safe-area-inset-bottom)">
 				<div className="pointer-events-none absolute inset-0 -mt-8 bg-linear-to-t/srgb from-background from-50% to-background/0" />
 				<div className="p-3 grid">
 					<Button label="Поехали!" onClick={onNext} />
@@ -92,8 +93,13 @@ const FeaturesOverviewStep = ({ onNext }: StepProps) => {
 }
 
 const GroupSelectionStep = ({ onNext }: StepProps) => {
+	const queryClient = useQueryClient()
+
 	const handleGroupClick = async (groupId: number, groupName: string) => {
 		await orpc.users.updateUserGroup.call({ groupId })
+		await queryClient.invalidateQueries({
+			queryKey: orpc.users.me.queryKey(),
+		})
 		analytics.track("group_selected", {
 			group_id: groupId,
 			group_name: groupName,
@@ -128,7 +134,7 @@ const STEPS = [FeaturesOverviewStep, GroupSelectionStep]
 const STEP_NAMES = ["features", "group_selection"] as const
 
 export default function OnboardingPage() {
-	const router = useRouter()
+	const navigate = useNavigate()
 
 	const [step, setStep] = useState(0)
 
@@ -145,7 +151,7 @@ export default function OnboardingPage() {
 		})
 
 		if (step === STEPS.length - 1) {
-			router.replace("/")
+			void navigate({ to: "/", replace: true })
 			return
 		}
 
@@ -159,7 +165,7 @@ export default function OnboardingPage() {
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
 				exit={{ opacity: 0 }}
-				className="absolute inset-0 p-4 pt-(--safe-area-inset-top)"
+				className="absolute inset-0 mx-auto max-w-(--page-max-width) p-4 pt-(--safe-area-inset-top)"
 			>
 				<Step onNext={handleNext} />
 			</motion.div>

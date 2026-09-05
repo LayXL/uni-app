@@ -5,7 +5,9 @@ import { getSession } from "@repo/bitrix/session/get-session"
 import { and, db, eq, groupsTable, gt, inArray, sql } from "@repo/drizzle"
 import { env } from "@repo/env"
 
+import { getS3Bucket } from "../../lib/s3"
 import { privateProcedure } from "../../procedures/private"
+import { syncTeacherAvatars } from "./sync-teacher-avatars"
 
 const GROUPS_SYNC_LOCK_ID = 20_260_828
 
@@ -99,6 +101,8 @@ const matchGroups = (
 }
 
 const synchronizeGroups = async () => {
+	// Fail before changing groups if avatar storage is not configured.
+	getS3Bucket()
 	const { cookie } = await getSession(env.bitrixLogin, env.bitrixPassword)
 	const fetchedGroups = await getAllGroups(cookie)
 	const incomingGroups = prepareGroups(fetchedGroups)
@@ -122,7 +126,7 @@ const synchronizeGroups = async () => {
 		)
 	}
 
-	return db.transaction(async (tx) => {
+	const { teachers, ...result } = await db.transaction(async (tx) => {
 		await tx.execute(sql`select pg_advisory_xact_lock(${GROUPS_SYNC_LOCK_ID})`)
 
 		const storedGroups = await tx
@@ -169,7 +173,19 @@ const synchronizeGroups = async () => {
 			await tx.insert(groupsTable).values(groupsToCreate)
 		}
 
+		const teachers = await tx
+			.select({ id: groupsTable.id, bitrixId: groupsTable.bitrixId })
+			.from(groupsTable)
+			.where(
+				and(
+					gt(groupsTable.id, 0),
+					eq(groupsTable.type, "teacher"),
+					eq(groupsTable.isDeleted, false),
+				),
+			)
+
 		return {
+			teachers,
 			total: incomingGroups.length,
 			created: groupsToCreate.length,
 			updated: groupsToRename.length,
@@ -178,6 +194,12 @@ const synchronizeGroups = async () => {
 			duplicatesSkipped: fetchedGroups.length - incomingGroups.length,
 		}
 	})
+
+	// Network and image processing happen after the DB transaction has committed.
+	const avatars = await syncTeacherAvatars(teachers, cookie)
+	// biome-ignore lint/suspicious/noConsole: Operational diagnostics for manual synchronization
+	console.info("Teacher avatars synchronized", avatars)
+	return { ...result, avatars }
 }
 
 export const syncGroups = privateProcedure.handler(async ({ context }) => {

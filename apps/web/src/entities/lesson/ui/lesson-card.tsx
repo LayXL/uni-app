@@ -17,6 +17,7 @@ import { LessonModal } from "./lesson-modal"
 type LessonCardProps = {
 	group?: number
 	lesson: Lesson
+	followingLessons?: Lesson[]
 	isTeacherView?: boolean
 	isActive?: boolean
 	hideClassroom?: boolean
@@ -42,6 +43,7 @@ const formatAdditionalGroups = (groups: string[]) => {
 
 export const LessonCard = ({
 	lesson,
+	followingLessons = [],
 	group,
 	isTeacherView,
 	isActive,
@@ -50,7 +52,18 @@ export const LessonCard = ({
 }: LessonCardProps) => {
 	const [isOpen, setIsOpen] = useState(false)
 
-	const otherGroups = lesson.groups.filter(
+	const lessons = [lesson, ...followingLessons]
+	const combinedLesson = {
+		...lesson,
+		groups: Array.from(
+			new Map(
+				lessons
+					.flatMap((item) => item.groups)
+					.map((group) => [`${group.type}:${group.id}`, group]),
+			).values(),
+		),
+	}
+	const otherGroups = combinedLesson.groups.filter(
 		({ type, id }) => type === "studentsGroup" && id !== group,
 	)
 	const teachers = lesson.groups
@@ -75,14 +88,28 @@ export const LessonCard = ({
 					onClick={() => setIsOpen(true)}
 				>
 					<LiquidBorder />
-					<div className="flex min-w-0 items-center gap-1 text-sm">
-						<p className="shrink-0">{lesson.order} пара</p>
-						<p className="shrink-0">с</p>
-						<p className="shrink-0">{formatLessonTime(lesson.startTime)}</p>
-						<p className="shrink-0">до</p>
-						<p className="shrink-0">{formatLessonTime(lesson.endTime)}</p>
+					<div className="flex min-w-0 items-start gap-1 text-sm">
+						{followingLessons.length > 0 ? (
+							<p className="min-w-0">
+								{lesson.order}-{followingLessons.at(-1)?.order} пара,{" "}
+								{lessons
+									.map(
+										(item) =>
+											`${formatLessonTime(item.startTime)} → ${formatLessonTime(item.endTime)}`,
+									)
+									.join(", ")}
+							</p>
+						) : (
+							<>
+								<p className="shrink-0">{lesson.order} пара</p>
+								<p className="shrink-0">с</p>
+								<p className="shrink-0">{formatLessonTime(lesson.startTime)}</p>
+								<p className="shrink-0">до</p>
+								<p className="shrink-0">{formatLessonTime(lesson.endTime)}</p>
+							</>
+						)}
 						{!hideClassroom && (
-							<div className="ml-auto flex min-w-0 items-center gap-1 pl-2">
+							<div className="ml-auto flex shrink-0 min-w-0 items-center gap-1 pl-2">
 								<Icon name="place-12" className="shrink-0 text-muted" />
 								<p
 									className={cn(
@@ -107,7 +134,8 @@ export const LessonCard = ({
 			</Touchable>
 			<ModalRoot isOpen={isOpen} onClose={() => setIsOpen(false)}>
 				<LessonModal
-					lesson={lesson}
+					lesson={combinedLesson}
+					followingLessons={followingLessons}
 					group={group}
 					onClassroomClick={(classroomId) => {
 						onClassroomClick?.(classroomId)

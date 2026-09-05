@@ -13,6 +13,7 @@ import type {
 	Stair,
 } from "@repo/shared/building-scheme"
 import { isRoom } from "@repo/shared/building-scheme"
+import { getFloorContours } from "@repo/shared/building-scheme-geometry"
 import { buildingSchemeSchema } from "@repo/shared/building-scheme-schema"
 
 import { Button } from "@/shared/ui/button"
@@ -897,11 +898,13 @@ export const MapEditor = () => {
 								onPointerLeave={() => setDragTarget(null)}
 							>
 								<title>Интерактивный план этажа</title>
-								<polygon
-									points={toPoints(
-										activeFloor.wallsPosition,
-										activeFloor.position,
-									)}
+								<path
+									d={getFloorContours(activeFloor)
+										.map(
+											(contour) => `M ${toPoints(contour, { x: 0, y: 0 })} Z`,
+										)
+										.join(" ")}
+									fillRule="evenodd"
 									fill="var(--map-floor-fill)"
 									stroke="var(--map-floor-stroke)"
 									strokeWidth="4"

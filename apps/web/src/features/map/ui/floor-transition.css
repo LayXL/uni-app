@@ -1,0 +1,61 @@
+/* Reuse the page-slide transition installed for the floor controls. */
+@import "./floor-control.css";
+
+.map-floor-transition {
+	--page-slide-distance: clamp(24px, 5vw, 56px);
+	--page-blur: 0px;
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+}
+
+.map-floor-transition > .t-page {
+	width: 100%;
+	height: 100%;
+	transform-origin: center;
+}
+
+.map-floor-transition > canvas.t-page {
+	pointer-events: none;
+}
+
+.map-floor-transition:not([data-running]) > .t-page {
+	transition: none;
+	will-change: auto;
+}
+
+.map-floor-transition[data-transition] > .t-page {
+	pointer-events: none;
+}
+
+.map-floor-transition[data-transition="zoom-in"] {
+	--map-floor-enter-scale: 0.96;
+	--map-floor-exit-scale: 1.04;
+}
+
+.map-floor-transition[data-transition="zoom-out"] {
+	--map-floor-enter-scale: 1.04;
+	--map-floor-exit-scale: 0.96;
+}
+
+.map-floor-transition[data-transition^="zoom"] > .t-page[data-page-id="1"] {
+	transform: scale(var(--map-floor-exit-scale));
+}
+
+.map-floor-transition[data-transition^="zoom"] > .t-page[data-page-id="2"] {
+	transform: scale(var(--map-floor-enter-scale));
+}
+
+.map-floor-transition[data-transition^="zoom"][data-page="1"]
+	> .t-page[data-page-id="1"],
+.map-floor-transition[data-transition^="zoom"][data-page="2"]
+	> .t-page[data-page-id="2"] {
+	transform: scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.map-floor-transition > .t-page {
+		/* biome-ignore lint/complexity/noImportantStyles: Respect reduced motion during every transition state. */
+		transition: none !important;
+	}
+}

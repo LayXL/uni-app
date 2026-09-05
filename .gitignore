@@ -26,6 +26,7 @@ coverage
 
 # Build Outputs
 .next/
+.output/
 out/
 build
 dist
@@ -121,3 +122,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local development artifacts
+.tanstack/
+debug-storybook.log

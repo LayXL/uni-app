@@ -1,8 +1,8 @@
 "use client"
 
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query"
+import { useNavigate, useRouter } from "@tanstack/react-router"
 import { format } from "date-fns"
-import { useRouter } from "next/navigation"
 import { useCallback, useEffect, useMemo, useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
@@ -32,6 +32,7 @@ type EventPreview = {
 
 export default function EditEventClient({ id }: EditEventClientProps) {
 	const router = useRouter()
+	const navigate = useNavigate()
 	const queryClient = useQueryClient()
 	const [error, setError] = useState<string | null>(null)
 	const [preview, setPreview] = useState<EventPreview | null>(null)
@@ -118,7 +119,7 @@ export default function EditEventClient({ id }: EditEventClientProps) {
 				queryKey: orpc.events.getAllEvents.queryKey(),
 			})
 
-			router.replace("/events")
+			void navigate({ to: "/events", replace: true })
 		} catch {
 			setError("Не удалось обновить событие")
 		}
@@ -162,7 +163,7 @@ export default function EditEventClient({ id }: EditEventClientProps) {
 				onSubmit={handleSubmit}
 				submitLabel="Сохранить"
 				submittingLabel="Сохранение..."
-				onCancel={() => router.back()}
+				onCancel={() => router.history.back()}
 			/>
 			{error && (
 				<div className="text-sm text-destructive text-center mt-2">{error}</div>

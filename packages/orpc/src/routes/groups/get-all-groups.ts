@@ -7,17 +7,21 @@ import {
 } from "@repo/shared/testing-group"
 
 import { publicProcedure } from "../../procedures/public"
+import { withAvatar } from "./with-avatar"
 
 const PRIORITY_GROUP_NAME = "Т-123"
 
 const isPriorityGroup = (group: { displayName: string }) =>
 	group.displayName.split(" (")[0] === PRIORITY_GROUP_NAME
 
-const withPriorityGroupFirst = <T extends { displayName: string }>(
+const sortGroups = <T extends { displayName: string; type: string }>(
 	groups: T[],
 ) =>
 	groups.toSorted(
-		(a, b) => Number(isPriorityGroup(b)) - Number(isPriorityGroup(a)),
+		(a, b) =>
+			Number(b.type === "studentsGroup") - Number(a.type === "studentsGroup") ||
+			Number(isPriorityGroup(b)) - Number(isPriorityGroup(a)) ||
+			a.displayName.localeCompare(b.displayName, "ru"),
 	)
 
 export const getAllGroups = publicProcedure.handler(async () => {
@@ -41,5 +45,5 @@ export const getAllGroups = publicProcedure.handler(async () => {
 			]
 		: groups
 
-	return withPriorityGroupFirst(visibleGroups)
+	return sortGroups(visibleGroups).map(withAvatar)
 })

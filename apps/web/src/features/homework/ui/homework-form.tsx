@@ -9,12 +9,14 @@ import { formatFileSize } from "@/entities/homework/types"
 import { useFileUpload } from "@/features/homework/hooks/use-file-upload"
 import { useSubjectItems } from "@/features/homework/hooks/use-subject-items"
 import { Button } from "@/shared/ui/button"
+import { DatePicker } from "@/shared/ui/date-picker"
 import { FormField } from "@/shared/ui/form-field"
 import { Icon } from "@/shared/ui/icon"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { SearchInput } from "@/shared/ui/search-input"
 import { Toggle } from "@/shared/ui/toggle"
 import { Touchable } from "@/shared/ui/touchable"
+import { cn } from "@/shared/utils/cn"
 
 const formSchema = z.object({
 	subject: z.number().optional(),
@@ -50,6 +52,8 @@ export function HomeworkForm({
 	const {
 		files,
 		fileInputRef,
+		isDragging,
+		dropzoneProps,
 		uploadingCount,
 		isUploading,
 		uploadError,
@@ -89,7 +93,7 @@ export function HomeworkForm({
 				render={({ field }) => (
 					<FormField label="Предмет">
 						<SearchInput
-							placeholder="Выберите предмет"
+							placeholder="Например, математика"
 							items={subjectItems}
 							value={field.value}
 							onChange={field.onChange}
@@ -106,7 +110,7 @@ export function HomeworkForm({
 					<FormField label="Название" required card>
 						<input
 							type="text"
-							placeholder="Напишите название"
+							placeholder="Например, решить задачи 1–5"
 							maxLength={255}
 							className="bg-card rounded-3xl p-3 w-full outline-none placeholder:text-muted transition-shadow"
 							{...field}
@@ -121,7 +125,7 @@ export function HomeworkForm({
 				render={({ field }) => (
 					<FormField label="Описание" card>
 						<textarea
-							placeholder="Опишите задание..."
+							placeholder="Страница 42, с подробным решением и рисунками"
 							rows={4}
 							className="bg-card rounded-3xl p-3 w-full outline-none placeholder:text-muted transition-shadow resize-none"
 							{...field}
@@ -135,9 +139,9 @@ export function HomeworkForm({
 				name="deadline"
 				render={({ field }) => (
 					<FormField label="Дедлайн" required card>
-						<input
-							type="date"
-							className="bg-card rounded-3xl p-3 w-full min-w-0 outline-none transition-shadow appearance-none"
+						<DatePicker
+							ariaLabel="Дедлайн"
+							invalid={!!errors.deadline}
 							{...field}
 						/>
 					</FormField>
@@ -150,10 +154,20 @@ export function HomeworkForm({
 						<button
 							type="button"
 							onClick={openFilePicker}
-							className="border-2 border-dashed border-border rounded-3xl p-6 flex flex-col items-center gap-2 text-muted w-full"
+							{...dropzoneProps}
+							className={cn(
+								"border-2 border-dashed rounded-3xl p-6 flex flex-col items-center gap-2 w-full",
+								isDragging
+									? "border-accent bg-accent/10 text-accent"
+									: "border-border text-muted",
+							)}
 						>
 							<Icon name="iconify:material-symbols:upload-file" size={32} />
-							<span className="text-sm">Нажмите, чтобы прикрепить файлы</span>
+							<span className="text-sm text-center">
+								{isDragging
+									? "Отпусти, чтобы прикрепить файлы"
+									: "Нажми или перетащи сюда файлы"}
+							</span>
 							<span className="text-xs">Изображения и документы до 5 МБ</span>
 						</button>
 					</Touchable>

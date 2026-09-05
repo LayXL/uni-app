@@ -1,6 +1,6 @@
 import "./polyfills"
 
-import * as Sentry from "@sentry/nextjs"
+import * as Sentry from "@sentry/tanstackstart-react"
 
 Sentry.init({
 	dsn: "https://df2dbf351aa540a89eb7cbf1821ef945@glitchtip.layxl.dev/1",

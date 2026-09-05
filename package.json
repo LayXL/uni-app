@@ -21,7 +21,7 @@
     "packages/*"
   ],
   "engines": {
-    "node": ">=18"
+    "node": ">=20.9.0"
   },
   "packageManager": "bun@1.2.16",
   "devDependencies": {

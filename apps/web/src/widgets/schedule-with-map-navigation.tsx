@@ -1,14 +1,14 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import { useNavigate } from "@tanstack/react-router"
 
 import { ScheduleViewer } from "@/features/schedule/ui/schedule-viewer"
 
 export const ScheduleWithMapNavigation = () => {
-	const router = useRouter()
+	const navigate = useNavigate()
 
 	const handleClassroomClick = (classroomId: number) => {
-		router.push(`/map?room=${classroomId}`)
+		void navigate({ to: "/map", search: { room: classroomId } })
 	}
 
 	return <ScheduleViewer onClassroomClick={handleClassroomClick} />

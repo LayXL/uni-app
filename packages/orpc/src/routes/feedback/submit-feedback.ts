@@ -5,6 +5,7 @@ import { db, sql, userFeedbackTable } from "@repo/drizzle"
 import { USER_FEEDBACK_REASON_IDS } from "@repo/shared/user-feedback"
 
 import { privateProcedure } from "../../procedures/private"
+import { notifyFeedback } from "./notify-feedback"
 
 const inputSchema = z
 	.object({
@@ -69,6 +70,8 @@ export const submitFeedback = privateProcedure
 		if (!feedback) {
 			throw new ORPCError("INTERNAL_SERVER_ERROR")
 		}
+
+		await notifyFeedback(feedback)
 
 		return feedback
 	})

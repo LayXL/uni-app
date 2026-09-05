@@ -1,20 +1,9 @@
 "use client"
 
-import {
-	emitEvent,
-	mockTelegramEnv,
-	retrieveRawInitData,
-} from "@tma.js/sdk-react"
+import { useNavigate } from "@tanstack/react-router"
+import { mockTelegramEnv, retrieveRawInitData } from "@tma.js/sdk-react"
 import cookie from "js-cookie"
-import { useRouter } from "next/navigation"
 import { useEffect } from "react"
-
-const noInsets = {
-	left: 0,
-	top: 0,
-	bottom: 0,
-	right: 0,
-} as const
 
 const themeParams = {
 	accent_text_color: "#6ab2f2",
@@ -46,26 +35,26 @@ const launchParams = {
 } as const
 
 export default function Page() {
-	const router = useRouter()
+	const navigate = useNavigate()
 
 	useEffect(() => {
-		if (process.env.NODE_ENV === "development") {
+		if (import.meta.env.DEV) {
 			mockTelegramEnv({ launchParams })
 		}
 
 		const hash = retrieveRawInitData()
 
 		if (hash && hash.length > 0) {
-			const isProduction = process.env.NODE_ENV === "production"
+			const isProduction = import.meta.env.PROD
 
 			cookie.set("session", `tma ${hash}`, {
 				expires: 7,
 				sameSite: isProduction ? "none" : "lax",
 				secure: isProduction,
 			})
-			router.replace("/")
+			void navigate({ to: "/", replace: true })
 		}
-	}, [router.replace])
+	}, [navigate])
 
 	return null
 }

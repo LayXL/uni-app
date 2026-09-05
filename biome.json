@@ -1,13 +1,18 @@
 {
 	"$schema": "https://biomejs.dev/schemas/2.3.8/schema.json",
 	"vcs": {
-		"enabled": false,
+		"enabled": true,
 		"clientKind": "git",
-		"useIgnoreFile": false
+		"useIgnoreFile": true
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"includes": ["apps/**/*", "packages/**/*"]
+		"includes": [
+			"apps/**/*",
+			"packages/**/*",
+			"!apps/web/src/routeTree.gen.ts",
+			"!apps/web/src/types/icon-name.ts"
+		]
 	},
 	"formatter": {
 		"enabled": true,

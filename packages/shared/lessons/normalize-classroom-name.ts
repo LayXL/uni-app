@@ -8,7 +8,16 @@ type ClassroomMapping = {
 }
 
 const assemblyHall: ClassroomMapping = {
-	aliases: ["305Aкт", "305Акт"],
+	aliases: [
+		"305Aкт",
+		"305Акт",
+		"акт.зал",
+		"акт. зал",
+		"акт зал",
+		"акт. зал.",
+		"305 Акт",
+		"305Акт.",
+	],
 	displayName: "Актовый зал",
 	roomName: "Актовый зал",
 }
@@ -56,7 +65,12 @@ const stripSubgroupSuffix = (classroom: string) => {
 
 const getClassroomMapping = (classroom: string) => {
 	const withoutSubgroup = stripSubgroupSuffix(classroom)
-	const mapping = classroomMappingsByAlias.get(normalizeKey(withoutSubgroup))
+	const key = normalizeKey(withoutSubgroup)
+	const isAssemblyHall =
+		/^(?:акт\.?\s*зал\.?|305\s*[аa]кт\.?|актовый зал)(?:\s*\(\d+\))?$/u.test(key)
+	const mapping = isAssemblyHall
+		? assemblyHall
+		: classroomMappingsByAlias.get(key)
 
 	return {
 		displayName: mapping?.displayName ?? withoutSubgroup,

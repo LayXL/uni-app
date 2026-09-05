@@ -69,6 +69,8 @@ export type Place = BaseEntity & {
 	type: "place"
 	/** тип точки интереса */
 	placeType?: PlaceType
+	/** скрывать маркер на карте, сохраняя объект для поиска */
+	hiddenOnMap?: boolean
 }
 
 export type MapEntity = Room | Place
@@ -98,6 +100,8 @@ export type Floor = {
 	acronym?: string
 	/** внешний полигон стен этажа */
 	wallsPosition: WallsPolygon
+	/** внутренние вырезы без перекрытия, в локальных координатах этажа */
+	holes?: WallsPolygon[]
 	/** коридоры/маршруты */
 	roads?: Road[]
 	/** лестницы на этаже */

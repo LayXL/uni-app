@@ -1,4 +1,4 @@
-import type { Preview } from "@storybook/nextjs-vite"
+import type { Preview } from "@storybook/react-vite"
 import type { CSSProperties } from "react"
 
 import "../src/app/globals.css"

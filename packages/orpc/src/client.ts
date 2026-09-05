@@ -13,16 +13,16 @@ import {
 import type { Context } from "./base"
 import type { router } from "./router"
 
+const publicRpcUrl = import.meta.env.VITE_ORPC_URL
+
 const link = new RPCLink<Context>({
 	url: () => {
 		if (typeof window !== "undefined") {
-			return process.env.NEXT_PUBLIC_ORPC_URL ?? `${window.location.origin}/rpc`
+			return publicRpcUrl ?? `${window.location.origin}/rpc`
 		}
 
 		return (
-			process.env.SERVER_ORPC_URL ??
-			process.env.NEXT_PUBLIC_ORPC_URL ??
-			"http://localhost:3000/rpc"
+			process.env.SERVER_ORPC_URL ?? publicRpcUrl ?? "http://localhost:3000/rpc"
 		)
 	},
 	headers: ({ context }) => {
