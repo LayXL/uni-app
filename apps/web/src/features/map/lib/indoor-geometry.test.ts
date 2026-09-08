@@ -169,7 +169,7 @@ describe("indoor geometry", () => {
 			throughRoute.intersectObject(model.group, true).length,
 		).toBeGreaterThan(0)
 		expect(model.labels.find((label) => label.floorId === 0)?.text).toBe(
-			"Далее: 1 этаж",
+			"Далее: 1\u00a0этаж",
 		)
 		disposeIndoorGroup(model.group)
 	})

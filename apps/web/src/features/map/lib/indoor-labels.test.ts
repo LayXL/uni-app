@@ -30,8 +30,16 @@ const school: Floor = {
 	name: "2 этаж школы",
 	stairs: [{ id: 8, floors: [0, 10], position: { x: 100, y: 200 } }],
 }
+const schoolFirst = { ...school, id: 11, name: "1 этаж школы" }
+const schoolThird = { ...school, id: 12, name: "3 этаж школы" }
 const data: BuildingScheme = {
-	floors: [university, school, { ...university, id: 4, name: "3 этаж" }],
+	floors: [
+		university,
+		school,
+		schoolFirst,
+		schoolThird,
+		{ ...university, id: 4, name: "3 этаж" },
+	],
 	entities: ["toilet", "toilet-men", "toilet-women"].map((icon, id) => ({
 		id,
 		type: "place",
@@ -91,10 +99,12 @@ describe("indoor landmark labels", () => {
 		}
 	})
 
-	test("uses the same destination icons and names while following a route", () => {
+	test("shows destination floors while following a route", () => {
 		for (const [floor, destination, icon, text] of [
-			[university, school, "seven", "В школу"],
-			[school, university, "midis", "В МИДИС"],
+			[university, school, "stairs", "Далее: 2\u00a0этаж школы"],
+			[university, schoolFirst, "stairs", "Далее: 1\u00a0этаж школы"],
+			[university, schoolThird, "stairs", "Далее: 3\u00a0этаж школы"],
+			[school, university, "stairs", "Далее: 2\u00a0этаж"],
 		] as const) {
 			const model = createIndoorRoute(
 				[

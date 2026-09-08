@@ -3,11 +3,8 @@
 import { skipToken, useQuery } from "@tanstack/react-query"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { type PointerEvent, useEffect, useMemo, useRef, useState } from "react"
-import type { z } from "zod"
 
 import { orpc } from "@repo/orpc/react"
-import type { routeSchema } from "@repo/orpc/routes/map/build-route"
-import type { BuildingScheme } from "@repo/shared/building-scheme"
 
 import { useRouteBuilder } from "@/features/map/hooks/use-route-builder"
 import { useDisableScroll } from "@/shared/hooks/use-disable-scroll"
@@ -20,79 +17,7 @@ import { cn } from "@/shared/utils/cn"
 import { useActiveFloor } from "../hooks/use-active-floor"
 import { useMapData } from "../hooks/use-map-data"
 import { useMapState } from "../hooks/use-map-state"
-
-type Step = {
-	title: string
-	x: number
-	y: number
-	floor: number
-}
-
-const buildSteps = (
-	route: z.infer<typeof routeSchema>,
-	data: BuildingScheme,
-) => {
-	const steps: Step[] = []
-
-	if (route.length === 0) return steps
-
-	const points = [
-		route[0],
-		...route.reduce(
-			(acc, step, i) => {
-				if (step.type === "stairs") {
-					acc.push(route[i + 1])
-				}
-				return acc
-			},
-			[] as typeof route,
-		),
-	]
-
-	let lastPointIndex = 0
-
-	for (let i = 0; i < route.length; i++) {
-		const step = route[i]
-
-		if (step.type === "stairs") {
-			const direction = step.toFloor
-				? step.toFloor > step.floor
-					? "up"
-					: "down"
-				: undefined
-
-			const targetFloor = data.floors.find((f) => f.id === step.toFloor)
-			const floorLabel = targetFloor?.acronym ?? step.toFloor
-
-			steps.push({
-				x: points[lastPointIndex].x,
-				y: points[lastPointIndex].y,
-				floor: points[lastPointIndex].floor,
-				title:
-					step.floor === 1 && step.toFloor === 5
-						? "Перейди в школу через переход"
-						: step.floor === 5 && step.toFloor === 1
-							? "Перейди в МИДИС через переход"
-							: direction === "up"
-								? `Поднимись на ${floorLabel} этаж`
-								: `Спустись на ${floorLabel} этаж`,
-			})
-
-			lastPointIndex++
-		}
-	}
-
-	const lastStep = points[lastPointIndex]
-
-	steps.push({
-		title: "Дойди до точки",
-		x: lastStep?.x ?? 0,
-		y: lastStep?.y ?? 0,
-		floor: lastStep?.floor ?? 0,
-	})
-
-	return steps
-}
+import { buildSteps } from "../lib/route-steps"
 
 export const RouteNavigation = () => {
 	const mapData = useMapData()

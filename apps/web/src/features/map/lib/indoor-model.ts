@@ -25,6 +25,7 @@ import { isRoom } from "@repo/shared/building-scheme"
 
 import { levelFloors, renderLevel, renderLevelRoute } from "./campus-layout"
 import { getFloorColor } from "./floor-colors"
+import { formatNavigationText } from "./format-navigation-text"
 import {
 	entityCenter,
 	floorRouteChains,
@@ -350,10 +351,10 @@ ${shader.vertexShader}`
 			if (destination)
 				labels.push({
 					position,
-					...(buildingPassage(floor, destination) ?? {
-						text: `Далее: ${destination.name.toLowerCase()}`,
-						icon: "stairs",
-					}),
+					text: formatNavigationText(
+						`Далее: ${destination.name.toLowerCase()}`,
+					),
+					icon: "stairs",
 					floorId: destination.id,
 					priority: 1100,
 				})
