@@ -62,7 +62,10 @@ export const authMiddleware = base.middleware(async ({ context, next }) => {
 
 		if (process.env.NODE_ENV === "production") {
 			try {
-				validate(searchParams, env.botToken, { expiresIn: 60 * 60 * 24 })
+				validate(searchParams, env.botToken, {
+					// expiresIn: 60 * 60 * 24,
+					expiresIn: 0, // Disable expiration checks; keep signature validation.
+				})
 			} catch {
 				throw new ORPCError("UNAUTHORIZED")
 			}
