@@ -1,6 +1,8 @@
 import { useMatch } from "@tanstack/react-router"
 import { lazy, Suspense, useEffect, useState } from "react"
 
+import { MapLoading } from "@/features/map/ui/map-loading"
+
 const MapPageContent = lazy(() =>
 	import("./map-page-content").then((module) => ({
 		default: module.MapPageContent,
@@ -15,7 +17,7 @@ export function SessionMap() {
 		if (active) setVisited(true)
 	}, [active])
 
-	if (!active && !visited) return null
+	if (!visited) return null
 
 	return (
 		<div
@@ -24,16 +26,7 @@ export function SessionMap() {
 			className="fixed inset-0"
 			style={{ visibility: active ? "visible" : "hidden" }}
 		>
-			<Suspense
-				fallback={
-					<div
-						role="status"
-						className="grid size-full place-items-center bg-(--map-background) text-sm text-muted"
-					>
-						Загрузка карты…
-					</div>
-				}
-			>
+			<Suspense fallback={<MapLoading />}>
 				<MapPageContent active={active} initialRoomId={match?.search.room} />
 			</Suspense>
 		</div>

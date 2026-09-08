@@ -1,8 +1,9 @@
-import { Icon } from "@/shared/ui/icon"
+import { motion, useReducedMotion } from "motion/react"
+
 import { Touchable } from "@/shared/ui/touchable"
 
-import { useFilteredFloors } from "../hooks/use-filtered-floors"
 import { useMapData } from "../hooks/use-map-data"
+import { floorLevel } from "../lib/campus-layout"
 
 import "./floor-control.css"
 
@@ -16,47 +17,55 @@ export const FloorControls = ({
 	onChangeFloor,
 }: FloorControlsProps) => {
 	const mapData = useMapData()
-	const midisFloors = useFilteredFloors(mapData, 0)
-	const schoolFloors = useFilteredFloors(mapData, 1)
-	const campuses = [
-		{ name: "МИДИС", icon: "midis" as const, floors: midisFloors },
-		{ name: "Школа", icon: "seven" as const, floors: schoolFloors },
-	]
+	const shouldReduceMotion = useReducedMotion()
+	const floors = mapData.floors
+		.filter(
+			(floor, index, all) =>
+				all.findIndex((other) => floorLevel(other) === floorLevel(floor)) ===
+				index,
+		)
+		.toSorted((a, b) => floorLevel(b) - floorLevel(a))
+	const active = mapData.floors.find((floor) => floor.id === activeFloor)
+	const activeIndex = floors.findIndex(
+		(floor) => active && floorLevel(floor) === floorLevel(active),
+	)
+
 	return (
-		<div className="floor-control flex flex-col items-stretch gap-1 overflow-hidden rounded-3xl border border-border bg-background p-1">
-			{campuses.map(({ name, icon, floors }) =>
-				floors?.length ? (
-					<div
-						key={name}
-						role="group"
-						aria-label={`Этажи: ${name}`}
-						className="flex flex-col"
-					>
-						<div
-							className="grid h-9 place-items-center"
-							title={name}
-							aria-hidden="true"
+		<div className="floor-control flex flex-col items-stretch gap-1 overflow-hidden rounded-3xl border border-border bg-background/90 p-1 shadow-[0_8px_32px_rgba(0,0,0,0.16)] backdrop-blur-xl">
+			<div
+				role="group"
+				aria-label="Этажи вуза и школы"
+				className="relative isolate flex flex-col"
+			>
+				{activeIndex >= 0 && (
+					<motion.span
+						aria-hidden="true"
+						className="pointer-events-none absolute left-0 top-0 -z-10 size-11 rounded-full bg-accent/10"
+						initial={false}
+						animate={{ y: `${activeIndex * 100}%` }}
+						transition={
+							shouldReduceMotion
+								? { duration: 0 }
+								: { type: "spring", stiffness: 500, damping: 38, mass: 0.7 }
+						}
+					/>
+				)}
+				{floors.map((floor) => (
+					<Touchable key={floor.id}>
+						<button
+							type="button"
+							className="size-11 shrink-0 rounded-full text-lg font-medium grid place-items-center text-muted transition-colors aria-pressed:text-accent focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent"
+							aria-label={`${floorLevel(floor)} этаж`}
+							aria-pressed={
+								!!active && floorLevel(active) === floorLevel(floor)
+							}
+							onClick={() => onChangeFloor(floor.id)}
 						>
-							<Icon name={icon} size={24} />
-						</div>
-						<div className="relative flex flex-col">
-							{floors.map((floor) => (
-								<Touchable key={floor.id}>
-									<button
-										type="button"
-										className="size-11 shrink-0 rounded-full text-sm grid place-items-center transition-colors bg-background aria-pressed:bg-accent aria-pressed:text-accent-foreground"
-										aria-label={floor.name}
-										aria-pressed={activeFloor === floor.id}
-										onClick={() => onChangeFloor(floor.id)}
-									>
-										{floor.acronym ?? floor.name}
-									</button>
-								</Touchable>
-							))}
-						</div>
-					</div>
-				) : null,
-			)}
+							{floor.acronym ?? floorLevel(floor)}
+						</button>
+					</Touchable>
+				))}
+			</div>
 		</div>
 	)
 }

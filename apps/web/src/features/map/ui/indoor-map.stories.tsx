@@ -6,6 +6,7 @@ import { orpc } from "@repo/orpc/react"
 import type { BuildingScheme } from "@repo/shared/building-scheme"
 
 import scheme from "../../../../../../scripts/v3.json"
+import { layoutCampuses } from "../lib/campus-layout"
 import type { IndoorRoutePoint } from "../lib/indoor-geometry"
 import type { IndoorScene, IndoorView } from "../lib/indoor-scene"
 import { IndoorMapCanvas } from "./indoor-map-canvas"
@@ -13,7 +14,7 @@ import { MapControls } from "./map-controls"
 import { RoomModal } from "./room-modal"
 import { RouteBuilderModal } from "./route-builder-modal"
 
-const data = scheme as BuildingScheme
+const data = layoutCampuses(scheme as BuildingScheme)
 
 const IndoorPreview = ({
 	theme = "light" as "light" | "dark",

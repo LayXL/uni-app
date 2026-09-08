@@ -1,10 +1,11 @@
 import * as fabric from "fabric"
-import { type RefObject, useEffect, useRef } from "react"
+import { type RefObject, useEffect, useMemo, useRef } from "react"
 
 import type { BuildingScheme, Place, Room } from "@repo/shared/building-scheme"
 import { isPlace, isRoom } from "@repo/shared/building-scheme"
 import { getFloorContours } from "@repo/shared/building-scheme-geometry"
 
+import { renderLevel, renderLevelRoute } from "../lib/campus-layout"
 import { getMapColors } from "../lib/colors"
 import { getFloorColor } from "../lib/floor-colors"
 import { clamp, getRoomPolygon } from "../lib/geometry"
@@ -177,7 +178,7 @@ const getRoundedPolygonPath = (points: fabric.Point[], radius = 20): string => {
 
 export const useFloorRender = ({
 	fabricRef,
-	data,
+	data: sourceData,
 	activeFloor,
 	selectedRoomId,
 	viewportRef,
@@ -186,11 +187,23 @@ export const useFloorRender = ({
 	iconObjectsRef,
 	iconBaseScaleRef,
 	isDebug,
-	route,
+	route: sourceRoute,
 	enabled = true,
 	colorScheme,
 	onFloorReady,
 }: UseFloorRenderParams) => {
+	const level = useMemo(
+		() => (sourceData ? renderLevel(sourceData, activeFloor) : undefined),
+		[sourceData, activeFloor],
+	)
+	const data = level?.data
+	const route = useMemo(
+		() =>
+			sourceData && sourceRoute
+				? renderLevelRoute(sourceData, activeFloor, sourceRoute)
+				: undefined,
+		[sourceData, activeFloor, sourceRoute],
+	)
 	const routeObjectsRef = useRef<fabric.Object[]>([])
 
 	// Preload all icons once when data is available
@@ -259,7 +272,8 @@ export const useFloorRender = ({
 		const colors = getMapColors()
 
 		const floorPolygon = new fabric.Path(
-			getFloorContours(floor)
+			(level?.parts ?? [floor])
+				.flatMap(getFloorContours)
 				.map((contour) =>
 					getRoundedPolygonPath(contour.map((p) => new fabric.Point(p.x, p.y))),
 				)
@@ -618,6 +632,7 @@ export const useFloorRender = ({
 		}
 	}, [
 		activeFloor,
+		level,
 		fabricRef,
 		data,
 		labelBaseSizeRef,

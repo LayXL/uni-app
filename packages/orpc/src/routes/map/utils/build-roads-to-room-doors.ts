@@ -25,16 +25,16 @@ export function buildRoadsToRoomDoors(
 
 		floorRooms.forEach((room) => {
 			room.doorsPosition?.forEach((door) => {
-				const doorGlobal: Coordinate = {
-					x: floor.position.x + room.position.x + door.x,
-					y: floor.position.y + room.position.y + door.y,
+				const doorOnFloor: Coordinate = {
+					x: room.position.x + door.x,
+					y: room.position.y + door.y,
 				}
 
 				let closest: ProjectionResult | null = null
 
 				for (const road of baseRoads) {
 					const projected = projectPointToSegment(
-						doorGlobal,
+						doorOnFloor,
 						road.start,
 						road.end,
 					)
@@ -52,7 +52,7 @@ export function buildRoadsToRoomDoors(
 
 				extraRoads.push({
 					start: closest.projection,
-					end: doorGlobal,
+					end: doorOnFloor,
 				})
 			})
 		})

@@ -211,6 +211,13 @@
       "when": 1788564240000,
       "tag": "0029_first_floor_toilet_icons",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1788899426420,
+      "tag": "0030_align_school_floors",
+      "breakpoints": true
     }
   ]
 }

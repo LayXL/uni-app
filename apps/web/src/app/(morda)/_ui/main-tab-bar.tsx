@@ -1,7 +1,8 @@
 "use client"
 
-import { Link, useLocation } from "@tanstack/react-router"
+import { Link, useLocation, useNavigate } from "@tanstack/react-router"
 import { motion, useReducedMotion } from "motion/react"
+import { useRef } from "react"
 
 import { useRouteBuilder } from "@/features/map/hooks/use-route-builder"
 import { analytics } from "@/shared/lib/analytics"
@@ -43,12 +44,15 @@ const tabs: Tab[] = [
 ]
 
 export function MainTabBar() {
+	const navigate = useNavigate()
+	const pressedTab = useRef<Tab["href"] | null>(null)
 	const pathname = useLocation({ select: (location) => location.pathname })
 	const shouldReduceMotion = useReducedMotion()
 	const isRouteActive = useRouteBuilder((state) => state.isActive)
 	const isMainPage = tabs.some((tab) => tab.href === pathname)
 	const isMapRouteActive = pathname === "/map" && isRouteActive
-	const currentTab = tabs.find((tab) => tab.href === pathname)
+	const currentTabIndex = tabs.findIndex((tab) => tab.href === pathname)
+	const currentTab = tabs[currentTabIndex]
 
 	if (!isMainPage || isMapRouteActive) return null
 
@@ -65,48 +69,75 @@ export function MainTabBar() {
 				aria-label="Основные разделы"
 				className="fixed right-[max(0.75rem,var(--safe-area-inset-right))] bottom-[calc(var(--safe-area-inset-bottom)+0.75rem)] left-[max(0.75rem,var(--safe-area-inset-left))] z-40 mx-auto max-w-lg rounded-[1.75rem] border border-border bg-background/90 px-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.16)] backdrop-blur-xl"
 			>
-				<div className="mx-auto grid h-(--tab-bar-height) max-w-lg grid-cols-3 gap-1 py-1.5">
+				<div className="relative isolate mx-auto grid h-(--tab-bar-height) max-w-lg grid-cols-3 gap-1 py-1.5">
+					<motion.span
+						aria-hidden="true"
+						className="pointer-events-none absolute inset-y-1.5 left-0 -z-10 w-[calc((100%-0.5rem)/3)] rounded-[1.375rem] bg-accent/10"
+						initial={false}
+						animate={{
+							x: `calc(${currentTabIndex * 100}% + ${currentTabIndex * 0.25}rem)`,
+						}}
+						transition={
+							shouldReduceMotion
+								? { duration: 0 }
+								: {
+										type: "spring",
+										stiffness: 500,
+										damping: 38,
+										mass: 0.7,
+									}
+						}
+					/>
 					{tabs.map((tab) => {
 						const isActive = pathname === tab.href
+						const trackClick = () => {
+							if (!currentTab) return
+
+							analytics.track("tab_bar_clicked", {
+								tab: tab.id,
+								previous_tab: currentTab.id,
+							})
+						}
 
 						return (
 							<Touchable key={tab.href}>
 								<Link
 									to={tab.href}
 									aria-current={isActive ? "page" : undefined}
-									onClick={() => {
-										if (!currentTab) return
+									onPointerDown={(event) => {
+										pressedTab.current = null
+										if (
+											!event.isPrimary ||
+											event.button !== 0 ||
+											event.metaKey ||
+											event.ctrlKey ||
+											event.shiftKey ||
+											event.altKey
+										)
+											return
 
-										analytics.track("tab_bar_clicked", {
-											tab: tab.id,
-											previous_tab: currentTab.id,
-										})
+										pressedTab.current = tab.href
+										trackClick()
+										void navigate({ to: tab.href })
+									}}
+									onClick={(event) => {
+										const wasPressed = pressedTab.current === tab.href
+										pressedTab.current = null
+										if (event.detail > 0 && wasPressed) {
+											event.preventDefault()
+											return
+										}
+
+										trackClick()
 									}}
 									className={cn(
-										"relative isolate flex min-w-0 flex-col items-center justify-center gap-1 rounded-[1.375rem] text-[10px] leading-3 font-medium text-muted transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent",
+										"relative isolate grid min-w-0 grid-rows-[24px_12px] content-center justify-items-center gap-1 rounded-[1.375rem] text-[10px] leading-3 font-medium text-muted transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent",
 										isActive && "text-accent",
 									)}
 								>
-									{isActive && (
-										<motion.span
-											layoutId="main-tab-active-background"
-											aria-hidden="true"
-											className="pointer-events-none absolute inset-0 -z-10 rounded-[1.375rem] bg-accent/10"
-											transition={
-												shouldReduceMotion
-													? { duration: 0 }
-													: {
-															type: "spring",
-															stiffness: 500,
-															damping: 38,
-															mass: 0.7,
-														}
-											}
-										/>
-									)}
 									<Icon
 										name={isActive ? tab.activeIcon : tab.inactiveIcon}
-										size={23}
+										size={24}
 									/>
 									<span className="max-w-full truncate px-1">{tab.label}</span>
 								</Link>

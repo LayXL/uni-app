@@ -3,6 +3,7 @@ import { type RefObject, useCallback, useEffect, useMemo } from "react"
 
 import { clamp, createViewportMatrix } from "../lib/geometry"
 import { updateIconLabelVisibility } from "../lib/icon-label-visibility"
+import { safeCameraTarget } from "../lib/safe-camera-target"
 import type { FabricMatrix, ViewportState } from "../types"
 import { useMapState } from "./use-map-state"
 
@@ -52,16 +53,9 @@ export const useMapViewport = ({
 				const inverted = fabric.util.invertTransform(createViewportMatrix(next))
 				const worldCenter = fabric.util.transformPoint(screenCenter, inverted)
 
-				const padding = 200
-				const clampedX = clamp(
-					worldCenter.x,
-					bounds.minX - padding,
-					bounds.maxX + padding,
-				)
-				const clampedY = clamp(
-					worldCenter.y,
-					bounds.minY - padding,
-					bounds.maxY + padding,
+				const { x: clampedX, y: clampedY } = safeCameraTarget(
+					worldCenter,
+					bounds,
 				)
 
 				if (clampedX !== worldCenter.x || clampedY !== worldCenter.y) {

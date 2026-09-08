@@ -20,6 +20,7 @@ import { useMapViewport } from "../hooks/use-map-viewport"
 import { usePersistedMapView } from "../hooks/use-persisted-map-view"
 import { useRouteBuilder } from "../hooks/use-route-builder"
 import { useSelectedRoom } from "../hooks/use-selected-room"
+import { levelFloors } from "../lib/campus-layout"
 import {
 	clamp,
 	collectBounds,
@@ -38,6 +39,21 @@ import "./floor-transition.css"
 type MapViewerProps = {
 	initialRoomId?: number
 	active?: boolean
+}
+
+const collectLevelBounds = (
+	data: import("@repo/shared/building-scheme").BuildingScheme,
+	floorId: number,
+) => {
+	const bounds = levelFloors(data, floorId).map((floor) =>
+		collectBounds(floor, data.entities),
+	)
+	return {
+		minX: Math.min(...bounds.map((b) => b.minX)),
+		minY: Math.min(...bounds.map((b) => b.minY)),
+		maxX: Math.max(...bounds.map((b) => b.maxX)),
+		maxY: Math.max(...bounds.map((b) => b.maxY)),
+	}
 }
 
 const FLOOR_PADDING = 192
@@ -103,7 +119,7 @@ export const MapViewer = ({ initialRoomId, active = true }: MapViewerProps) => {
 		if (!mapData) return null
 		const floor = mapData.floors.find((f) => f.id === activeFloor)
 		if (!floor) return null
-		return collectBounds(floor, mapData.entities)
+		return collectLevelBounds(mapData, floor.id)
 	}, [mapData, activeFloor])
 
 	const {
@@ -121,6 +137,10 @@ export const MapViewer = ({ initialRoomId, active = true }: MapViewerProps) => {
 		onViewportChange: handleViewportChange,
 		bounds,
 	})
+
+	useEffect(() => {
+		if (isViewportReady) applyViewport({ ...viewportRef.current })
+	}, [applyViewport, isViewportReady, viewportRef])
 
 	const handleResize = useCallback(
 		(
@@ -165,7 +185,7 @@ export const MapViewer = ({ initialRoomId, active = true }: MapViewerProps) => {
 			const floor = mapData.floors.find((f) => f.id === floorId)
 			if (!floor) return null
 
-			const bounds = collectBounds(floor, mapData.entities)
+			const bounds = collectLevelBounds(mapData, floor.id)
 			const worldWidth = bounds.maxX - bounds.minX + FLOOR_PADDING * 2
 			const worldHeight = bounds.maxY - bounds.minY + FLOOR_PADDING * 2
 
@@ -395,7 +415,6 @@ export const MapViewer = ({ initialRoomId, active = true }: MapViewerProps) => {
 						activeFloor={activeFloor}
 						onChangeFloor={(floorId) => {
 							setActiveFloor(floorId)
-							centerOnFloor(floorId)
 						}}
 						rotation={rotation}
 						resetRotation={resetRotation}

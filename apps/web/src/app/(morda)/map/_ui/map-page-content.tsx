@@ -1,26 +1,14 @@
 "use client"
 
-import { useQuery } from "@tanstack/react-query"
+import { useSuspenseQuery } from "@tanstack/react-query"
 
 import { orpc } from "@repo/orpc/react"
 
 import { MapBottomBar } from "@/features/map/ui/map-bottom-bar"
 import { MapViewer } from "@/features/map/ui/map-viewer"
 import { RouteNavigation } from "@/features/map/ui/route-navigation"
-import { useIsClient } from "@/shared/hooks/use-is-client"
 
 import { SettingsButton } from "../../_ui/settings-button"
-
-export const MapPageSkeleton = () => (
-	<div
-		role="status"
-		aria-busy="true"
-		aria-label="Загрузка карты"
-		className="fixed inset-0 grid place-items-center bg-(--map-background)"
-	>
-		<div className="size-16 animate-pulse rounded-3xl bg-card" />
-	</div>
-)
 
 type MapPageProps = { initialRoomId?: number; active?: boolean }
 
@@ -43,14 +31,7 @@ export const MapPageContent = ({
 	initialRoomId,
 	active = true,
 }: MapPageProps) => {
-	const isClient = useIsClient()
-	const mapQuery = useQuery({
-		...orpc.map.getMap.queryOptions(),
-		enabled: isClient && active,
-	})
-
-	if (mapQuery.error) throw mapQuery.error
-	if (!isClient || mapQuery.isPending) return <MapPageSkeleton />
+	useSuspenseQuery(orpc.map.getMap.queryOptions())
 
 	return <MapPageView initialRoomId={initialRoomId} active={active} />
 }

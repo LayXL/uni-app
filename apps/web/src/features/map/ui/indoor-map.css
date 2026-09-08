@@ -72,6 +72,11 @@
 	touch-action: none;
 }
 
+.indoor-label[data-kind="campus"] {
+	background: transparent;
+	border-color: transparent;
+}
+
 button.indoor-label {
 	pointer-events: auto;
 	cursor: pointer;

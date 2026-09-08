@@ -23,6 +23,7 @@ import type {
 } from "@repo/shared/building-scheme"
 import { isRoom } from "@repo/shared/building-scheme"
 
+import { levelFloors, renderLevel, renderLevelRoute } from "./campus-layout"
 import { getFloorColor } from "./floor-colors"
 import {
 	entityCenter,
@@ -33,6 +34,7 @@ import {
 } from "./indoor-geometry"
 
 export const WALL_HEIGHT = 58
+const priorityLabelNames = new Set(["буфет", "столовая", "гардероб", "магазин"])
 const namedMapIcons: Record<string, string> = {
 	туалет: "toilet",
 	столовая: "food",
@@ -61,6 +63,7 @@ export const INDOOR_PALETTES = {
 }
 
 export type IndoorLabel = {
+	kind?: "campus"
 	position: Coordinate
 	text: string
 	icon?: string
@@ -175,7 +178,9 @@ export const createIndoorFloor = (
 			entityId: entity.id,
 			icon,
 			iconOnly: icon === "stairs" || /^toilet(?:-|$)/.test(icon ?? ""),
-			priority: entity.priority ?? 0,
+			priority: priorityLabelNames.has(name)
+				? Math.max(entity.priority ?? 0, 500)
+				: (entity.priority ?? 0),
 		})
 	}
 	if (walls.length) {
@@ -403,4 +408,57 @@ export const disposeIndoorGroup = (group: Group) => {
 	for (const material of materials) material.dispose()
 	group.removeFromParent()
 	group.clear()
+}
+
+export const createIndoorLevel = (
+	data: BuildingScheme,
+	floor: Floor,
+	theme: "light" | "dark",
+) => {
+	const parts = levelFloors(data, floor.id)
+	const ids = new Set(parts.map((part) => part.id))
+	const models = parts.map((part) =>
+		createIndoorFloor(
+			data,
+			{
+				...part,
+				stairs: part.stairs?.filter(
+					(s) => !s.floors.some((id) => ids.has(id) && id !== part.id),
+				),
+			},
+			theme,
+		),
+	)
+	const model = models[0]
+	for (const other of models.slice(1)) {
+		model.group.add(other.group)
+		for (const [id, room] of other.rooms) model.rooms.set(id, room)
+		model.labels.push(...other.labels)
+	}
+	for (const part of parts) {
+		const xs = part.wallsPosition.map((p) => p.x + part.position.x)
+		const ys = part.wallsPosition.map((p) => p.y + part.position.y)
+		model.labels.push({
+			position: {
+				x: (Math.min(...xs) + Math.max(...xs)) / 2,
+				y: Math.min(...ys) - 90,
+			},
+			text: /школ/i.test(part.name) ? "Школа" : "МИДИС",
+			kind: "campus",
+			priority: 100,
+		})
+	}
+	return model
+}
+export const createIndoorLevelRoute = (
+	route: IndoorRoutePoint[],
+	floor: Floor,
+	data: BuildingScheme,
+) => {
+	const level = renderLevel(data, floor.id).data
+	return createIndoorRoute(
+		renderLevelRoute(data, floor.id, route),
+		level.floors.find((f) => f.id === floor.id) ?? floor,
+		level,
+	)
 }

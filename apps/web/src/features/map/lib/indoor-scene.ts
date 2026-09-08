@@ -20,6 +20,7 @@ import type {
 	Floor,
 } from "@repo/shared/building-scheme"
 
+import { floorLevel, levelFloors } from "./campus-layout"
 import { getMapIconColor } from "./icon-style"
 import {
 	indoorFocusTarget,
@@ -32,14 +33,15 @@ import {
 	resolveLabelCollisions,
 } from "./indoor-label-layout"
 import {
-	createIndoorFloor,
-	createIndoorRoute,
+	createIndoorLevel,
+	createIndoorLevelRoute,
 	disposeIndoorGroup,
 	highlightIndoorRoom,
 	type IndoorLabel,
 	WALL_HEIGHT,
 } from "./indoor-model"
 import { createIndoorTouchRotation } from "./indoor-touch-rotation"
+import { safeCameraTarget } from "./safe-camera-target"
 
 export type IndoorView = "3d" | "top"
 export type IndoorCameraView = {
@@ -103,8 +105,8 @@ export function createIndoorScene(
 	let view: IndoorView = "3d"
 	let floor: Floor | undefined
 	let data: BuildingScheme | undefined
-	let model: ReturnType<typeof createIndoorFloor> | undefined
-	let routeModel: ReturnType<typeof createIndoorRoute> | undefined
+	let model: ReturnType<typeof createIndoorLevel> | undefined
+	let routeModel: ReturnType<typeof createIndoorLevelRoute> | undefined
 	let shineFrame = 0
 	let shineTimer: ReturnType<typeof setTimeout> | undefined
 	let shineStarted = 0
@@ -334,7 +336,8 @@ export function createIndoorScene(
 				node.data = label
 				node.element.dataset.selected = String(label.selected)
 				node.element.dataset.kind =
-					label.priority >= 1000 ? "route" : label.icon ? "place" : "room"
+					label.kind ??
+					(label.priority >= 1000 ? "route" : label.icon ? "place" : "room")
 				if (label.icon)
 					node.element.style.setProperty(
 						"--indoor-place-color",
@@ -574,14 +577,19 @@ export function createIndoorScene(
 		) => {
 			const nextFloor = nextData.floors.find((f) => f.id === floorId)
 			if (!nextFloor) return
-			const changed = floor?.id !== nextFloor.id
+			const initial = !floor
+			const changed = !floor || floorLevel(floor) !== floorLevel(nextFloor)
+			if (changed && !initial) {
+				touchRotation.stop()
+				interrupt()
+			}
 			data = nextData
 			floor = nextFloor
 			if (model) disposeIndoorGroup(model.group)
 			if (routeModel) disposeIndoorGroup(routeModel.group)
 			stopRouteShine()
 			routeModel = undefined
-			model = createIndoorFloor(data, floor, theme)
+			model = createIndoorLevel(data, floor, theme)
 			scene.add(model.group)
 			bounds.setFromObject(model.group)
 			const center = bounds.getCenter(new Vector3())
@@ -599,22 +607,47 @@ export function createIndoorScene(
 			renderer.shadowMap.needsUpdate = true
 			highlightIndoorRoom(model, selectedId)
 			rebuildLabels()
-			if (changed) fit(false)
+			if (initial) fit(false)
+			else if (changed) {
+				const safe = safeCameraTarget(
+					{ x: controls.target.x, y: controls.target.z },
+					{
+						minX: bounds.min.x,
+						maxX: bounds.max.x,
+						minY: bounds.min.z,
+						maxY: bounds.max.z,
+					},
+				)
+				if (safe.x !== controls.target.x || safe.y !== controls.target.z) {
+					moveCamera(
+						new Vector3(safe.x, controls.target.y, safe.y),
+						camera.position.clone().sub(controls.target),
+						camera.zoom,
+						false,
+					)
+				}
+			}
 		},
 		select: (id: number | null, center = true) => {
 			selectedId = id
 			if (model) highlightIndoorRoom(model, id)
 			rebuildLabels()
 			const entity = data?.entities.find(
-				(e) => e.id === id && e.floorId === floor?.id,
+				(e) =>
+					e.id === id &&
+					floor &&
+					data &&
+					levelFloors(data, floor.id).some((part) => part.id === e.floorId),
 			)
-			if (entity && floor && center) focus(entityCenter(entity, floor))
+			const entityFloor = data?.floors.find((f) => f.id === entity?.floorId)
+			if (entity && entityFloor && center)
+				focus(entityCenter(entity, entityFloor))
 		},
 		setRoute: (route: IndoorRoutePoint[] = []) => {
 			stopRouteShine()
 			if (routeModel) disposeIndoorGroup(routeModel.group)
 			routeModel =
-				floor && data ? createIndoorRoute(route, floor, data) : undefined
+				floor && data ? createIndoorLevelRoute(route, floor, data) : undefined
 			if (routeModel) scene.add(routeModel.group)
 			shineStarted = performance.now()
 			animateRouteShine()

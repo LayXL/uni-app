@@ -1,6 +1,6 @@
 "use client"
 
-import { lazy, Suspense, useState } from "react"
+import { lazy, useState } from "react"
 
 const IndoorMapViewer = lazy(() =>
 	import("./indoor-map-viewer").then((module) => ({
@@ -20,16 +20,7 @@ export const MapViewer = ({
 }) => {
 	const [fallback, setFallback] = useState(false)
 	return (
-		<Suspense
-			fallback={
-				<div
-					role="status"
-					className="grid size-full place-items-center text-sm text-muted"
-				>
-					Загрузка карты…
-				</div>
-			}
-		>
+		<>
 			{fallback ? (
 				<div className="relative size-full">
 					<FlatMapViewer initialRoomId={initialRoomId} active={active} />
@@ -47,6 +38,6 @@ export const MapViewer = ({
 					onUnavailable={() => setFallback(true)}
 				/>
 			)}
-		</Suspense>
+		</>
 	)
 }
