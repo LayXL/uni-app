@@ -219,14 +219,15 @@ export const createIndoorFloor = (
 			iconOnly: true,
 			priority: 50,
 		})
-		for (let i = 0; i < 6; i++) {
-			const step = new Mesh(
-				new BoxGeometry(40, 4 + i * 5, 7),
-				new MeshStandardMaterial({ color: palette.edge, roughness: 1 }),
-			)
-			step.position.set(p.x, (4 + i * 5) / 2, p.y + i * 7 - 21)
-			group.add(step)
-		}
+		// Temporarily hide 3D stairs; keep the geometry code for later.
+		// for (let i = 0; i < 6; i++) {
+		// 	const step = new Mesh(
+		// 		new BoxGeometry(40, 4 + i * 5, 7),
+		// 		new MeshStandardMaterial({ color: palette.edge, roughness: 1 }),
+		// 	)
+		// 	step.position.set(p.x, (4 + i * 5) / 2, p.y + i * 7 - 21)
+		// 	group.add(step)
+		// }
 	}
 	return { group, rooms, labels, palette }
 }

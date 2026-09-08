@@ -9,6 +9,7 @@ import { cn } from "@/shared/utils/cn"
 import type { IconName } from "@/types/icon-name"
 
 type SearchInputTriggerProps = {
+	className?: string
 	icon: IconName
 	value?: number
 	placeholder: string
@@ -19,6 +20,7 @@ type SearchInputTriggerProps = {
 }
 
 export const SearchInputTrigger = ({
+	className,
 	icon,
 	value,
 	placeholder,
@@ -46,7 +48,7 @@ export const SearchInputTrigger = ({
 			<Touchable>
 				<button
 					type="button"
-					className="h-12 w-full flex items-center text-left"
+					className={cn("h-12 w-full flex items-center text-left", className)}
 					onClick={() => setIsOpen(true)}
 				>
 					<div className="size-12 min-w-12 grid place-items-center pointer-events-none">

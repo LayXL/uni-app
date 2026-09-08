@@ -27,6 +27,7 @@ import {
 	stopIndoorInertia,
 	withIndoorViewTilt,
 } from "./indoor-controls"
+import { createIndoorFloorTransition } from "./indoor-floor-transition"
 import { entityCenter, type IndoorRoutePoint } from "./indoor-geometry"
 import {
 	isLabelInViewport,
@@ -106,6 +107,15 @@ export function createIndoorScene(
 	let floor: Floor | undefined
 	let data: BuildingScheme | undefined
 	let model: ReturnType<typeof createIndoorLevel> | undefined
+	let floorTransition:
+		| ReturnType<typeof createIndoorFloorTransition>
+		| undefined
+	const finishFloorTransition = () => {
+		if (floorTransition) {
+			floorTransition.finish()
+		}
+		floorTransition = undefined
+	}
 	let routeModel: ReturnType<typeof createIndoorLevelRoute> | undefined
 	let shineFrame = 0
 	let shineTimer: ReturnType<typeof setTimeout> | undefined
@@ -210,6 +220,7 @@ export function createIndoorScene(
 			setLabelVisible(
 				label,
 				label.collisionVisible &&
+					(!floorTransition || floorTransition.revealed) &&
 					projected[index].inDepth &&
 					isLabelInViewport(projected[index], width, height),
 			)
@@ -220,6 +231,12 @@ export function createIndoorScene(
 	function render(now: number) {
 		frame = 0
 		if (disposed) return
+		if (floorTransition) {
+			if (floorTransition.update(now)) finishFloorTransition()
+			else requestRender()
+		}
+		if (routeModel)
+			routeModel.group.visible = !floorTransition || floorTransition.revealed
 		if (tween) {
 			const progress = Math.min((now - tween.start) / 360, 1)
 			const t = 1 - (1 - progress) ** 3
@@ -240,7 +257,7 @@ export function createIndoorScene(
 		if (touchRotation.update(now)) requestRender()
 		renderer.render(scene, camera)
 		layoutLabels()
-		if (!tween && !frame) callbacks.onCamera?.(cameraView())
+		if (!tween && !floorTransition && !frame) callbacks.onCamera?.(cameraView())
 	}
 	const activateLabel = (label: IndoorLabel) => {
 		if (label.floorId != null) callbacks.onFloor(label.floorId)
@@ -364,6 +381,7 @@ export function createIndoorScene(
 		zoom: number,
 		animate = true,
 	) => {
+		finishFloorTransition()
 		touchRotation.stop()
 		stopIndoorInertia(controls, camera)
 		updateRotationLimits(animate && !reducedMotion.matches)
@@ -448,6 +466,7 @@ export function createIndoorScene(
 	}
 	controls.addEventListener("change", requestRender)
 	const interrupt = () => {
+		finishFloorTransition()
 		tween = undefined
 		stopIndoorInertia(controls, camera)
 		updateRotationLimits()
@@ -537,6 +556,7 @@ export function createIndoorScene(
 	return {
 		setActive: (next: boolean) => {
 			if (active === next) return
+			finishFloorTransition()
 			stopRouteShine()
 			active = next
 			controls.enabled = next
@@ -577,15 +597,21 @@ export function createIndoorScene(
 		) => {
 			const nextFloor = nextData.floors.find((f) => f.id === floorId)
 			if (!nextFloor) return
+			finishFloorTransition()
+			const levelDelta = floor ? floorLevel(nextFloor) - floorLevel(floor) : 0
 			const initial = !floor
 			const changed = !floor || floorLevel(floor) !== floorLevel(nextFloor)
 			if (changed && !initial) {
 				touchRotation.stop()
 				interrupt()
 			}
+			const outgoing =
+				changed && !initial && active && !reducedMotion.matches
+					? model?.group
+					: undefined
 			data = nextData
 			floor = nextFloor
-			if (model) disposeIndoorGroup(model.group)
+			if (model && !outgoing) disposeIndoorGroup(model.group)
 			if (routeModel) disposeIndoorGroup(routeModel.group)
 			stopRouteShine()
 			routeModel = undefined
@@ -627,6 +653,26 @@ export function createIndoorScene(
 					)
 				}
 			}
+			if (outgoing) {
+				floorTransition = createIndoorFloorTransition(
+					camera,
+					outgoing,
+					model.group,
+					performance.now(),
+					{
+						targetZoom: MathUtils.clamp(
+							camera.zoom * 1.08 ** -levelDelta,
+							controls.minZoom,
+							controls.maxZoom,
+						),
+						shadow: light.shadow,
+						refresh: () => {
+							renderer.shadowMap.needsUpdate = true
+						},
+					},
+				)
+			}
+			requestRender()
 		},
 		select: (id: number | null, center = true) => {
 			selectedId = id
@@ -654,6 +700,7 @@ export function createIndoorScene(
 			rebuildLabels()
 		},
 		dispose: () => {
+			finishFloorTransition()
 			disposed = true
 			stopRouteShine()
 			cancelAnimationFrame(frame)
