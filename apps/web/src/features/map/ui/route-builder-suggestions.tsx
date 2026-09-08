@@ -12,6 +12,7 @@ import { Touchable } from "@/shared/ui/touchable"
 import { getClientTestNow } from "@/shared/utils/test-time"
 
 import { useMapData } from "../hooks/use-map-data"
+import { getRouteSuggestions } from "../lib/get-route-suggestions"
 import type { CreateEntitySelectHandler } from "./route-builder-modal"
 
 type RouteBuilderSuggestionsProps = {
@@ -46,32 +47,14 @@ export const RouteBuilderSuggestions = ({
 		}),
 	)
 
-	const suggestions = todaySchedule?.reduce(
-		(acc, lesson, index) => {
-			const entityId = lesson.classroomId
-
-			if (entityId) {
-				const from = acc[index - 1]?.to ?? 166
-				const to = entityId
-
-				if (from === to || acc.find((s) => s.from === from && s.to === to)) {
-					return acc
-				}
-
-				acc.push({ from, to })
-			}
-
-			return acc
-		},
-		[] as { from: number; to: number }[],
-	)
+	const suggestions = getRouteSuggestions(todaySchedule ?? [])
 
 	const entityItems = useMemo(
 		() => new Map(entities.map((entity) => [entity.id, entity])),
 		[entities],
 	)
 
-	if (!suggestions || suggestions.length === 0) {
+	if (suggestions.length === 0) {
 		return null
 	}
 
