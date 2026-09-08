@@ -14,14 +14,20 @@ interface TouchableProps {
 		}
 	>
 	hapticType?: HapticType
+	dimOnPress?: boolean
 }
 
-export const Touchable = ({ children, hapticType }: TouchableProps) => {
+export const Touchable = ({
+	children,
+	hapticType,
+	dimOnPress = true,
+}: TouchableProps) => {
 	return cloneElement(
 		children,
 		{
 			className: cn(
-				"cursor-pointer active:brightness-80 transition-[filter]",
+				"cursor-pointer",
+				dimOnPress && "active:brightness-80 transition-[filter]",
 				children.props.className,
 			),
 			onClickCapture: (event: React.MouseEvent<Element>) => {

@@ -655,16 +655,12 @@ export function createIndoorScene(
 			}
 			if (outgoing) {
 				floorTransition = createIndoorFloorTransition(
-					camera,
 					outgoing,
 					model.group,
 					performance.now(),
 					{
-						targetZoom: MathUtils.clamp(
-							camera.zoom * 1.08 ** -levelDelta,
-							controls.minZoom,
-							controls.maxZoom,
-						),
+						levelDelta,
+						pivot: controls.target,
 						shadow: light.shadow,
 						refresh: () => {
 							renderer.shadowMap.needsUpdate = true

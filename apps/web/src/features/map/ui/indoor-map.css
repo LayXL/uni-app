@@ -68,7 +68,6 @@
 	text-wrap: balance;
 	user-select: none;
 	background: color-mix(in srgb, var(--indoor-label-bg) 88%, transparent);
-	font-variant-numeric: tabular-nums;
 	touch-action: none;
 }
 

@@ -50,14 +50,26 @@ export function HomeworkList() {
 
 	return (
 		<>
-			<div className="flex items-center justify-between px-4 pb-1">
-				<span className="text-sm text-muted">Только мои задания</span>
-				<Toggle value={onlyMine} onChange={setOnlyMine} />
-			</div>
+			{homeworks.length > 0 && (
+				<>
+					<h1 className="mb-4 px-4 text-2xl font-semibold">Домашние задания</h1>
+					<div className="flex items-center justify-between px-4 pb-1">
+						<span className="text-sm text-muted">Только мои задания</span>
+						<Toggle value={onlyMine} onChange={setOnlyMine} />
+					</div>
+				</>
+			)}
 			{visibleHomeworks.length === 0 ? (
-				<div className="flex flex-col items-center gap-3 py-16 px-4">
-					<LottiePlayer src="duck-thumb-up" className="w-40 h-40 self-center" />
-					<p className="text-center">Домашних заданий нет</p>
+				<div className="flex flex-1 flex-col items-center justify-center px-4 py-6 text-center">
+					<div className="mb-3 size-36">
+						<LottiePlayer src="duck-thumb-up" className="size-36" />
+					</div>
+					<h2 className="text-lg font-semibold">Домашних заданий нет</h2>
+					<p className="mt-1 text-sm text-muted">
+						{homeworks.length > 0
+							? "Отключи «Только мои задания», чтобы увидеть задания группы"
+							: "Можно выдохнуть или добавить новое задание"}
+					</p>
 				</div>
 			) : (
 				<div className="flex flex-col gap-2 px-4 pt-2">

@@ -36,6 +36,9 @@ const MapBottomBarButton = ({
 
 export const MapBottomBar = () => {
 	const openRouteBuilderModal = useRouteBuilder((state) => state.openModal)
+	const isRouteActive = useRouteBuilder((state) => state.isActive)
+
+	if (isRouteActive) return null
 
 	return (
 		<div className="flex gap-1">

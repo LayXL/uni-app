@@ -3,7 +3,7 @@ import {
 	type LightShadow,
 	type Material,
 	Mesh,
-	type OrthographicCamera,
+	type Vector3,
 } from "three"
 
 import { disposeIndoorGroup } from "./indoor-model"
@@ -40,17 +40,32 @@ const fadeGroup = (group: Group) => {
 	}
 }
 
-/** A one-way camera zoom with a geometry crossfade. */
+const scaleAround = (group: Group, pivot: Vector3) => {
+	const position = group.position.clone()
+	const scale = group.scale.clone()
+	return (factor: number) => {
+		group.scale.copy(scale).multiplyScalar(factor)
+		group.position.copy(position).sub(pivot).multiplyScalar(factor).add(pivot)
+	}
+}
+
+/** Animate the floor groups around the view center without changing camera zoom. */
 export const createIndoorFloorTransition = (
-	camera: OrthographicCamera,
 	outgoing: Group,
 	incoming: Group,
 	started: number,
-	options: { targetZoom: number; shadow: LightShadow; refresh: () => void },
+	options: {
+		levelDelta: number
+		pivot: Vector3
+		shadow: LightShadow
+		refresh: () => void
+	},
 ) => {
-	const zoom = camera.zoom
+	const pivot = options.pivot.clone()
+	const scaleOut = scaleAround(outgoing, pivot)
+	const scaleIn = scaleAround(incoming, pivot)
+	const factor = 1.08 ** -Math.sign(options.levelDelta)
 	const shadowIntensity = options.shadow.intensity
-	let shadowsRefreshed = false
 	const smoothstep = (value: number) => {
 		const t = Math.min(Math.max(value, 0), 1)
 		return t * t * (3 - 2 * t)
@@ -60,10 +75,12 @@ export const createIndoorFloorTransition = (
 	let finished = false
 	let revealed = false
 	fadeIn(0)
+	scaleIn(1 / factor)
 	const finish = () => {
 		if (finished) return
 		finished = true
 		fadeIn(1)
+		scaleIn(1)
 		disposeIndoorGroup(outgoing)
 		options.shadow.intensity = shadowIntensity
 		options.refresh()
@@ -75,7 +92,7 @@ export const createIndoorFloorTransition = (
 		finish,
 		update(now: number) {
 			if (finished) return true
-			const progress = Math.min(Math.max((now - started) / 420, 0), 1)
+			const progress = Math.min(Math.max((now - started) / 300, 0), 1)
 			const easedBlend = smoothstep((progress - 0.35) / 0.3)
 			fadeOut(1 - easedBlend)
 			fadeIn(easedBlend)
@@ -84,13 +101,12 @@ export const createIndoorFloorTransition = (
 			options.shadow.intensity =
 				shadowIntensity *
 				(1 - smoothstep(progress / 0.35) + smoothstep((progress - 0.65) / 0.35))
-			if (progress >= 0.65 && !shadowsRefreshed) {
-				shadowsRefreshed = true
-				options.refresh()
-			}
-			revealed = progress >= 0.5
-			camera.zoom = zoom + (options.targetZoom - zoom) * smoothstep(progress)
-			camera.updateProjectionMatrix()
+			const movement = smoothstep(progress)
+			scaleOut(factor ** movement)
+			scaleIn(factor ** (movement - 1))
+			// Incoming geometry is still moving as its shadows reappear.
+			if (progress >= 0.65) options.refresh()
+			revealed = progress === 1
 			if (progress === 1) finish()
 			return finished
 		},

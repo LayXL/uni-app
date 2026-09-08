@@ -67,12 +67,16 @@ export function MainTabBar() {
 			/>
 			<nav
 				aria-label="Основные разделы"
-				className="fixed right-[max(0.75rem,var(--safe-area-inset-right))] bottom-[calc(var(--safe-area-inset-bottom)+0.75rem)] left-[max(0.75rem,var(--safe-area-inset-left))] z-40 mx-auto max-w-lg rounded-[1.75rem] border border-border bg-background/90 px-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.16)] backdrop-blur-xl"
+				className="fixed right-[max(0.75rem,var(--safe-area-inset-right))] bottom-[calc(var(--safe-area-inset-bottom)+0.75rem)] left-[max(0.75rem,var(--safe-area-inset-left))] isolate z-40 mx-auto max-w-lg rounded-[1.75rem] border border-border px-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.16)]"
 			>
+				<span
+					aria-hidden="true"
+					className="pointer-events-none absolute inset-0 rounded-[inherit] bg-background/90 backdrop-blur-xl"
+				/>
 				<div className="relative isolate mx-auto grid h-(--tab-bar-height) max-w-lg grid-cols-3 gap-1 py-1.5">
 					<motion.span
 						aria-hidden="true"
-						className="pointer-events-none absolute inset-y-1.5 left-0 -z-10 w-[calc((100%-0.5rem)/3)] rounded-[1.375rem] bg-accent/10"
+						className="pointer-events-none absolute inset-y-1.5 left-0 z-0 w-[calc((100%-0.5rem)/3)] rounded-[1.375rem] bg-accent/10"
 						initial={false}
 						animate={{
 							x: `calc(${currentTabIndex * 100}% + ${currentTabIndex * 0.25}rem)`,
@@ -88,6 +92,7 @@ export function MainTabBar() {
 									}
 						}
 					/>
+					{/* Keep each tab composited even when the moving highlight is elsewhere. */}
 					{tabs.map((tab) => {
 						const isActive = pathname === tab.href
 						const trackClick = () => {
@@ -100,7 +105,7 @@ export function MainTabBar() {
 						}
 
 						return (
-							<Touchable key={tab.href}>
+							<Touchable key={tab.href} dimOnPress={false}>
 								<Link
 									to={tab.href}
 									aria-current={isActive ? "page" : undefined}
@@ -131,7 +136,7 @@ export function MainTabBar() {
 										trackClick()
 									}}
 									className={cn(
-										"relative isolate grid min-w-0 grid-rows-[24px_12px] content-center justify-items-center gap-1 rounded-[1.375rem] text-[10px] leading-3 font-medium text-muted transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent",
+										"relative z-10 grid min-w-0 transform-gpu grid-rows-[24px_12px] content-center justify-items-center gap-1 rounded-[1.375rem] text-[10px] leading-3 font-medium text-muted transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent",
 										isActive && "text-accent",
 									)}
 								>
