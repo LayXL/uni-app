@@ -7,8 +7,8 @@ import { useRef } from "react"
 import { useRouteBuilder } from "@/features/map/hooks/use-route-builder"
 import { analytics } from "@/shared/lib/analytics"
 import { Icon } from "@/shared/ui/icon"
-import { Touchable } from "@/shared/ui/touchable"
 import { cn } from "@/shared/utils/cn"
+import { haptic } from "@/shared/utils/haptic"
 import type { IconName } from "@/types/icon-name"
 
 type Tab = {
@@ -105,48 +105,49 @@ export function MainTabBar() {
 						}
 
 						return (
-							<Touchable key={tab.href} dimOnPress={false}>
-								<Link
-									to={tab.href}
-									aria-current={isActive ? "page" : undefined}
-									onPointerDown={(event) => {
-										pressedTab.current = null
-										if (
-											!event.isPrimary ||
-											event.button !== 0 ||
-											event.metaKey ||
-											event.ctrlKey ||
-											event.shiftKey ||
-											event.altKey
-										)
-											return
+							<Link
+								key={tab.href}
+								to={tab.href}
+								aria-current={isActive ? "page" : undefined}
+								onPointerDown={(event) => {
+									pressedTab.current = null
+									if (
+										!event.isPrimary ||
+										event.button !== 0 ||
+										event.metaKey ||
+										event.ctrlKey ||
+										event.shiftKey ||
+										event.altKey
+									)
+										return
 
-										pressedTab.current = tab.href
-										trackClick()
-										void navigate({ to: tab.href })
-									}}
-									onClick={(event) => {
-										const wasPressed = pressedTab.current === tab.href
-										pressedTab.current = null
-										if (event.detail > 0 && wasPressed) {
-											event.preventDefault()
-											return
-										}
+									pressedTab.current = tab.href
+									haptic("light")
+									trackClick()
+									void navigate({ to: tab.href })
+								}}
+								onClick={(event) => {
+									const wasPressed = pressedTab.current === tab.href
+									pressedTab.current = null
+									if (event.detail > 0 && wasPressed) {
+										event.preventDefault()
+										return
+									}
 
-										trackClick()
-									}}
-									className={cn(
-										"relative z-10 grid min-w-0 transform-gpu grid-rows-[24px_12px] content-center justify-items-center gap-1 rounded-[1.375rem] text-[10px] leading-3 font-medium text-muted transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent",
-										isActive && "text-accent",
-									)}
-								>
-									<Icon
-										name={isActive ? tab.activeIcon : tab.inactiveIcon}
-										size={24}
-									/>
-									<span className="max-w-full truncate px-1">{tab.label}</span>
-								</Link>
-							</Touchable>
+									haptic("light")
+									trackClick()
+								}}
+								className={cn(
+									"relative z-10 grid min-w-0 cursor-pointer transform-gpu grid-rows-[24px_12px] content-center justify-items-center gap-1 rounded-[1.375rem] text-[10px] leading-3 font-medium text-muted transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent",
+									isActive && "text-accent",
+								)}
+							>
+								<Icon
+									name={isActive ? tab.activeIcon : tab.inactiveIcon}
+									size={24}
+								/>
+								<span className="max-w-full truncate px-1">{tab.label}</span>
+							</Link>
 						)
 					})}
 				</div>

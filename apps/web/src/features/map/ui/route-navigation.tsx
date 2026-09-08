@@ -190,7 +190,7 @@ export const RouteNavigation = () => {
 					animate={{ opacity: 1, y: 0 }}
 					exit={{ opacity: 0, y: -16 }}
 					transition={TRANSITION}
-					className="absolute top-[calc(var(--safe-area-inset-top,0px)+1rem+1px)] left-[calc(var(--safe-area-inset-left,0px)+4.5rem)] right-[calc(var(--safe-area-inset-right,0px)+4.5rem)] z-50 flex justify-center"
+					className="absolute top-[calc(var(--safe-area-inset-top,0px)+0.75rem)] left-[calc(var(--safe-area-inset-left,0px)+4.5rem)] right-[calc(var(--safe-area-inset-right,0px)+4.5rem)] z-50 flex justify-center"
 				>
 					<Button
 						variant="secondary"
