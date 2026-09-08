@@ -7,7 +7,6 @@ type MapControlsProps = {
 	hidden?: boolean
 	activeFloor: number
 	onChangeFloor: (floorId: number) => void
-	zoomByStep: (deltaZoom: number) => void
 	rotation?: number
 	resetRotation?: () => void
 	view?: "3d" | "top"
@@ -18,7 +17,6 @@ export const MapControls = ({
 	hidden = false,
 	activeFloor,
 	onChangeFloor,
-	zoomByStep,
 	rotation = 0,
 	resetRotation,
 	view,
@@ -28,7 +26,7 @@ export const MapControls = ({
 		<div
 			inert={hidden}
 			className={cn(
-				"pointer-events-none absolute inset-x-0 top-1/2 flex -translate-y-1/2 items-center justify-between px-3 transition-opacity duration-300 ease-in-out motion-reduce:transition-none",
+				"pointer-events-none absolute left-[max(0.75rem,var(--safe-area-inset-left,0px))] right-[max(0.75rem,var(--safe-area-inset-right,0px))] top-[calc(var(--safe-area-inset-top,0px)+0.75rem)] flex items-start justify-between transition-opacity duration-300 ease-in-out motion-reduce:transition-none",
 				hidden ? "opacity-0" : "opacity-100",
 			)}
 		>
@@ -41,7 +39,6 @@ export const MapControls = ({
 
 			<div className={hidden ? "pointer-events-none" : "pointer-events-auto"}>
 				<PositionControls
-					zoomByStep={zoomByStep}
 					rotation={rotation}
 					resetRotation={resetRotation}
 					view={view}

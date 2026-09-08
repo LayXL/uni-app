@@ -62,7 +62,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const CampusSlide: Story = {
-	name: "МИДИС ↔ школа",
+export const BothCampuses: Story = {
+	name: "МИДИС и школа — все этажи",
 	render: () => <FloorControlsPreview />,
 }

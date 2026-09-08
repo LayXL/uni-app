@@ -184,7 +184,6 @@ export const IndoorMapViewer = ({
 					<MapControls
 						activeFloor={activeFloor}
 						onChangeFloor={changeFloor}
-						zoomByStep={(factor) => sceneRef.current?.zoom(factor)}
 						view={view}
 						onToggleView={() => setView(view === "3d" ? "top" : "3d")}
 					/>

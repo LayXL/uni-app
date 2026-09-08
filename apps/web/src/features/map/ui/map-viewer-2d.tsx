@@ -307,20 +307,6 @@ export const MapViewer = ({ initialRoomId, active = true }: MapViewerProps) => {
 		setSelectedRoomId,
 	])
 
-	const zoomByStep = useCallback(
-		(deltaZoom: number) => {
-			const canvas = fabricRef.current
-			if (!canvas) return
-
-			const center = new fabric.Point(
-				canvas.getWidth() / 2,
-				canvas.getHeight() / 2,
-			)
-			zoomAtPoint(center, deltaZoom)
-		},
-		[zoomAtPoint],
-	)
-
 	const resetRotation = useCallback(() => {
 		const currentRotation = viewportRef.current.rotation
 		if (Math.abs(currentRotation) < 0.001) return
@@ -411,7 +397,6 @@ export const MapViewer = ({ initialRoomId, active = true }: MapViewerProps) => {
 							setActiveFloor(floorId)
 							centerOnFloor(floorId)
 						}}
-						zoomByStep={zoomByStep}
 						rotation={rotation}
 						resetRotation={resetRotation}
 					/>

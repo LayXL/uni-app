@@ -12,6 +12,10 @@ export const useFilteredFloors = (
 				.filter(
 					(floor) => floor.name.includes("школы") === (activeCampus === 1),
 				)
-				.toReversed(),
+				.toSorted(
+					(a, b) =>
+						Number.parseFloat((b.acronym ?? b.name).replace(",", ".")) -
+						Number.parseFloat((a.acronym ?? a.name).replace(",", ".")),
+				),
 		[data, activeCampus],
 	)

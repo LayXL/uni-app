@@ -35,6 +35,9 @@ import {
 export const WALL_HEIGHT = 58
 const namedMapIcons: Record<string, string> = {
 	туалет: "toilet",
+	столовая: "food",
+	буфет: "food",
+	'бистро "апельсин"': "food",
 	лестница: "stairs",
 	магазин: "storefront-outline-24",
 }

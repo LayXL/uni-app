@@ -9,7 +9,7 @@ import scheme from "../../../../../../scripts/v3.json"
 import type { IndoorRoutePoint } from "../lib/indoor-geometry"
 import type { IndoorScene, IndoorView } from "../lib/indoor-scene"
 import { IndoorMapCanvas } from "./indoor-map-canvas"
-import { PositionControls } from "./position-controls"
+import { MapControls } from "./map-controls"
 import { RoomModal } from "./room-modal"
 import { RouteBuilderModal } from "./route-builder-modal"
 
@@ -75,30 +75,15 @@ const IndoorPreview = ({
 						onFloor={setFloorId}
 						onError={() => setFailed(true)}
 					/>
-					<div className="absolute left-3 top-1/2 flex -translate-y-1/2 flex-col gap-1 rounded-2xl border border-border bg-background p-1">
-						{data.floors.map((f) => (
-							<button
-								key={f.id}
-								type="button"
-								className="size-9 rounded-xl text-sm aria-pressed:bg-accent aria-pressed:text-accent-foreground"
-								aria-label={f.name}
-								aria-pressed={f.id === floorId}
-								onClick={() => {
-									setSelected(null)
-									setFloorId(f.id)
-								}}
-							>
-								{f.acronym ?? f.id}
-							</button>
-						))}
-					</div>
-					<div className="absolute right-3 top-1/2 -translate-y-1/2">
-						<PositionControls
-							zoomByStep={(factor) => sceneRef.current?.zoom(factor)}
-							view={view}
-							onToggleView={() => setView(view === "3d" ? "top" : "3d")}
-						/>
-					</div>
+					<MapControls
+						activeFloor={floorId}
+						onChangeFloor={(id) => {
+							setSelected(null)
+							setFloorId(id)
+						}}
+						view={view}
+						onToggleView={() => setView(view === "3d" ? "top" : "3d")}
+					/>
 					<div className="absolute inset-x-3 bottom-6 mx-auto flex max-w-md flex-wrap items-center justify-center gap-2 rounded-2xl border border-border bg-background p-4 text-sm">
 						<span>{floor.name}</span>
 						<button

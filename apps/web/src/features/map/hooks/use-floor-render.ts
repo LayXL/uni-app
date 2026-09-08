@@ -25,7 +25,12 @@ const isToiletRoom = (room: Room) =>
 	room.name.trim().toLowerCase() === TOILET_ROOM_NAME
 
 const getRoomMapIcon = (room: Room) =>
-	room.icon ?? (isToiletRoom(room) ? TOILET_ROOM_ICON : undefined)
+	room.icon ??
+	(isToiletRoom(room)
+		? TOILET_ROOM_ICON
+		: /^(столовая|буфет|бистро "апельсин")$/i.test(room.name.trim())
+			? "food"
+			: undefined)
 
 const getCachedIcon = (src: string) => {
 	if (!iconImageCache.has(src)) {

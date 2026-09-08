@@ -28,6 +28,10 @@ import {
 } from "./indoor-controls"
 import { entityCenter, type IndoorRoutePoint } from "./indoor-geometry"
 import {
+	isLabelInViewport,
+	resolveLabelCollisions,
+} from "./indoor-label-layout"
+import {
 	createIndoorFloor,
 	createIndoorRoute,
 	disposeIndoorGroup,
@@ -143,6 +147,7 @@ export function createIndoorScene(
 		width: number
 		height: number
 		visible: boolean
+		collisionVisible: boolean
 		removalTimer?: ReturnType<typeof setTimeout>
 	}
 	let labels: LabelNode[] = []
@@ -182,35 +187,34 @@ export function createIndoorScene(
 		controls.maxPolarAngle = view === "top" && !transitioning ? 0 : Math.PI / 3
 	}
 	const layoutLabels = () => {
-		const occupied: { x: number; y: number; w: number; h: number }[] = []
-		for (const label of labels) {
+		const projected = labels.map((label) => {
 			projection
 				.set(label.data.position.x, WALL_HEIGHT + 12, label.data.position.y)
 				.project(camera)
-			const x = ((projection.x + 1) * width) / 2
-			const y = ((1 - projection.y) * height) / 2
-			const w = label.width + 8
-			const h = label.height + 6
-			const outside =
-				projection.z < -1 ||
-				projection.z > 1 ||
-				x < w / 2 + 8 ||
-				x > width - w / 2 - 8 ||
-				y < 60 ||
-				y > height - 155
-			const collides = occupied.some(
-				(other) =>
-					Math.abs(x - other.x) < (w + other.w) / 2 &&
-					Math.abs(y - other.y) < (h + other.h) / 2,
-			)
-			const visible = !outside && (!collides || label.data.selected)
-			setLabelVisible(label, Boolean(visible))
-			label.anchor.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px) translate(-50%, -50%)`
-			if (visible) {
-				occupied.push({ x, y, w, h })
+			return {
+				x: ((projection.x + 1) * width) / 2,
+				y: ((1 - projection.y) * height) / 2,
+				w: label.width + 8,
+				h: label.height + 6,
+				selected: label.data.selected,
+				wasVisible: label.collisionVisible,
+				inDepth: projection.z >= -1 && projection.z <= 1,
 			}
-		}
+		})
+		const accepted = resolveLabelCollisions(projected)
+		labels.forEach((label, index) => {
+			const { x, y } = projected[index]
+			label.collisionVisible = accepted[index]
+			setLabelVisible(
+				label,
+				label.collisionVisible &&
+					projected[index].inDepth &&
+					isLabelInViewport(projected[index], width, height),
+			)
+			label.anchor.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`
+		})
 	}
+
 	function render(now: number) {
 		frame = 0
 		if (disposed) return
@@ -321,6 +325,7 @@ export function createIndoorScene(
 						width: element.offsetWidth,
 						height: element.offsetHeight,
 						visible: false,
+						collisionVisible: false,
 					}
 					labelNodes.set(key, node)
 				}

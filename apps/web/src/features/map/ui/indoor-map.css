@@ -41,6 +41,8 @@
 }
 
 .indoor-label-anchor {
+	width: max-content;
+	will-change: transform;
 	position: absolute;
 	top: 0;
 	left: 0;

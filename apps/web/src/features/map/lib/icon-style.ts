@@ -3,6 +3,7 @@ export const MAP_ICON_RADIUS = 14
 export const MAP_ICON_LABEL_TOP = MAP_ICON_RADIUS + 5
 
 const iconColors: Record<string, string> = {
+	food: "#a34b14",
 	wardrobe: "#b45309",
 	"storefront-outline-24": "#b45309",
 	stairs: "#475569",

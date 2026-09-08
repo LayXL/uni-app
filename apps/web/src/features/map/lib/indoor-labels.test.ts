@@ -6,6 +6,7 @@ import {
 	createIndoorFloor,
 	createIndoorRoute,
 	disposeIndoorGroup,
+	highlightIndoorRoom,
 } from "./indoor-model"
 
 const university: Floor = {
@@ -116,4 +117,38 @@ describe("indoor landmark labels", () => {
 			disposeIndoorGroup(model.group)
 		}
 	})
+})
+
+test("food labels have icons while room floors retain the standard color in both themes", () => {
+	const entities = ["Столовая", "Буфет", 'Бистро "Апельсин"'].map(
+		(name, id) => ({
+			type: "room" as const,
+			id,
+			name,
+			floorId: university.id,
+			position: { x: id * 100, y: 0 },
+			wallsPosition: [
+				{ x: 0, y: 0 },
+				{ x: 80, y: 0 },
+				{ x: 80, y: 80 },
+				{ x: 0, y: 80 },
+			],
+		}),
+	)
+	for (const theme of ["light", "dark"] as const) {
+		const model = createIndoorFloor({ ...data, entities }, university, theme)
+		for (const entity of entities) {
+			expect(
+				model.labels.find((label) => label.entityId === entity.id)?.icon,
+			).toBe("food")
+			const room = model.rooms.get(entity.id)
+			if (!room) throw new Error(`Missing room ${entity.id}`)
+			const color = room.material.color.getHexString()
+			expect(`#${color}`).toBe(model.palette.room)
+			highlightIndoorRoom(model, entity.id)
+			highlightIndoorRoom(model, null)
+			expect(room.material.color.getHexString()).toBe(color)
+		}
+		disposeIndoorGroup(model.group)
+	}
 })

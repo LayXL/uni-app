@@ -35,7 +35,7 @@ export const MapViewer = ({
 					<FlatMapViewer initialRoomId={initialRoomId} active={active} />
 					<p
 						role="status"
-						className="absolute left-3 top-[calc(var(--safe-area-inset-top,0px)+1rem)] max-w-[calc(100%-5rem)] rounded-2xl bg-background px-3 py-2 text-xs text-muted"
+						className="absolute left-3 bottom-[calc(var(--tab-bar-height,0px)+var(--safe-area-inset-bottom,0px)+6rem)] max-w-[calc(100%-5rem)] rounded-2xl bg-background px-3 py-2 text-xs text-muted"
 					>
 						3D недоступен на этом устройстве. Открыта 2D карта.
 					</p>

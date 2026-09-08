@@ -32,7 +32,7 @@ const MapPageView = ({ initialRoomId, active = true }: MapPageProps) => (
 				<div className="absolute bottom-[calc(var(--tab-bar-height)+var(--safe-area-inset-bottom)+1.5rem)] left-[max(0.75rem,var(--safe-area-inset-left))] right-[max(0.75rem,var(--safe-area-inset-right))] z-20 mx-auto max-w-lg">
 					<MapBottomBar />
 				</div>
-				<SettingsButton />
+				<SettingsButton className="top-[calc(var(--safe-area-inset-top,0px)+4.25rem)]" />
 				<RouteNavigation />
 			</>
 		)}

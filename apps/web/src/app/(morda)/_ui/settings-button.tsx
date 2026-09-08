@@ -33,9 +33,14 @@ export function SettingsLink({ className }: { className?: string }) {
 	)
 }
 
-export function SettingsButton() {
+export function SettingsButton({ className }: { className?: string }) {
 	return (
-		<div className="fixed top-[calc(var(--safe-area-inset-top)+0.75rem)] right-[calc(var(--safe-area-inset-right)+0.75rem)] z-10">
+		<div
+			className={cn(
+				"fixed top-[calc(var(--safe-area-inset-top)+0.75rem)] right-[calc(var(--safe-area-inset-right)+0.75rem)] z-10",
+				className,
+			)}
+		>
 			<SettingsLink />
 		</div>
 	)
