@@ -22,6 +22,7 @@ type State = {
 	setEndNearestToilet: () => void
 	setStart: (start: Point) => void
 	setEnd: (end: Point) => void
+	swapPoints: () => void
 	resetRoute: () => void
 	setIsActive: (isActive: boolean) => void
 }
@@ -50,6 +51,18 @@ export const useRouteBuilder = create<State>((set) => ({
 		set((state) => ({ start, hasPoints: state.end !== undefined })),
 	setEnd: (end) =>
 		set((state) => ({ end, hasPoints: state.start !== undefined })),
+	swapPoints: () =>
+		set((state) =>
+			state.endNearestToilet
+				? state
+				: {
+						startRoomId: state.endRoomId,
+						endRoomId: state.startRoomId,
+						start: state.end,
+						end: state.start,
+						hasPoints: state.start !== undefined && state.end !== undefined,
+					},
+		),
 	resetRoute: () =>
 		set({
 			start: undefined,

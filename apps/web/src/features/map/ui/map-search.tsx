@@ -3,6 +3,7 @@ import { useShallow } from "zustand/react/shallow"
 
 import { isRoom, type MapEntity } from "@repo/shared/building-scheme"
 
+import { useCloudStorage } from "@/shared/hooks/use-cloud-storage"
 import { analytics } from "@/shared/lib/analytics"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
 import type { SearchInputItem } from "@/shared/ui/search-input"
@@ -15,8 +16,14 @@ import { getEntitySearchDescription } from "../lib/get-entity-search-description
 import { entityCenter } from "../lib/indoor-geometry"
 import { SearchInputTrigger } from "./search-input-trigger"
 
+const MAX_RECENT_PLACES = 20
+
 export const MapSearch = () => {
 	const mapData = useMapData()
+	const [recentPlaceIds, setRecentPlaceIds] = useCloudStorage<number[]>(
+		"recent-map-places",
+		[],
+	)
 	const { setActiveFloor } = useActiveFloor()
 	const { setSelectedRoomId } = useSelectedRoom()
 	const { moveTo, setZoom } = useMapState(
@@ -32,15 +39,25 @@ export const MapSearch = () => {
 	}, [mapData?.entities])
 
 	const entityItems = useMemo<SearchInputItem<number>[]>(() => {
+		const recentRanks = new Map(
+			(recentPlaceIds ?? []).map((id, index) => [id, index]),
+		)
+		const defaultRank = recentRanks.size
+
 		return entities
 			.filter((entity) => !entity.hiddenInSearch && entity.name)
-			.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
+			.sort(
+				(a, b) =>
+					(recentRanks.get(a.id) ?? defaultRank) -
+						(recentRanks.get(b.id) ?? defaultRank) ||
+					(b.priority ?? 0) - (a.priority ?? 0),
+			)
 			.map((entity) => ({
 				key: entity.id,
 				value: entity.name,
 				description: getEntitySearchDescription(entity, mapData.floors),
 			}))
-	}, [entities, mapData.floors])
+	}, [entities, mapData.floors, recentPlaceIds])
 
 	const filterEntity = (item: SearchInputItem<number>, query: string) => {
 		const entity = entities.find((e) => e.id === item.key)
@@ -58,6 +75,13 @@ export const MapSearch = () => {
 		const entity = entities.find((e) => e.id === entityId)
 		const floor = mapData.floors.find((floor) => floor.id === entity?.floorId)
 		if (!entity || !floor) return
+
+		setRecentPlaceIds(
+			[
+				entityId,
+				...(recentPlaceIds ?? []).filter((id) => id !== entityId),
+			].slice(0, MAX_RECENT_PLACES),
+		)
 
 		if (isRoom(entity)) {
 			analytics.track("room_searched", {

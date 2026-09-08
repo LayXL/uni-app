@@ -218,6 +218,13 @@
       "when": 1788899426420,
       "tag": "0030_align_school_floors",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1788905089092,
+      "tag": "0031_fix_robotized_section_name",
+      "breakpoints": true
     }
   ]
 }

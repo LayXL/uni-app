@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { Icon } from "@/shared/ui/icon"
 import { usePopupClose } from "@/shared/ui/popup"
@@ -30,6 +30,32 @@ export const SearchInputTrigger = ({
 	filterFn,
 }: SearchInputTriggerProps) => {
 	const [isOpen, setIsOpen] = useState(false)
+	const [viewport, setViewport] = useState<{
+		top: number
+		height: number
+	} | null>(null)
+
+	useEffect(() => {
+		if (!isOpen) return
+
+		const visualViewport = window.visualViewport
+		const updateViewport = () => {
+			setViewport({
+				top: visualViewport?.offsetTop ?? 0,
+				height: visualViewport?.height ?? window.innerHeight,
+			})
+		}
+
+		updateViewport()
+		visualViewport?.addEventListener("resize", updateViewport)
+		visualViewport?.addEventListener("scroll", updateViewport)
+		window.addEventListener("resize", updateViewport)
+		return () => {
+			visualViewport?.removeEventListener("resize", updateViewport)
+			visualViewport?.removeEventListener("scroll", updateViewport)
+			window.removeEventListener("resize", updateViewport)
+		}
+	}, [isOpen])
 
 	usePopupClose(isOpen, () => setIsOpen(false))
 
@@ -66,9 +92,17 @@ export const SearchInputTrigger = ({
 			</Touchable>
 			{isOpen && (
 				<Portal>
-					<div className="fixed inset-0 bg-background z-50 p-4 pt-[calc(var(--safe-area-inset-top)+1rem)]">
+					<div
+						className="fixed inset-x-0 top-0 h-dvh overflow-hidden bg-background z-50 p-4 pt-[calc(var(--safe-area-inset-top)+1rem)] pb-[calc(var(--safe-area-inset-bottom)+1rem)]"
+						style={
+							viewport
+								? { top: viewport.top, height: viewport.height }
+								: undefined
+						}
+					>
 						<SearchInput
 							autoFocus
+							fillAvailableHeight
 							items={filteredItems}
 							value={value}
 							onChange={handleChange}

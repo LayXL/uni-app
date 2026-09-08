@@ -36,6 +36,7 @@ type SearchInputProps<T> = Omit<
 	emptyMessage?: string
 	ref?: ForwardedRef<HTMLInputElement>
 	noAbsolutePosition?: boolean
+	fillAvailableHeight?: boolean
 }
 
 const defaultFilter = <T,>(item: SearchInputItem<T>, q: string) =>
@@ -53,6 +54,7 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 		className,
 		ref,
 		noAbsolutePosition,
+		fillAvailableHeight,
 		...inputProps
 	} = props
 
@@ -173,8 +175,14 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 	}
 
 	return (
-		<div ref={containerRef} className="relative">
-			<div className="relative w-full rounded-3xl">
+		<div
+			ref={containerRef}
+			className={cn(
+				"relative",
+				fillAvailableHeight && "flex h-full min-h-0 flex-col",
+			)}
+		>
+			<div className="relative w-full shrink-0 rounded-3xl">
 				<LiquidBorder />
 				<input
 					ref={inputRef}
@@ -216,13 +224,14 @@ export const SearchInput = <T,>(props: SearchInputProps<T>) => {
 				</AnimatePresence>
 			</div>
 
-			{(isOpen || noAbsolutePosition) && (
+			{(isOpen || noAbsolutePosition || fillAvailableHeight) && (
 				<div
 					className={cn(
-						noAbsolutePosition ? "relative" : "absolute",
+						noAbsolutePosition || fillAvailableHeight ? "relative" : "absolute",
 						"z-50 w-full mt-1",
 						"bg-card border border-border rounded-3xl shadow-lg",
-						"max-h-60 overflow-y-auto",
+						"overflow-y-auto overscroll-contain",
+						fillAvailableHeight ? "min-h-0 flex-1" : "max-h-60",
 					)}
 				>
 					{filteredItems.length > 0 ? (

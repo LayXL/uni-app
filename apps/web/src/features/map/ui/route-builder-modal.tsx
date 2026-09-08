@@ -5,9 +5,11 @@ import { isRoom } from "@repo/shared/building-scheme"
 
 import { analytics } from "@/shared/lib/analytics"
 import { Button } from "@/shared/ui/button"
+import { Icon } from "@/shared/ui/icon"
 import { LiquidBorder } from "@/shared/ui/liquid-border"
 import { ModalRoot } from "@/shared/ui/modal-root"
 import type { SearchInputItem } from "@/shared/ui/search-input"
+import { Touchable } from "@/shared/ui/touchable"
 
 import { useMapData } from "../hooks/use-map-data"
 import { useRouteBuilder } from "../hooks/use-route-builder"
@@ -68,6 +70,7 @@ export const RouteBuilderModal = () => {
 		setEndNearestToilet,
 		setStart,
 		setEnd,
+		swapPoints,
 		closeModal,
 		setIsActive,
 	} = useRouteBuilder()
@@ -160,6 +163,7 @@ export const RouteBuilderModal = () => {
 					<div className="relative bg-card rounded-3xl">
 						<LiquidBorder />
 						<SearchInputTrigger
+							className="pr-14"
 							icon="iconify:material-symbols:near-me-rounded"
 							value={startRoomId ?? undefined}
 							placeholder="Откуда"
@@ -171,8 +175,9 @@ export const RouteBuilderModal = () => {
 							}}
 							filterFn={filterEntity}
 						/>
-						<div className="h-px ml-12 mr-px bg-border" />
+						<div className="h-px ml-12 mr-16 bg-border" />
 						<SearchInputTrigger
+							className="pr-14"
 							icon="iconify:material-symbols:flag-rounded"
 							value={endRoomId ?? undefined}
 							placeholder="Куда"
@@ -184,6 +189,22 @@ export const RouteBuilderModal = () => {
 							}}
 							filterFn={filterEntity}
 						/>
+						<Touchable>
+							<button
+								type="button"
+								aria-label="Поменять местами откуда и куда"
+								title="Поменять местами откуда и куда"
+								className="absolute right-2 top-1/2 -translate-y-1/2 grid size-11 place-items-center rounded-full bg-card text-accent disabled:opacity-40 disabled:cursor-default focus-visible:outline-2 focus-visible:outline-accent"
+								onClick={swapPoints}
+								disabled={endNearestToilet || (!start && !end)}
+							>
+								<Icon
+									name="arrows-up-down-16"
+									size={24}
+									className="shrink-0 [mask-size:contain]! [mask-position:center] [mask-repeat:no-repeat]"
+								/>
+							</button>
+						</Touchable>
 					</div>
 					<RouteBuilderSuggestions
 						handleStartSelect={handleStartSelect}
