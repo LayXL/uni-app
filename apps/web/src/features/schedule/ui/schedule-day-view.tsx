@@ -16,6 +16,7 @@ import { cn } from "@/shared/utils/cn"
 import {
 	getAdjacentDate,
 	getDayDragOffset,
+	getDayGestureDirection,
 	getSwipeDayOffset,
 } from "../lib/day-navigation"
 
@@ -173,7 +174,7 @@ export const ScheduleDayView = ({
 				/>
 			</div>
 			<div
-				className="relative flex min-w-0 flex-1 flex-col overflow-x-clip touch-pan-y"
+				className="relative flex min-w-0 flex-1 flex-col overflow-x-clip touch-pan-y [&_*]:touch-pan-y"
 				onPointerDown={(event) => {
 					if (
 						isSettling.current ||
@@ -196,23 +197,19 @@ export const ScheduleDayView = ({
 					if (!start || start.id !== event.pointerId) return
 					const dx = event.clientX - start.x
 					const dy = event.clientY - start.y
-					if (
-						!start.horizontal &&
-						Math.abs(dy) > 12 &&
-						Math.abs(dy) >= Math.abs(dx)
-					) {
-						gesture.current = null
+					if (!start.horizontal) {
+						const direction = getDayGestureDirection(dx, dy)
+						if (!direction) return
 						suppressClick.current = true
-						return
-					}
-					if (
-						!start.horizontal &&
-						Math.abs(dx) > 8 &&
-						Math.abs(dx) > Math.abs(dy) * 1.5
-					) {
+						if (direction === "vertical") {
+							gesture.current = null
+							return
+						}
 						start.horizontal = true
-						suppressClick.current = true
-						event.currentTarget.setPointerCapture(event.pointerId)
+						// Touch pointers already have implicit capture on the touched card.
+						if (event.pointerType !== "touch") {
+							event.currentTarget.setPointerCapture(event.pointerId)
+						}
 					}
 					if (start.horizontal) {
 						x.set(

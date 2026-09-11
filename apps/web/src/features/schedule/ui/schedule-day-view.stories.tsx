@@ -40,7 +40,7 @@ const lesson: Lesson = {
 	groups: [{ id: 1, type: "teacher", displayName: "Иванов Иван Иванович" }],
 }
 
-const Preview = () => {
+const Preview = ({ lessonCount = 2 }: { lessonCount?: number }) => {
 	const [selectedDate, setSelectedDate] = useState(today)
 	const [settings, setSettings] = useState<typeof defaultCardSettings>({
 		...defaultCardSettings,
@@ -62,18 +62,17 @@ const Preview = () => {
 				/>
 			) : (
 				<ScheduleCardList mergeCards>
-					<LessonCard lesson={{ ...lesson, date }} variant="row" />
-					<LessonCard
-						lesson={{
-							...lesson,
-							date,
-							order: 4,
-							startTime: "13:45",
-							endTime: "15:20",
-							subject: { id: 2, name: "Математика" },
-						}}
-						variant="row"
-					/>
+					{Array.from({ length: lessonCount }, (_, index) => (
+						<LessonCard
+							key={index}
+							lesson={{
+								...lesson,
+								date,
+								order: index + 1,
+							}}
+							variant="row"
+						/>
+					))}
 				</ScheduleCardList>
 			)}
 		</section>
@@ -108,7 +107,7 @@ const Preview = () => {
 	)
 }
 
-const DayPreview = () => {
+const DayPreview = ({ lessonCount = 2 }: { lessonCount?: number }) => {
 	const [queryClient] = useState(() => {
 		const client = new QueryClient({
 			defaultOptions: { queries: { staleTime: Infinity } },
@@ -118,7 +117,9 @@ const DayPreview = () => {
 	})
 	const [router] = useState(() =>
 		createRouter({
-			routeTree: createRootRoute({ component: Preview }),
+			routeTree: createRootRoute({
+				component: () => <Preview lessonCount={lessonCount} />,
+			}),
 			history: createMemoryHistory({ initialEntries: ["/"] }),
 		}),
 	)
@@ -143,3 +144,8 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 export const Default: Story = {}
+
+export const LongDay: Story = {
+	name: "Длинный день — вертикальная прокрутка",
+	args: { lessonCount: 10 },
+}

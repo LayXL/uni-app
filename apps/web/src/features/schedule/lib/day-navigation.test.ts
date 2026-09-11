@@ -5,10 +5,20 @@ import { getNextTwoWeeksDates } from "@repo/shared/lessons/get-next-two-weeks-da
 import {
 	getAdjacentDate,
 	getDayDragOffset,
+	getDayGestureDirection,
 	getSwipeDayOffset,
 } from "./day-navigation"
 
 describe("day navigation", () => {
+	test("leaves vertical and diagonal gestures to native scrolling", () => {
+		expect(getDayGestureDirection(8, 7)).toBeNull()
+		expect(getDayGestureDirection(10, 8)).toBe("vertical")
+		expect(getDayGestureDirection(-12, 10)).toBe("vertical")
+		expect(getDayGestureDirection(0, -20)).toBe("vertical")
+		expect(getDayGestureDirection(20, 10)).toBe("vertical")
+		expect(getDayGestureDirection(-20, 3)).toBe("horizontal")
+		expect(getDayGestureDirection(20, -3)).toBe("horizontal")
+	})
 	test("tracks the pointer directly and resists dragging beyond the first or last day", () => {
 		expect(getDayDragOffset(-24, 390, true, true)).toBe(-24)
 		expect(getDayDragOffset(24, 390, true, true)).toBe(24)

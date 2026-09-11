@@ -1,3 +1,8 @@
+export const getDayGestureDirection = (deltaX: number, deltaY: number) => {
+	if (Math.hypot(deltaX, deltaY) < 12) return null
+	return Math.abs(deltaX) > Math.abs(deltaY) * 2 ? "horizontal" : "vertical"
+}
+
 export const getSwipeDayOffset = (deltaX: number, deltaY: number) => {
 	if (Math.abs(deltaX) < 50 || Math.abs(deltaX) <= Math.abs(deltaY) * 1.5)
 		return 0
