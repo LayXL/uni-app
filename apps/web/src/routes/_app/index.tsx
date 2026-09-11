@@ -22,7 +22,7 @@ export const Route = createFileRoute("/_app/")({
 
 function SchedulePage() {
 	return (
-		<div className="flex min-h-screen flex-col pt-(--safe-area-inset-top) pb-[calc(var(--tab-bar-height)+var(--safe-area-inset-bottom)+1.75rem)]">
+		<div className="flex min-h-dvh flex-col pt-(--safe-area-inset-top) pb-[calc(var(--tab-bar-height)+var(--safe-area-inset-bottom)+1.75rem)]">
 			<Suspense fallback={<SchedulePageSkeleton />}>
 				<SchedulePageContent />
 			</Suspense>

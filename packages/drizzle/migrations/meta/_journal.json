@@ -225,6 +225,27 @@
       "when": 1788905089092,
       "tag": "0031_fix_robotized_section_name",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1789154643193,
+      "tag": "0032_user_schedule_card_settings",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1789156868379,
+      "tag": "0033_schedule_view_mode",
+      "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1789158630358,
+      "tag": "0034_schedule_settings_hint",
+      "breakpoints": true
     }
   ]
 }

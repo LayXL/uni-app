@@ -9,37 +9,30 @@ import { analytics } from "@/shared/lib/analytics"
 
 import {
 	dismissUserFeedbackPrompt,
-	getAppSessionId,
 	isUserFeedbackPromptDismissed,
 	isUserFeedbackPromptRestored,
 } from "../lib/get-app-session-id"
 import type { UserFeedbackPayload } from "../ui/user-feedback-card"
+import { useAppVisit } from "./use-app-visit"
 
 export const useUserFeedbackPrompt = ({ enabled = true } = {}) => {
-	const [sessionId, setSessionId] = useState<string>()
+	const registerVisit = useAppVisit({ enabled })
+	const { sessionId } = registerVisit
 	const [isRestored, setIsRestored] = useState(false)
 	const [isDismissed, setIsDismissed] = useState(false)
 	const trackedShownSession = useRef<string | null>(null)
-	const registerVisit = useMutation(
-		orpc.feedback.registerVisit.mutationOptions(),
-	)
 	const submitFeedback = useMutation(
 		orpc.feedback.submitFeedback.mutationOptions(),
 	)
 
-	const registerVisitMutate = registerVisit.mutate
-
 	useEffect(() => {
-		if (!enabled) return
-
-		const currentSessionId = getAppSessionId()
-		setSessionId(currentSessionId)
-		setIsRestored(isUserFeedbackPromptRestored(currentSessionId))
+		if (!enabled || !sessionId) return
+		setIsRestored(isUserFeedbackPromptRestored(sessionId))
 		setIsDismissed(isUserFeedbackPromptDismissed())
-		registerVisitMutate({ sessionId: currentSessionId })
-	}, [enabled, registerVisitMutate])
+	}, [enabled, sessionId])
 
 	const shouldShow =
+		enabled &&
 		registerVisit.isSuccess &&
 		!isDismissed &&
 		(isRestored || (registerVisit.data?.shouldShow ?? false))

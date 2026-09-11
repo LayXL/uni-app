@@ -36,7 +36,7 @@ export const GroupScheduleSkeleton = () => (
 
 const GroupScheduleView = ({ group }: { group: ScheduleGroup }) => {
 	return (
-		<div className="flex flex-col pt-[calc(var(--safe-area-inset-top)+1rem)]">
+		<div className="flex min-h-dvh flex-col pt-[calc(var(--safe-area-inset-top)+1rem)] pb-[calc(var(--safe-area-inset-bottom)+1rem)]">
 			{group.type === "teacher" ? (
 				<>
 					{isVK() && (

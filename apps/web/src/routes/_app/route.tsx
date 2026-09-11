@@ -7,6 +7,7 @@ import { MainTabBar } from "@/app/(morda)/_ui/main-tab-bar"
 import { MaintenanceGate } from "@/app/(morda)/_ui/maintenance-gate"
 import { YandexMetrikaUser } from "@/app/(morda)/_ui/yandex-metrika-user"
 import { SessionMap } from "@/app/(morda)/map/_ui/session-map"
+import { AppVisitRegistration } from "@/features/schedule/hooks/use-app-visit"
 import { PageSkeleton } from "@/shared/ui/page-skeleton"
 import { UnauthorizedPage } from "@/shared/ui/unauthorized-page"
 import { isUnauthorizedError } from "@/shared/utils/is-unauthorized-error"
@@ -52,6 +53,7 @@ function AuthenticatedApp() {
 	return (
 		<>
 			<YandexMetrikaUser />
+			<AppVisitRegistration />
 			<MaintenanceGate>
 				<Outlet />
 				<SessionMap />

@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 
+import { transformFullNameToInitials } from "@repo/shared/groups/transform-full-name-to-initials"
 import { transformToGroupName } from "@repo/shared/groups/transform-to-group-name"
 import type { Lesson } from "@repo/shared/lessons/types/lesson"
 
@@ -20,6 +21,8 @@ type LessonCardProps = {
 	isTeacherView?: boolean
 	isActive?: boolean
 	hideClassroom?: boolean
+	showFullTeacherName?: boolean
+	showParallelGroups?: boolean
 	variant?: "card" | "row"
 	onClassroomClick?: (classroomId: number) => void
 }
@@ -47,6 +50,8 @@ export const LessonCard = ({
 	isTeacherView,
 	isActive,
 	hideClassroom,
+	showFullTeacherName = false,
+	showParallelGroups = true,
 	variant = "card",
 	onClassroomClick,
 }: LessonCardProps) => {
@@ -59,11 +64,17 @@ export const LessonCard = ({
 		.filter(
 			({ type, id }) => type === "teacher" && (!isTeacherView || id !== group),
 		)
-		.map((teacher) => transformToGroupName(teacher))
+		.map((teacher) =>
+			showFullTeacherName
+				? transformToGroupName(teacher)
+				: transformFullNameToInitials(transformToGroupName(teacher)),
+		)
 	const additionalGroups = otherGroups.map((group) =>
 		transformToGroupName(group),
 	)
-	const additionalGroupsLabel = formatAdditionalGroups(additionalGroups)
+	const additionalGroupsLabel = showParallelGroups
+		? formatAdditionalGroups(additionalGroups)
+		: ""
 
 	return (
 		<>
@@ -80,11 +91,11 @@ export const LessonCard = ({
 				>
 					{variant === "card" && <LiquidBorder />}
 					<div className="flex min-w-0 items-start gap-1 text-sm">
-						<p className="shrink-0">{lesson.order} пара</p>
-						<p className="shrink-0">с</p>
-						<p className="shrink-0">{formatLessonTime(lesson.startTime)}</p>
-						<p className="shrink-0">до</p>
-						<p className="shrink-0">{formatLessonTime(lesson.endTime)}</p>
+						<p className="shrink-0 text-muted">
+							{formatLessonTime(lesson.startTime)} – {formatLessonTime(lesson.endTime)}
+						</p>
+						<span aria-hidden="true" className="text-muted">·</span>
+						<p className="shrink-0 text-muted">{lesson.order} пара</p>
 						{!hideClassroom && (
 							<div className="ml-auto flex shrink-0 min-w-0 items-center gap-1 pl-2">
 								<Icon name="place-12" className="shrink-0 text-muted" />
@@ -101,13 +112,13 @@ export const LessonCard = ({
 					</div>
 					<p
 						className={cn(
-							"line-clamp-1 break-all font-medium transition-colors",
+							"line-clamp-2 break-words font-medium transition-colors",
 							isActive && "text-accent",
 						)}
 					>
 						{lesson.subject.name}
 					</p>
-					<p className="line-clamp-1 break-all text-sm text-muted">
+					<p className="line-clamp-1 break-all text-[15px] text-muted">
 						{teachers.join(", ")}
 						{teachers.length > 0 && additionalGroupsLabel ? " + " : ""}
 						{additionalGroupsLabel}

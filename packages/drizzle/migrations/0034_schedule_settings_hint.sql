@@ -1,0 +1,2 @@
+ALTER TABLE "user_schedule_card_settings" ADD COLUMN IF NOT EXISTS "scheduleSettingsHintDismissed" boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE "user_schedule_card_settings" ADD COLUMN IF NOT EXISTS "scheduleSettingsHintForced" boolean DEFAULT false NOT NULL;

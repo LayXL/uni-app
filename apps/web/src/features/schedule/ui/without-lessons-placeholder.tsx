@@ -12,6 +12,7 @@ import { useInView } from "motion/react"
 import { useRef } from "react"
 
 import { LottiePlayer } from "@/shared/ui/lottie"
+import { cn } from "@/shared/utils/cn"
 
 const PHRASES = [
 	"Ну и хорошо",
@@ -62,6 +63,7 @@ type WithoutLessonsPlaceholderProps = {
 	date: string
 	startDate?: string
 	isTeacherView?: boolean
+	fillHeight?: boolean
 }
 
 const getTitle = (startDate: string, endDate: string) => {
@@ -83,15 +85,23 @@ const getTitle = (startDate: string, endDate: string) => {
 const GroupWithoutLessonsPlaceholder = ({
 	phrase,
 	title,
+	fillHeight,
 }: {
 	phrase: string
 	title: string
+	fillHeight: boolean
 }) => {
 	const ref = useRef<HTMLDivElement>(null)
 	const isInView = useInView(ref, { once: true, amount: 0.5 })
 
 	return (
-		<div ref={ref} className="flex flex-col items-center px-4 py-6 text-center">
+		<div
+			ref={ref}
+			className={cn(
+				"flex flex-col items-center px-4 py-6 text-center",
+				fillHeight && "flex-1 justify-center",
+			)}
+		>
 			<div className="mb-3 size-28">
 				{isInView && <LottiePlayer src="duck-sunglasses" className="size-28" />}
 			</div>
@@ -105,10 +115,17 @@ export const WithoutLessonsPlaceholder = ({
 	date,
 	startDate = date,
 	isTeacherView = false,
+	fillHeight = false,
 }: WithoutLessonsPlaceholderProps) => {
 	if (isTeacherView) {
 		return (
-			<p className="px-2 text-left text-sm font-normal">
+			<p
+				className={cn(
+					"px-2 text-left text-sm font-normal",
+					fillHeight &&
+						"flex flex-1 items-center justify-center py-6 text-center",
+				)}
+			>
 				В этот день нет занятий
 			</p>
 		)
@@ -116,6 +133,7 @@ export const WithoutLessonsPlaceholder = ({
 
 	return (
 		<GroupWithoutLessonsPlaceholder
+			fillHeight={fillHeight}
 			phrase={getPhraseByDate(date)}
 			title={getTitle(startDate, date)}
 		/>

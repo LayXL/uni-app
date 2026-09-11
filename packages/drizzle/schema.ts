@@ -44,6 +44,16 @@ export const usersTable = pgTable("users", {
 	lastAppOpenedAt: timestamp(),
 })
 
+export const userScheduleCardSettingsTable = pgTable("user_schedule_card_settings", {
+	userId: integer().primaryKey().references(() => usersTable.id, { onDelete: "cascade" }),
+	showFullTeacherName: boolean().notNull().default(false),
+	showParallelGroups: boolean().notNull().default(true),
+	mergeCards: boolean().notNull().default(true),
+	viewMode: varchar({ length: 16, enum: ["list", "day"] }).notNull().default("list"),
+	scheduleSettingsHintDismissed: boolean().notNull().default(false),
+	scheduleSettingsHintForced: boolean().notNull().default(false),
+})
+
 export const groupTypeEnum = pgEnum("group_type", ["teacher", "studentsGroup"])
 
 export const groupsTable = pgTable("groups", {
