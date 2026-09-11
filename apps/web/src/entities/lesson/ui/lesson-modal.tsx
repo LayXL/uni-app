@@ -15,7 +15,6 @@ import { formatLessonTime } from "../lib/format-lesson-time"
 
 type LessonModalProps = {
 	lesson: Lesson
-	followingLessons?: Lesson[]
 	group?: number
 	onClassroomClick?: (classroomId: number) => void
 }
@@ -39,7 +38,6 @@ const TeacherAvatar = ({ url }: { url?: string | null }) => {
 
 export const LessonModal = ({
 	lesson,
-	followingLessons = [],
 	group,
 	onClassroomClick,
 }: LessonModalProps) => {
@@ -63,12 +61,8 @@ export const LessonModal = ({
 			<div className="flex items-center gap-1 text-muted tabular-nums">
 				<Icon name="clock-outline-16" className="shrink-0" />
 				<span>
-					{[lesson, ...followingLessons]
-						.map(
-							(item) =>
-								`${formatLessonTime(item.startTime)} → ${formatLessonTime(item.endTime)}`,
-						)
-						.join(", ")}
+					{formatLessonTime(lesson.startTime)} →{" "}
+					{formatLessonTime(lesson.endTime)}
 				</span>
 			</div>
 			{shouldShowStudentGroups && (
