@@ -64,7 +64,7 @@ export const ScheduleSettingsHint = ({
 							</svg>
 						</Popover.Arrow>
 						<Popover.Title className="mb-2 whitespace-nowrap text-base font-semibold">
-							Настройте расписание под себя
+							Настрой расписание под себя
 						</Popover.Title>
 						<Button
 							label="Хорошо"

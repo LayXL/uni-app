@@ -12,6 +12,7 @@ import { EventCard } from "@/entities/event/ui/event-card"
 import { isLessonActive } from "@/entities/lesson/lib/is-lesson-active"
 import { LessonCard } from "@/entities/lesson/ui/lesson-card"
 import { groupScheduleItems } from "@/features/schedule/lib/group-schedule-items"
+import { useDisableTelegramSwipes } from "@/shared/hooks/use-disable-telegram-swipes"
 import { useNowInYekaterinburg } from "@/shared/hooks/use-now-in-yekaterinburg"
 import { cn } from "@/shared/utils/cn"
 
@@ -35,6 +36,7 @@ export const ScheduleViewerWithGroup = ({
 	isTeacherView: boolean
 	onClassroomClick?: (classroomId: number) => void
 }) => {
+	useDisableTelegramSwipes()
 	const settings = useCardSettings()
 	const { showFullTeacherName, showParallelGroups, mergeCards, viewMode } =
 		settings
