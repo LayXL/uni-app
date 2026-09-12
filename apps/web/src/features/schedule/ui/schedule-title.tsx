@@ -2,6 +2,8 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react"
 
+import { cssTimeToMs } from "@/shared/utils/css-time-to-ms"
+
 import { useFitScheduleTitle } from "../hooks/use-fit-schedule-title"
 import { useScheduleSplash } from "../hooks/use-schedule-splash"
 
@@ -26,7 +28,7 @@ export const ScheduleTitle = () => {
 			return
 		}
 
-		const duration = Number.parseFloat(
+		const duration = cssTimeToMs(
 			getComputedStyle(element).getPropertyValue("--text-swap-dur"),
 		)
 		element.classList.add("is-exit")
