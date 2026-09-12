@@ -130,7 +130,7 @@ export const ScheduleCardSettingsControl = ({
 						<p className="mb-2">Вид расписания</p>
 						<ScheduleViewMode
 							value={settings.viewMode}
-							disabled={settings.isLoading || settings.isSaving}
+							disabled={settings.isLoading}
 							onChange={(mode) => settings.setSetting("viewMode", mode)}
 						/>
 					</div>
@@ -162,7 +162,7 @@ export const ScheduleCardSettingsControl = ({
 									className="shrink-0"
 									ariaLabel={label}
 									value={settings[key]}
-									disabled={settings.isLoading || settings.isSaving}
+									disabled={settings.isLoading}
 									onChange={(value) => settings.setSetting(key, value)}
 								/>
 							</div>

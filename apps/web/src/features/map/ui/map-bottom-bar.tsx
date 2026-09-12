@@ -24,7 +24,7 @@ const MapBottomBarButton = ({
 			<button
 				type="button"
 				aria-label={label}
-				className="relative flex shrink-0 items-center justify-center size-12 rounded-3xl bg-background"
+				className="relative flex shrink-0 items-center justify-center size-12 rounded-3xl bg-card"
 				onClick={onClick}
 			>
 				<LiquidBorder />

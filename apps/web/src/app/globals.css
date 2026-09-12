@@ -98,11 +98,11 @@
 			env(safe-area-inset-left, 0px)
 		);
 
-		--background: #ffffff;
+		--background: #fafafa;
 		--foreground: #000000;
 		--secondary: #efeff4;
 		--muted: #8e8e93;
-		--card: #fafafa;
+		--card: #ffffff;
 		--border: #c8c7cc;
 		--accent: #fc4c01;
 		--accent-foreground: #ffffff;

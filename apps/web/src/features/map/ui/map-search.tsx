@@ -106,9 +106,9 @@ export const MapSearch = () => {
 	}
 
 	return (
-		<div className="relative min-w-0 flex-1 bg-background rounded-3xl">
+		<div className="relative min-w-0 flex-1 bg-card rounded-3xl">
 			<SearchInputTrigger
-				className="bg-background rounded-3xl"
+				className="bg-card rounded-3xl"
 				icon="iconify:material-symbols:search-rounded"
 				placeholder="Найти аудиторию или место"
 				items={entityItems}

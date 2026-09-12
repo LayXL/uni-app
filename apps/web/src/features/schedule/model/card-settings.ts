@@ -1,8 +1,8 @@
 "use client"
 
 import {
-	useIsMutating,
 	useMutation,
+	useMutationState,
 	useQuery,
 	useQueryClient,
 } from "@tanstack/react-query"
@@ -22,35 +22,34 @@ export const useCardSettings = () => {
 	const queryClient = useQueryClient()
 	const queryKey = [...orpc.users.getCardSettings.queryKey(), user.id]
 	const mutationKey = [...orpc.users.updateCardSettings.mutationKey(), user.id]
-	const isSaving = useIsMutating({ mutationKey }) > 0
+	const pendingPatches = useMutationState({
+		filters: { mutationKey, status: "pending" },
+		select: (mutation) => mutation.state.variables as Partial<CardSettings>,
+	})
 	const query = useQuery({
 		...orpc.users.getCardSettings.queryOptions(),
 		queryKey,
 	})
 	const mutation = useMutation({
 		mutationKey,
+		scope: { id: JSON.stringify(mutationKey) },
 		mutationFn: (patch: Partial<CardSettings>) =>
 			orpc.users.updateCardSettings.call(patch),
-		onMutate: async (patch) => {
-			await queryClient.cancelQueries({ queryKey })
-			const previous = queryClient.getQueryData<CardSettings>(queryKey)
-			queryClient.setQueryData(queryKey, { ...previous, ...patch })
-			return { previous }
-		},
+		onMutate: () => queryClient.cancelQueries({ queryKey }),
 		onSuccess: (settings) => {
 			queryClient.setQueryData(queryKey, settings)
 		},
-		onError: (_error, _patch, context) => {
-			if (context?.previous) {
-				queryClient.setQueryData(queryKey, context.previous)
-			}
-		},
 	})
+	// Keep queued edits visible when an earlier save updates the cache.
+	const settings = { ...(query.data ?? defaultCardSettings) }
+	for (const patch of pendingPatches) {
+		Object.assign(settings, patch)
+	}
 
 	return {
-		...(query.data ?? defaultCardSettings),
+		...settings,
 		isLoading: query.isPending,
-		isSaving,
+		isSaving: pendingPatches.length > 0,
 		error: query.isError
 			? "Не удалось загрузить настройки. Попробуйте ещё раз."
 			: mutation.isError
@@ -64,7 +63,7 @@ export const useCardSettings = () => {
 			key: K,
 			value: CardSettings[K],
 		) => {
-			if (!query.data || isSaving) return
+			if (!query.data) return
 			mutation.mutate({ [key]: value })
 		},
 	}
