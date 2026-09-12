@@ -13,7 +13,7 @@ import {
 import { env } from "@repo/env"
 import { isTestingGroupId } from "@repo/shared/testing-group"
 
-import { privateProcedure } from "../../procedures/private"
+import { publicProcedure } from "../../procedures/public"
 
 const getTestingEvents = ({
 	dates,
@@ -59,7 +59,7 @@ const getTestingEvents = ({
 	]
 }
 
-export const getEvents = privateProcedure
+export const getEvents = publicProcedure
 	.input(
 		z.object({
 			dates: z
@@ -70,8 +70,8 @@ export const getEvents = privateProcedure
 			group: z.number().optional(),
 		}),
 	)
-	.handler(async ({ input, context }) => {
-		const groupId = input.group ?? context.user.group
+	.handler(async ({ input }) => {
+		const groupId = input.group
 
 		let groupDisplayName: string | null = null
 

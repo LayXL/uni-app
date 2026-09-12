@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from "@tanstack/react-router"
 import { motion, useReducedMotion } from "motion/react"
 import { useRef } from "react"
 
+import { useUser } from "@/entities/user/hooks/useUser"
 import { useRouteBuilder } from "@/features/map/hooks/use-route-builder"
 import { analytics } from "@/shared/lib/analytics"
 import { Icon } from "@/shared/ui/icon"
@@ -19,7 +20,7 @@ type Tab = {
 	id: "schedule" | "map" | "homework"
 }
 
-const tabs: Tab[] = [
+const allTabs: Tab[] = [
 	{
 		id: "schedule",
 		href: "/",
@@ -44,6 +45,8 @@ const tabs: Tab[] = [
 ]
 
 export function MainTabBar() {
+	const user = useUser()
+	const tabs = allTabs.filter((tab) => !user.isGuest || tab.id !== "homework")
 	const navigate = useNavigate()
 	const pressedTab = useRef<Tab["href"] | null>(null)
 	const pathname = useLocation({ select: (location) => location.pathname })
@@ -73,10 +76,18 @@ export function MainTabBar() {
 					aria-hidden="true"
 					className="pointer-events-none absolute inset-0 rounded-[inherit] bg-background/90 backdrop-blur-xl"
 				/>
-				<div className="relative isolate mx-auto grid h-(--tab-bar-height) max-w-lg grid-cols-3 gap-1 py-1.5">
+				<div
+					className="relative isolate mx-auto grid h-(--tab-bar-height) max-w-lg gap-1 py-1.5"
+					style={{
+						gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))`,
+					}}
+				>
 					<motion.span
 						aria-hidden="true"
-						className="pointer-events-none absolute inset-y-1.5 left-0 z-0 w-[calc((100%-0.5rem)/3)] rounded-[1.375rem] bg-accent/10"
+						className="pointer-events-none absolute inset-y-1.5 left-0 z-0 rounded-[1.375rem] bg-accent/10"
+						style={{
+							width: `calc((100% - ${(tabs.length - 1) * 0.25}rem) / ${tabs.length})`,
+						}}
 						initial={false}
 						animate={{
 							x: `calc(${currentTabIndex * 100}% + ${currentTabIndex * 0.25}rem)`,

@@ -11,6 +11,7 @@ import {
 } from "@repo/shared/time/test-time"
 
 import type { Context } from "./base"
+import { createGuestClient } from "./guest-client"
 import type { router } from "./router"
 
 const publicRpcUrl = import.meta.env.VITE_ORPC_URL
@@ -48,4 +49,8 @@ const link = new RPCLink<Context>({
 	},
 })
 
-export const client: RouterClient<typeof router> = createORPCClient(link)
+export const client: RouterClient<typeof router> = createGuestClient(
+	createORPCClient(link),
+)
+
+export { GUEST_USER_ID } from "./guest-storage"

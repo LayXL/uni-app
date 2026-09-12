@@ -1,21 +1,16 @@
 "use client"
 
 import { Link } from "@tanstack/react-router"
-import { useEffect, useState } from "react"
 
+import { useUser } from "@/entities/user/hooks/useUser"
 import { Icon } from "@/shared/ui/icon"
 import { Touchable } from "@/shared/ui/touchable"
 import { cn } from "@/shared/utils/cn"
-import { isVK } from "@/shared/utils/is-vk"
 
 export function SettingsLink({ className }: { className?: string }) {
-	const [isVkPlatform, setIsVkPlatform] = useState(false)
+	const user = useUser()
 
-	useEffect(() => {
-		setIsVkPlatform(isVK())
-	}, [])
-
-	if (!isVkPlatform) return null
+	if (user.isGuest || user.telegramId !== null) return null
 
 	return (
 		<Touchable>

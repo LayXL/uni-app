@@ -6,10 +6,12 @@ import { Navigate } from "@tanstack/react-router"
 import { orpc } from "@repo/orpc/react"
 import { getNextTwoWeeksDates } from "@repo/shared/lessons/get-next-two-weeks-dates"
 
+import { GroupSelectionStep } from "@/entities/group/ui/group-selection-step"
 import { useUser } from "@/entities/user/hooks/useUser"
 import { useInitializeScheduleSplash } from "@/features/schedule/hooks/use-initialize-schedule-splash"
 import { useScheduleGroup } from "@/features/schedule/hooks/use-schedule-group"
 import { useScheduleSplash } from "@/features/schedule/hooks/use-schedule-splash"
+import { cardSettingsQueryOptions } from "@/features/schedule/model/card-settings"
 import { ScheduleHeader } from "@/features/schedule/ui/schedule-header"
 import { ScheduleTimer } from "@/features/schedule/ui/schedule-timer"
 import { ScheduleTitle } from "@/features/schedule/ui/schedule-title"
@@ -40,10 +42,15 @@ const SchedulePageView = () => (
 )
 
 const ScheduleData = ({ groupId }: { groupId: number }) => {
+	const user = useUser()
 	const isClient = useIsClient()
 	const dates = getNextTwoWeeksDates()
 	const results = useQueries({
 		queries: [
+			{
+				...cardSettingsQueryOptions(user.id),
+				enabled: isClient,
+			},
 			{
 				...orpc.groups.getAllGroups.queryOptions({}),
 				enabled: isClient,
@@ -81,7 +88,18 @@ export const SchedulePageContent = () => {
 	const { group } = useScheduleGroup()
 	useInitializeScheduleSplash(user.group)
 
-	if (!user.group) return <Navigate to="/onboarding" replace />
+	if (!user.group) {
+		return user.isGuest ? (
+			<div className="p-4">
+				<div className="flex justify-end">
+					<SettingsLink />
+				</div>
+				<GroupSelectionStep source="schedule_search" />
+			</div>
+		) : (
+			<Navigate to="/onboarding" replace />
+		)
+	}
 	if (!group) return <SchedulePageSkeleton />
 
 	return <ScheduleData groupId={group.id} />

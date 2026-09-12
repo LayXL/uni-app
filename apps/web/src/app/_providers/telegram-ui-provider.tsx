@@ -1,11 +1,10 @@
 "use client"
 
-import { useLocation, useNavigate, useRouter } from "@tanstack/react-router"
+import { useLocation, useRouter } from "@tanstack/react-router"
 import {
 	backButton,
 	miniApp,
 	retrieveLaunchParams,
-	settingsButton,
 	themeParams,
 	useSignal,
 	viewport,
@@ -76,30 +75,6 @@ const useThemeParams = () => {
 	}, [isAvailable])
 }
 
-const useSettingsButton = () => {
-	const navigate = useNavigate()
-	const isAvailable = useSignal(settingsButton.mount.isAvailable, () => false)
-
-	useEffect(() => {
-		if (!isAvailable) {
-			return
-		}
-
-		settingsButton.mount()
-		settingsButton.show()
-
-		const offClick = settingsButton.onClick(() => {
-			void navigate({ to: "/settings" })
-		})
-
-		return () => {
-			settingsButton.hide()
-			settingsButton.unmount()
-			offClick()
-		}
-	}, [isAvailable, navigate])
-}
-
 const useBackButton = () => {
 	const router = useRouter()
 	const pathname = useLocation({ select: (location) => location.pathname })
@@ -161,7 +136,6 @@ export const TelegramUiProvider = ({ children }: { children: ReactNode }) => {
 	useMiniApp()
 	useViewport()
 	useThemeParams()
-	useSettingsButton()
 
 	return (
 		<>

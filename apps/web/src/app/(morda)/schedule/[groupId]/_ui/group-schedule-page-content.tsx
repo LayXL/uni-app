@@ -6,6 +6,8 @@ import { orpc } from "@repo/orpc/react"
 import { transformToGroupName } from "@repo/shared/groups/transform-to-group-name"
 import { getNextTwoWeeksDates } from "@repo/shared/lessons/get-next-two-weeks-dates"
 
+import { useUser } from "@/entities/user/hooks/useUser"
+import { cardSettingsQueryOptions } from "@/features/schedule/model/card-settings"
 import { ScheduleViewerWithGroup } from "@/features/schedule/ui/schedule-viewer"
 import { TeacherScheduleProfile } from "@/features/schedule/ui/teacher-schedule-profile"
 import { useIsClient } from "@/shared/hooks/use-is-client"
@@ -73,10 +75,15 @@ export const GroupSchedulePageContent = ({
 }: {
 	groupIdParam: string
 }) => {
+	const user = useUser()
 	const isClient = useIsClient()
 	const groupId = Number(groupIdParam)
 	const isValidGroupId = Number.isInteger(groupId)
 	const dates = getNextTwoWeeksDates()
+	const settingsQuery = useQuery({
+		...cardSettingsQueryOptions(user.id),
+		enabled: isClient && isValidGroupId,
+	})
 	const groupQuery = useQuery({
 		...orpc.groups.getGroup.queryOptions({ input: { id: groupId } }),
 		enabled: isClient && isValidGroupId,
@@ -93,12 +100,17 @@ export const GroupSchedulePageContent = ({
 		}),
 		enabled: isClient && isValidGroupId,
 	})
-	const error = groupQuery.error ?? scheduleQuery.error ?? eventsQuery.error
+	const error =
+		settingsQuery.error ??
+		groupQuery.error ??
+		scheduleQuery.error ??
+		eventsQuery.error
 
 	if (!isValidGroupId) throw new Error("Invalid schedule group id")
 	if (error) throw error
 	if (
 		!isClient ||
+		settingsQuery.isPending ||
 		groupQuery.isPending ||
 		scheduleQuery.isPending ||
 		eventsQuery.isPending ||

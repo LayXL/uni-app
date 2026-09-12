@@ -17,19 +17,22 @@ import { useUser } from "@/entities/user/hooks/useUser"
 
 export type { CardSettings } from "@repo/shared/lessons/card-settings"
 
+export const cardSettingsQueryOptions = (userId: number) => ({
+	...orpc.users.getCardSettings.queryOptions(),
+	queryKey: [...orpc.users.getCardSettings.queryKey(), userId],
+})
+
 export const useCardSettings = () => {
 	const user = useUser()
 	const queryClient = useQueryClient()
-	const queryKey = [...orpc.users.getCardSettings.queryKey(), user.id]
+	const queryOptions = cardSettingsQueryOptions(user.id)
+	const { queryKey } = queryOptions
 	const mutationKey = [...orpc.users.updateCardSettings.mutationKey(), user.id]
 	const pendingPatches = useMutationState({
 		filters: { mutationKey, status: "pending" },
 		select: (mutation) => mutation.state.variables as Partial<CardSettings>,
 	})
-	const query = useQuery({
-		...orpc.users.getCardSettings.queryOptions(),
-		queryKey,
-	})
+	const query = useQuery(queryOptions)
 	const mutation = useMutation({
 		mutationKey,
 		scope: { id: JSON.stringify(mutationKey) },

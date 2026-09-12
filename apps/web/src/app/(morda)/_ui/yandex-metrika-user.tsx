@@ -9,8 +9,8 @@ export function YandexMetrikaUser() {
 	const user = useUser()
 
 	useEffect(() => {
-		setYandexMetrikaUserId(String(user.id))
-	}, [user.id])
+		if (!user.isGuest) setYandexMetrikaUserId(String(user.id))
+	}, [user.id, user.isGuest])
 
 	return null
 }

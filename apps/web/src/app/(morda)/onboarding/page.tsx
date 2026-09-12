@@ -1,13 +1,10 @@
 "use client"
 
-import { useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import { AnimatePresence, motion } from "motion/react"
 import { useEffect, useState } from "react"
 
-import { orpc } from "@repo/orpc/react"
-
-import { GroupSelector } from "@/entities/group/ui/group-selector"
+import { GroupSelectionStep } from "@/entities/group/ui/group-selection-step"
 import { analytics } from "@/shared/lib/analytics"
 import { Button } from "@/shared/ui/button"
 import { Icon } from "@/shared/ui/icon"
@@ -92,44 +89,6 @@ const FeaturesOverviewStep = ({ onNext }: StepProps) => {
 	)
 }
 
-const GroupSelectionStep = ({ onNext }: StepProps) => {
-	const queryClient = useQueryClient()
-
-	const handleGroupClick = async (groupId: number, groupName: string) => {
-		await orpc.users.updateUserGroup.call({ groupId })
-		await queryClient.invalidateQueries({
-			queryKey: orpc.users.me.queryKey(),
-		})
-		analytics.track("group_selected", {
-			group_id: groupId,
-			group_name: groupName,
-			source: "onboarding",
-		})
-		analytics.track("onboarding_completed", {
-			group_id: groupId,
-			group_name: groupName,
-		})
-		onNext()
-	}
-
-	return (
-		<div className="flex flex-col gap-4 pt-4">
-			<div className="flex flex-col gap-2 items-center">
-				<LottiePlayer
-					src="duck-with-toy"
-					className="w-40 h-40 self-center"
-					disableFadeIn
-					loop
-				/>
-				<h2 className="text-center text-xl font-bold">Давай знакомиться!</h2>
-				<p className="text-center text-sm text-muted text-balance">
-					Выбери группу, чтобы расписание всегда было под рукой
-				</p>
-			</div>
-			<GroupSelector onChange={handleGroupClick} />
-		</div>
-	)
-}
 const STEPS = [FeaturesOverviewStep, GroupSelectionStep]
 const STEP_NAMES = ["features", "group_selection"] as const
 

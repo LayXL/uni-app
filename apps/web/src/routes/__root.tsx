@@ -21,6 +21,9 @@ export const Route = createRootRoute({
 	head: () => ({
 		meta: [
 			{ charSet: "utf-8" },
+			{ title: "Мэпп — расписание и карта МИДИС" },
+			{ name: "application-name", content: "Мэпп" },
+			{ name: "apple-mobile-web-app-title", content: "Мэпп" },
 			{
 				name: "viewport",
 				content:
@@ -28,6 +31,19 @@ export const Route = createRootRoute({
 			},
 		],
 		links: [
+			{ rel: "icon", href: "/favicon.ico", sizes: "32x32" },
+			{
+				rel: "icon",
+				href: "/favicon-32.png",
+				type: "image/png",
+				sizes: "32x32",
+			},
+			{
+				rel: "apple-touch-icon",
+				href: "/apple-touch-icon.png",
+				sizes: "180x180",
+			},
+			{ rel: "manifest", href: "/manifest.webmanifest" },
 			{ rel: "stylesheet", href: styles },
 			{ rel: "preconnect", href: "https://fonts.googleapis.com" },
 			{

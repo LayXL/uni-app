@@ -16,10 +16,8 @@ export function NotificationSettings() {
 		mutationFn: (enabled: boolean) =>
 			orpc.users.updateNotifications.call({ enabled }),
 		onSuccess: (updated) => {
-			queryClient.setQueryData(
-				orpc.users.me.queryKey(),
-				(current: typeof user | undefined) =>
-					current ? { ...current, ...updated } : current,
+			queryClient.setQueryData(orpc.users.me.queryKey(), (current) =>
+				current ? { ...current, ...updated } : current,
 			)
 		},
 	})
@@ -42,7 +40,9 @@ export function NotificationSettings() {
 					<div className="min-w-0">
 						<h2 className="font-medium">Уведомления</h2>
 						<p className="mt-1 text-sm text-muted">
-							Присылать расписание на день
+							{user.isGuest
+								? "Доступны при входе через Telegram или ВКонтакте"
+								: "Присылать расписание на день"}
 						</p>
 					</div>
 					<Toggle
@@ -52,7 +52,7 @@ export function NotificationSettings() {
 								: user.isEnabledNotifications
 						}
 						onChange={(enabled) => mutation.mutate(enabled)}
-						disabled={mutation.isPending}
+						disabled={user.isGuest || mutation.isPending}
 						ariaLabel="Уведомления о расписании"
 						className="shrink-0"
 					/>

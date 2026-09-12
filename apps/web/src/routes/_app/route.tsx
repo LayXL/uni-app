@@ -1,6 +1,12 @@
 import { useQueries } from "@tanstack/react-query"
-import { createFileRoute, Outlet } from "@tanstack/react-router"
+import {
+	createFileRoute,
+	Navigate,
+	Outlet,
+	useLocation,
+} from "@tanstack/react-router"
 
+import { GUEST_USER_ID } from "@repo/orpc/client"
 import { orpc } from "@repo/orpc/react"
 
 import { MainTabBar } from "@/app/(morda)/_ui/main-tab-bar"
@@ -8,9 +14,8 @@ import { MaintenanceGate } from "@/app/(morda)/_ui/maintenance-gate"
 import { YandexMetrikaUser } from "@/app/(morda)/_ui/yandex-metrika-user"
 import { SessionMap } from "@/app/(morda)/map/_ui/session-map"
 import { AppVisitRegistration } from "@/features/schedule/hooks/use-app-visit"
+import { useIsClient } from "@/shared/hooks/use-is-client"
 import { PageSkeleton } from "@/shared/ui/page-skeleton"
-import { UnauthorizedPage } from "@/shared/ui/unauthorized-page"
-import { isUnauthorizedError } from "@/shared/utils/is-unauthorized-error"
 
 export const Route = createFileRoute("/_app")({
 	component: AppLayout,
@@ -19,7 +24,7 @@ export const Route = createFileRoute("/_app")({
 function AppLayout() {
 	return (
 		<div className="mx-auto w-full max-w-(--page-max-width)">
-			<AuthenticatedApp />
+			<SessionApp />
 		</div>
 	)
 }
@@ -32,22 +37,33 @@ function MordaLoadingShell() {
 	)
 }
 
-function AuthenticatedApp() {
+function SessionApp() {
+	const isClient = useIsClient()
+	const pathname = useLocation({ select: (location) => location.pathname })
 	const results = useQueries({
 		queries: [
-			orpc.users.me.queryOptions(),
-			orpc.system.getMaintenance.queryOptions(),
+			{ ...orpc.users.me.queryOptions(), enabled: isClient },
+			{ ...orpc.system.getMaintenance.queryOptions(), enabled: isClient },
 		],
 	})
 	const error = results.find((result) => result.error)?.error
 
 	if (error) {
-		if (isUnauthorizedError(error)) return <UnauthorizedPage />
 		throw error
 	}
 
-	if (results.some((result) => result.isPending)) {
+	if (!isClient || results.some((result) => result.isPending)) {
 		return <MordaLoadingShell />
+	}
+
+	if (
+		results[0].data?.id === GUEST_USER_ID &&
+		(pathname === "/onboarding" ||
+			pathname === "/onboarding/" ||
+			pathname === "/homework" ||
+			pathname.startsWith("/homework/"))
+	) {
+		return <Navigate to="/" replace />
 	}
 
 	return (
