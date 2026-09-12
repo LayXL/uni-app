@@ -91,8 +91,8 @@ export function createIndoorScene(
 	const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 	const controls = new MapControls(camera, host)
 	controls.screenSpacePanning = false
-	controls.enableDamping = !reducedMotion.matches
-	controls.dampingFactor = 0.12
+	// Apply pointer movement in full so the map stays attached to the cursor.
+	controls.enableDamping = false
 	controls.minPolarAngle = 0
 	controls.maxPolarAngle = Math.PI / 3
 	controls.minZoom = 0.35
@@ -251,7 +251,6 @@ export function createIndoorScene(
 			if (progress === 1) tween = undefined
 			else requestRender()
 		} else {
-			// A change schedules the next frame until gesture inertia settles.
 			controls.update()
 		}
 		if (touchRotation.update(now)) requestRender()
@@ -476,7 +475,6 @@ export function createIndoorScene(
 	const motionPreferenceChanged = () => {
 		touchRotation.stop()
 		interrupt()
-		controls.enableDamping = !reducedMotion.matches
 		animateRouteShine()
 	}
 	reducedMotion.addEventListener("change", motionPreferenceChanged)
