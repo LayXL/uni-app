@@ -3,6 +3,8 @@ import { RPCHandler } from "@orpc/server/fetch"
 
 import { isUnauthorizedError } from "@/shared/utils/is-unauthorized-error"
 
+import { isRequestAbort } from "./is-request-abort"
+
 function decodeURIComponentSafe(value: string) {
 	try {
 		return decodeURIComponent(value)
@@ -17,6 +19,7 @@ export async function handleRpcRequest(request: Request) {
 		interceptors: [
 			onError((error) => {
 				if (isUnauthorizedError(error)) return
+				if (isRequestAbort(error, request.signal)) return
 
 				// biome-ignore lint/suspicious/noConsole: server-side RPC error logging
 				console.error("Caught internal error:", error)

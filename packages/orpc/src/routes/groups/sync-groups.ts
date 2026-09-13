@@ -1,4 +1,5 @@
 import { ORPCError } from "@orpc/client"
+import { TimeoutError } from "ky"
 
 import { getAllGroups } from "@repo/bitrix/schedule/get-all-groups"
 import { getSession } from "@repo/bitrix/session/get-session"
@@ -210,6 +211,12 @@ export const syncGroups = privateProcedure.handler(async ({ context }) => {
 	try {
 		return await synchronizeGroups()
 	} catch (error) {
+		if (error instanceof TimeoutError) {
+			throw new ORPCError("GATEWAY_TIMEOUT", {
+				message: "Bitrix не ответил вовремя. Повторите синхронизацию позже.",
+				cause: error,
+			})
+		}
 		// biome-ignore lint/suspicious/noConsole: Preserve the original synchronization error in server logs
 		console.error("Failed to synchronize groups with Bitrix", error)
 		throw new ORPCError("INTERNAL_SERVER_ERROR", {

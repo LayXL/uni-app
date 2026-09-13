@@ -16,6 +16,15 @@ export async function getSession(
 ): Promise<Session> {
 	const authResponse = await bitrix.post("auth/index.php?login=yes", {
 		signal,
+		timeout: 30_000,
+		// Session creation may be repeated after a transient portal/proxy failure.
+		retry: {
+			limit: 2,
+			methods: ["post"],
+			statusCodes: [408, 429, 502, 503, 504],
+			retryOnTimeout: true,
+			maxRetryAfter: 5_000,
+		},
 		body: objectToQuery({
 			AUTH_FORM: "Y",
 			TYPE: "AUTH",
