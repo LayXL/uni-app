@@ -8,6 +8,7 @@ import { setupComposer } from "./composers/setup"
 import { sendWelcomeMessage, startComposer } from "./composers/start"
 import { userMiddleware } from "./middlewares/user"
 import { startDailyScheduleNotifications } from "./services/daily-schedule-notifications"
+import { startFeedbackNotifications } from "./services/feedback-notifications"
 import type { Context } from "./types/context"
 
 export const bot = new Bot<Context>(env.botToken, {
@@ -15,6 +16,7 @@ export const bot = new Bot<Context>(env.botToken, {
 })
 
 startDailyScheduleNotifications()
+startFeedbackNotifications(bot.api)
 
 // Middlewares
 bot.use(userMiddleware)

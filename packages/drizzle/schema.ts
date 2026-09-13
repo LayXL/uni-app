@@ -156,6 +156,7 @@ export const userFeedbackTable = pgTable(
 		source: varchar({ length: 64 }).notNull().default("schedule"),
 		createdAt: timestamp().notNull().default(sql`now()`),
 		updatedAt: timestamp().notNull().default(sql`now()`),
+		notificationDueAt: timestamp(),
 	},
 	(table) => [
 		check(

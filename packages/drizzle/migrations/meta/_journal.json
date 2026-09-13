@@ -246,6 +246,13 @@
       "when": 1789158630358,
       "tag": "0034_schedule_settings_hint",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1789295709202,
+      "tag": "0035_feedback_notification_queue",
+      "breakpoints": true
     }
   ]
 }
