@@ -21,6 +21,7 @@ const isLegacyRewriteCandidate = (pathname: string) =>
 	!pathname.startsWith("/assets/") &&
 	!pathname.startsWith("/lottie/") &&
 	!pathname.startsWith("/icons/") &&
+	pathname !== "/sw.js" &&
 	pathname !== "/favicon.ico"
 
 const withCompatibilityHeaders = (request: Request, response: Response) => {
@@ -29,6 +30,10 @@ const withCompatibilityHeaders = (request: Request, response: Response) => {
 
 	headers.set("Access-Control-Allow-Origin", "*")
 	headers.set("Access-Control-Allow-Credentials", "true")
+
+	if (headers.get("Content-Type")?.includes("text/html")) {
+		headers.set("Cache-Control", "no-cache")
+	}
 
 	if (pathname.endsWith(".svg")) {
 		headers.set("Content-Type", "image/svg+xml")

@@ -33,6 +33,12 @@ export default defineConfig({
 				},
 			},
 			routeRules: {
+				"/sw.js": {
+					headers: {
+						"Content-Type": "application/javascript; charset=utf-8",
+						"Cache-Control": "no-cache",
+					},
+				},
 				"/**": {
 					headers: {
 						"Access-Control-Allow-Origin": "*",
