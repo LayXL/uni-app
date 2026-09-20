@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { addDays, format, parseISO } from "date-fns"
 import { ru } from "date-fns/locale"
-import { Fragment, useMemo, useState } from "react"
+import { Fragment, type ReactNode, useMemo, useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
 import { getNextTwoWeeksDates } from "@repo/shared/lessons/get-next-two-weeks-dates"
@@ -24,6 +24,7 @@ import { ScheduleChannelBanner } from "./schedule-channel-banner"
 import { ScheduleDayChanges } from "./schedule-day-changes"
 import { ScheduleDayView } from "./schedule-day-view"
 import { ScheduleEnd } from "./schedule-end"
+import { ScheduleTimer } from "./schedule-timer"
 import { UserFeedbackCard } from "./user-feedback-card"
 import { WithoutLessonsPlaceholder } from "./without-lessons-placeholder"
 
@@ -31,10 +32,12 @@ export const ScheduleViewerWithGroup = ({
 	group,
 	isTeacherView,
 	onClassroomClick,
+	dayHeader,
 }: {
 	group: number
 	isTeacherView: boolean
 	onClassroomClick?: (classroomId: number) => void
+	dayHeader?: ReactNode
 }) => {
 	useDisableTelegramSwipes()
 	const settings = useCardSettings()
@@ -277,7 +280,12 @@ export const ScheduleViewerWithGroup = ({
 					selectedDate={selectedDate}
 					today={today}
 					onSelect={setSelectedDate}
-					renderDay={renderBody}
+					renderDay={(date) => (
+						<>
+							{date === today && dayHeader}
+							{renderBody(date)}
+						</>
+					)}
 				/>
 			) : (
 				renderBody()
@@ -304,6 +312,7 @@ export const ScheduleViewer = ({
 			group={selectedGroup.id}
 			isTeacherView={selectedGroup.type === "teacher"}
 			onClassroomClick={onClassroomClick}
+			dayHeader={<ScheduleTimer />}
 		/>
 	)
 }

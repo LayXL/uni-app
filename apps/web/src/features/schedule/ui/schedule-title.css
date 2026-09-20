@@ -41,6 +41,7 @@
 
 .schedule-title-text[data-default-title] {
 	font-size: var(--text-2xl, 1.5rem);
+	white-space: nowrap;
 }
 
 @media (prefers-reduced-motion: reduce) {

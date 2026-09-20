@@ -11,7 +11,10 @@ import { useUser } from "@/entities/user/hooks/useUser"
 import { useInitializeScheduleSplash } from "@/features/schedule/hooks/use-initialize-schedule-splash"
 import { useScheduleGroup } from "@/features/schedule/hooks/use-schedule-group"
 import { useScheduleSplash } from "@/features/schedule/hooks/use-schedule-splash"
-import { cardSettingsQueryOptions } from "@/features/schedule/model/card-settings"
+import {
+	cardSettingsQueryOptions,
+	useCardSettings,
+} from "@/features/schedule/model/card-settings"
 import { ScheduleHeader } from "@/features/schedule/ui/schedule-header"
 import { ScheduleTimer } from "@/features/schedule/ui/schedule-timer"
 import { ScheduleTitle } from "@/features/schedule/ui/schedule-title"
@@ -32,14 +35,18 @@ export const SchedulePageSkeleton = () => {
 	)
 }
 
-const SchedulePageView = () => (
-	<>
-		<ScheduleHeader action={<SettingsLink />} />
-		<ScheduleTimer />
-		<SaveCurrentGroupAsUser />
-		<ScheduleWithMapNavigation />
-	</>
-)
+const SchedulePageView = () => {
+	const { viewMode } = useCardSettings()
+
+	return (
+		<>
+			<ScheduleHeader action={<SettingsLink />} />
+			{viewMode === "list" && <ScheduleTimer />}
+			<SaveCurrentGroupAsUser />
+			<ScheduleWithMapNavigation />
+		</>
+	)
+}
 
 const ScheduleData = ({ groupId }: { groupId: number }) => {
 	const user = useUser()

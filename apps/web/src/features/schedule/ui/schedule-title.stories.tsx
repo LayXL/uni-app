@@ -44,11 +44,13 @@ export const FontFitting: Story = {
 							<p className="text-xs text-muted">Экран {width}px</p>
 							<div className="flex h-16 items-center gap-3 pl-4 pr-2">
 								<FitPreview text={text} />
-								<div className="flex shrink-0 items-center gap-2">
-									<span className="min-w-26 rounded-3xl bg-card px-3 py-2">
+								<div className="flex shrink-0 items-center gap-1">
+									<span className="size-10 rounded-full bg-card" />
+									<span className="min-w-20 rounded-3xl bg-card px-3 py-2">
 										Тест-401
 									</span>
 									<span className="size-10 rounded-full bg-card" />
+									<span className="size-8 rounded-full border border-border" />
 								</div>
 							</div>
 						</div>

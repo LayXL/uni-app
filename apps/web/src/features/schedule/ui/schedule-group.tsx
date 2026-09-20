@@ -52,7 +52,7 @@ export const ScheduleGroup = () => {
 			<Touchable>
 				<button
 					type="button"
-					className="relative min-w-26 bg-card rounded-3xl px-3 py-2"
+					className="relative min-w-20 bg-card rounded-3xl px-3 py-2"
 					onClick={() => setIsOpen(!isOpen)}
 				>
 					<LiquidBorder />

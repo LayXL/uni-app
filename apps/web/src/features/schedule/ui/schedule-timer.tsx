@@ -233,9 +233,7 @@ const ScheduleTimerWithGroup = ({ group }: { group: number }) => {
 			<div className="relative bg-card p-3 rounded-3xl overflow-hidden">
 				<LiquidBorder />
 				<div className="text-center text-lg flex flex-col items-center justify-center">
-					{timerState.time && (
-						<ScheduleTimerDigits time={timerState.time} />
-					)}
+					{timerState.time && <ScheduleTimerDigits time={timerState.time} />}
 					<span className="text-sm text-muted font-medium">
 						{timerState.label}
 					</span>
