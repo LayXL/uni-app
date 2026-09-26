@@ -185,3 +185,35 @@ test("empty floors and hidden viewports do not move the camera", () => {
 		false,
 	)
 })
+
+test("small pointer movements at the boundary never cause a large camera correction", () => {
+	for (const heading of [-2.3, 0.4, 1.2]) {
+		for (let direction = 0; direction < 8; direction++) {
+			const { camera, target } = setup(390, 844, 2, 0.7, heading)
+			const controls = new MapControls(camera)
+			controls.target.copy(target)
+			controls.domElement = {
+				clientWidth: 390,
+				clientHeight: 844,
+			} as HTMLElement
+			controls.screenSpacePanning = false
+			const constrain = createIndoorCameraConstraint([floor])
+			const dx = Math.cos((direction * Math.PI) / 4) * 8
+			const dy = Math.sin((direction * Math.PI) / 4) * 8
+			for (let frame = 0; frame < 500; frame++) {
+				controls.pan(dx, dy)
+				controls.update()
+				camera.updateMatrixWorld(true)
+				const before = new Vector3().project(camera)
+				constrain(camera, controls.target, 390, 844)
+				const after = new Vector3().project(camera)
+				const correction = Math.hypot(
+					(after.x - before.x) * 195,
+					(after.y - before.y) * 422,
+				)
+				// Returning to the previous valid view costs at most the pointer's 8px step.
+				expect(correction).toBeLessThanOrEqual(8 + 1e-6)
+			}
+		}
+	}
+})

@@ -49,6 +49,7 @@ export function createIndoorCameraConstraint(floors: Floor[]) {
 	const nearest = new Vector2()
 	const candidate = new Vector2()
 	const edge = new Vector2()
+	const corner = new Vector2()
 	const shift = new Vector3()
 	const destination = new Vector3()
 	const direction = new Vector3()
@@ -65,6 +66,15 @@ export function createIndoorCameraConstraint(floors: Floor[]) {
 		const limitX = 1 - (2 * Math.min(64, width * 0.15)) / width
 		const limitY = 1 - (2 * Math.min(96, height * 0.15)) / height
 		let distance = Infinity
+		const consider = (point: Vector2) => {
+			const dx = (point.x - MathUtils.clamp(point.x, -limitX, limitX)) * width
+			const dy = (point.y - MathUtils.clamp(point.y, -limitY, limitY)) * height
+			const nextDistance = dx * dx + dy * dy
+			if (nextDistance < distance) {
+				distance = nextDistance
+				nearest.copy(point)
+			}
+		}
 		for (const rings of footprints) {
 			for (const ring of rings) {
 				ring.world.forEach((point, i) => {
@@ -82,11 +92,24 @@ export function createIndoorCameraConstraint(floors: Floor[]) {
 					const a = screen[i]
 					edge.subVectors(screen[(i + 1) % screen.length], a)
 					if (crossesViewport(a, edge, limitX, limitY)) return false
-					const t = MathUtils.clamp(-a.dot(edge) / (edge.lengthSq() || 1), 0, 1)
-					candidate.copy(a).addScaledVector(edge, t)
-					if (candidate.lengthSq() < distance) {
-						distance = candidate.lengthSq()
-						nearest.copy(candidate)
+					// Disjoint segments and rectangles are closest at an endpoint or
+					// a rectangle corner projected onto the segment. Minimize that
+					// distance in pixels, not distance to the center of the screen:
+					// the latter can select another wing and jump at the boundary.
+					consider(a)
+					const length = (edge.x * width) ** 2 + (edge.y * height) ** 2
+					for (const x of [-limitX, limitX]) {
+						for (const y of [-limitY, limitY]) {
+							corner.set(x - a.x, y - a.y)
+							const t = MathUtils.clamp(
+								(corner.x * edge.x * width ** 2 +
+									corner.y * edge.y * height ** 2) /
+									(length || 1),
+								0,
+								1,
+							)
+							consider(candidate.copy(a).addScaledVector(edge, t))
+						}
 					}
 				}
 			}
