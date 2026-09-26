@@ -3,6 +3,7 @@ import {
 	type OrthographicCamera,
 	Plane,
 	Raycaster,
+	Spherical,
 	Vector2,
 	Vector3,
 } from "three"
@@ -44,6 +45,7 @@ export function createIndoorTouchRotation(
 	controls: MapControls,
 	reducedMotion: MediaQueryList,
 	onChange: () => void,
+	onTiltStart: () => void = () => {},
 ) {
 	const pointers = new Map<number, Vector2>()
 	const pivot = new Vector2()
@@ -52,6 +54,25 @@ export function createIndoorTouchRotation(
 	let lastMove = 0
 	let lastFrame = 0
 	let coasting = false
+	let gesture: {
+		start: Vector2[]
+		mode: "pending" | "tilt" | "map"
+		lastY: number
+	} | null = null
+	let suspended: { pan: boolean; zoom: boolean } | null = null
+	const resumeMapControls = () => {
+		if (!suspended) return
+		controls.enablePan = suspended.pan
+		controls.enableZoom = suspended.zoom
+		suspended = null
+	}
+	const suspendMapControls = () => {
+		suspended ??= { pan: controls.enablePan, zoom: controls.enableZoom }
+		// MapControls still tracks pointer positions, so lifting one finger can
+		// resume panning without jumping to its position before the tilt.
+		controls.enablePan = false
+		controls.enableZoom = false
+	}
 	const sample = () => {
 		const [a, b] = [...pointers.values()]
 		if (!a || !b) return null
@@ -63,16 +84,30 @@ export function createIndoorTouchRotation(
 		return a.distanceTo(b) >= 12 ? Math.atan2(b.y - a.y, b.x - a.x) : null
 	}
 	const stop = () => {
+		resumeMapControls()
+		gesture = null
 		coasting = false
 		velocity = 0
 		angle = sample()
 	}
 	return {
 		stop,
+		reset() {
+			pointers.clear()
+			stop()
+		},
 		down(event: PointerEvent) {
 			stop()
 			if (event.pointerType !== "touch") return
 			pointers.set(event.pointerId, new Vector2(event.clientX, event.clientY))
+			if (pointers.size === 2) {
+				const start = [...pointers.values()].map((point) => point.clone())
+				gesture = {
+					start,
+					mode: "pending",
+					lastY: (start[0].y + start[1].y) / 2,
+				}
+			}
 			angle = sample()
 			lastMove = event.timeStamp
 		},
@@ -83,6 +118,59 @@ export function createIndoorTouchRotation(
 			if (pointers.size !== 2) {
 				velocity = 0
 				return
+			}
+			if (gesture && gesture.mode !== "map") {
+				const [a, b] = [...pointers.values()]
+				const [startA, startB] = gesture.start
+				const dyA = a.y - startA.y
+				const dyB = b.y - startB.y
+				const y = (a.y + b.y) / 2
+				if (gesture.mode === "pending") {
+					const movedA = a.distanceTo(startA)
+					const movedB = b.distanceTo(startB)
+					const vertical =
+						Math.abs(dyA) >= 6 &&
+						Math.abs(dyB) >= 6 &&
+						dyA * dyB > 0 &&
+						Math.abs(dyA) > Math.abs(a.x - startA.x) * 1.5 &&
+						Math.abs(dyB) > Math.abs(b.x - startB.x) * 1.5 &&
+						Math.abs(dyA - dyB) < Math.abs(dyA + dyB) * 0.5
+					if (vertical && controls.enableRotate) {
+						gesture.mode = "tilt"
+						onTiltStart()
+					} else if (
+						(movedA >= 6 && movedB >= 6) ||
+						Math.max(movedA, movedB) > 30
+					) {
+						gesture.mode = "map"
+						resumeMapControls()
+					}
+				}
+				if (gesture.mode !== "map") {
+					suspendMapControls()
+					velocity = 0
+					if (gesture.mode === "tilt") {
+						const offset = camera.position.clone().sub(controls.target)
+						const spherical = new Spherical().setFromVector3(offset)
+						// A full-height swipe covers the usable tilt range. Up tilts
+						// toward the horizon; down returns toward the overhead view.
+						spherical.phi = MathUtils.clamp(
+							spherical.phi -
+								((y - gesture.lastY) * (Math.PI / 2)) /
+									Math.max(host.getBoundingClientRect().height, 1),
+							controls.minPolarAngle,
+							controls.maxPolarAngle,
+						)
+						spherical.makeSafe()
+						camera.position
+							.copy(controls.target)
+							.add(offset.setFromSpherical(spherical))
+						controls.update()
+						gesture.lastY = y
+						onChange()
+					}
+					return
+				}
 			}
 			const next = sample()
 			if (next == null) {
@@ -105,6 +193,8 @@ export function createIndoorTouchRotation(
 		},
 		up(event: PointerEvent, cancelled = false) {
 			if (!pointers.delete(event.pointerId)) return
+			resumeMapControls()
+			gesture = null
 			if (cancelled || pointers.size >= 2) {
 				stop()
 				return

@@ -1,5 +1,12 @@
 import { describe, expect, test } from "bun:test"
-import { OrthographicCamera, Plane, Raycaster, Vector2, Vector3 } from "three"
+import {
+	OrthographicCamera,
+	Plane,
+	Raycaster,
+	TOUCH,
+	Vector2,
+	Vector3,
+} from "three"
 import { MapControls } from "three/addons/controls/MapControls.js"
 
 import {
@@ -22,6 +29,9 @@ function setup(top: boolean, reducedMotion = false) {
 		controls,
 		{ matches: reducedMotion } as MediaQueryList,
 		() => {},
+		() => {
+			controls.maxPolarAngle = Math.PI / 3
+		},
 	)
 	return { camera, controls, touch }
 }
@@ -116,5 +126,139 @@ describe("two-finger indoor rotation", () => {
 		controls.update()
 		expect(controls.getAzimuthalAngle()).toBeGreaterThan(0.1)
 		expect(touch.update(performance.now() + 16)).toBe(false)
+	})
+})
+
+describe("two-finger indoor tilt", () => {
+	for (const top of [true, false]) {
+		test(`${top ? "2D" : "3D"} tilts up and down without changing heading, center, or zoom`, () => {
+			const { camera, controls, touch } = setup(top)
+			const initial = controls.getPolarAngle()
+			const target = controls.target.clone()
+			touch.down(pointer(1, 300, 300, 0))
+			touch.down(pointer(2, 500, 300, 0))
+			touch.move(pointer(1, 300, 290, 16))
+			touch.move(pointer(2, 500, 290, 17))
+			expect(controls.getPolarAngle()).toBeGreaterThan(initial)
+			touch.move(pointer(1, 300, 220, 32))
+			touch.move(pointer(2, 500, 220, 33))
+			expect(controls.getPolarAngle()).toBeCloseTo(initial + Math.PI / 15, 5)
+			touch.move(pointer(1, 300, 300, 48))
+			touch.move(pointer(2, 500, 300, 49))
+			expect(controls.getPolarAngle()).toBeCloseTo(initial, 5)
+			expect(controls.getAzimuthalAngle()).toBeCloseTo(0, 5)
+			expect(controls.target.distanceTo(target)).toBeLessThan(1e-7)
+			expect(camera.zoom).toBe(1)
+			touch.up(pointer(1, 300, 300, 50))
+			touch.up(pointer(2, 500, 300, 51))
+			expect(touch.update(performance.now() + 16)).toBe(false)
+		})
+	}
+
+	test("clamps tilt at the horizon limit and overhead view", () => {
+		const { controls, touch } = setup(false)
+		touch.down(pointer(1, 300, 300, 0))
+		touch.down(pointer(2, 500, 300, 0))
+		touch.move(pointer(1, 300, 290, 16))
+		touch.move(pointer(2, 500, 290, 17))
+		touch.move(pointer(1, 300, -1000, 32))
+		touch.move(pointer(2, 500, -1000, 33))
+		expect(controls.getPolarAngle()).toBeCloseTo(Math.PI / 3, 6)
+		touch.move(pointer(1, 300, 2000, 48))
+		touch.move(pointer(2, 500, 2000, 49))
+		expect(controls.getPolarAngle()).toBeLessThan(0.000002)
+	})
+
+	for (const direction of ["pinch", "horizontal pan"] as const) {
+		test(`${direction} preserves tilt and restores MapControls`, () => {
+			const { controls, touch } = setup(false)
+			const initial = controls.getPolarAngle()
+			touch.down(pointer(1, 300, 300, 0))
+			touch.down(pointer(2, 500, 300, 0))
+			touch.move(pointer(1, 290, 300, 16))
+			touch.move(pointer(2, direction === "pinch" ? 510 : 490, 300, 17))
+			controls.update()
+			expect(controls.getPolarAngle()).toBeCloseTo(initial, 6)
+			expect(controls.enablePan).toBe(true)
+			expect(controls.enableZoom).toBe(true)
+		})
+	}
+
+	test("cancellation and hiding the map clear the gesture and restore controls", () => {
+		const { controls, touch } = setup(false)
+		touch.down(pointer(1, 300, 300, 0))
+		touch.down(pointer(2, 500, 300, 0))
+		touch.move(pointer(1, 300, 290, 16))
+		touch.move(pointer(2, 500, 290, 17))
+		expect(controls.enablePan).toBe(false)
+		touch.up(pointer(1, 300, 290, 20), true)
+		expect(controls.enablePan).toBe(true)
+		expect(controls.enableZoom).toBe(true)
+		touch.reset()
+		const initial = controls.getPolarAngle()
+		touch.down(pointer(3, 300, 300, 30))
+		touch.move(pointer(3, 300, 100, 40))
+		expect(controls.getPolarAngle()).toBe(initial)
+	})
+
+	test("MapControls tracks a tilt without pan/zoom and resumes one-finger dragging without a jump", () => {
+		const { camera, controls, touch } = setup(false)
+		const document = new EventTarget()
+		const host = Object.assign(new EventTarget(), {
+			ownerDocument: document,
+			style: {},
+			clientWidth: 800,
+			clientHeight: 600,
+			getRootNode: () => document,
+			getBoundingClientRect: () => ({
+				left: 0,
+				top: 0,
+				width: 800,
+				height: 600,
+			}),
+			setPointerCapture: () => {},
+			releasePointerCapture: () => {},
+		}) as unknown as HTMLElement
+		controls.connect(host)
+		controls.touches.TWO = TOUCH.DOLLY_PAN
+		const dispatch = (
+			type: "pointerdown" | "pointermove" | "pointerup",
+			id: number,
+			x: number,
+			y: number,
+		) => {
+			const event = Object.assign(new Event(type), {
+				pointerId: id,
+				pointerType: "touch",
+				clientX: x,
+				clientY: y,
+				pageX: x,
+				pageY: y,
+			}) as PointerEvent
+			if (type === "pointerdown") {
+				host.dispatchEvent(event)
+				touch.down(event)
+			} else {
+				// The scene handles move/up in the capture phase, before MapControls.
+				if (type === "pointermove") touch.move(event)
+				else touch.up(event)
+				document.dispatchEvent(event)
+			}
+		}
+		dispatch("pointerdown", 1, 300, 300)
+		dispatch("pointerdown", 2, 500, 300)
+		dispatch("pointermove", 1, 300, 290)
+		dispatch("pointermove", 2, 500, 290)
+		dispatch("pointermove", 1, 300, 200)
+		dispatch("pointermove", 2, 500, 200)
+		expect(controls.target.length()).toBeLessThan(1e-7)
+		expect(camera.zoom).toBe(1)
+		dispatch("pointerup", 2, 500, 200)
+		dispatch("pointermove", 1, 300, 200)
+		expect(controls.target.length()).toBeLessThan(1e-7)
+		dispatch("pointermove", 1, 310, 200)
+		expect(controls.target.length()).toBeCloseTo(10, 5)
+		dispatch("pointerup", 1, 310, 200)
+		controls.dispose()
 	})
 })

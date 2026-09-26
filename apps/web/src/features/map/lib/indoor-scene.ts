@@ -193,6 +193,10 @@ export function createIndoorScene(
 		controls,
 		reducedMotion,
 		requestRender,
+		() => {
+			view = "3d"
+			updateRotationLimits()
+		},
 	)
 	const updateRotationLimits = (transitioning = false) => {
 		// Keep azimuth rotation in 2D; only lock the camera's tilt.
@@ -542,9 +546,10 @@ export function createIndoorScene(
 	host.addEventListener("pointerdown", pointerDown)
 	// MapControls captures only the first pointer; also track the second finger
 	// when it leaves the map so a release cannot leave a stale twist in progress.
-	host.ownerDocument.addEventListener("pointermove", pointerMove)
-	host.ownerDocument.addEventListener("pointerup", pointerUp)
-	host.ownerDocument.addEventListener("pointercancel", pointerCancel)
+	// Recognize tilt before MapControls applies its default two-finger pan.
+	host.ownerDocument.addEventListener("pointermove", pointerMove, true)
+	host.ownerDocument.addEventListener("pointerup", pointerUp, true)
+	host.ownerDocument.addEventListener("pointercancel", pointerCancel, true)
 	host.addEventListener("wheel", touchRotation.stop, { passive: true })
 	canvas.addEventListener("webglcontextlost", contextLost)
 	const observer = new ResizeObserver(resize)
@@ -565,7 +570,7 @@ export function createIndoorScene(
 				return
 			}
 			clearLabels()
-			touchRotation.stop()
+			touchRotation.reset()
 			pointers.clear()
 			down = undefined
 			if (tween) moveCamera(tween.toTarget, tween.toOffset, tween.toZoom, false)
@@ -703,10 +708,15 @@ export function createIndoorScene(
 			controls.removeEventListener("start", interrupt)
 			reducedMotion.removeEventListener("change", motionPreferenceChanged)
 			controls.dispose()
+			touchRotation.reset()
 			host.removeEventListener("pointerdown", pointerDown)
-			host.ownerDocument.removeEventListener("pointermove", pointerMove)
-			host.ownerDocument.removeEventListener("pointerup", pointerUp)
-			host.ownerDocument.removeEventListener("pointercancel", pointerCancel)
+			host.ownerDocument.removeEventListener("pointermove", pointerMove, true)
+			host.ownerDocument.removeEventListener("pointerup", pointerUp, true)
+			host.ownerDocument.removeEventListener(
+				"pointercancel",
+				pointerCancel,
+				true,
+			)
 			host.removeEventListener("wheel", touchRotation.stop)
 			canvas.removeEventListener("webglcontextlost", contextLost)
 			if (model) disposeIndoorGroup(model.group)

@@ -138,6 +138,7 @@ export const IndoorMapViewer = ({
 	}, [])
 	const onCamera = useCallback((camera: IndoorCameraView) => {
 		cameraRef.current = camera
+		setView(camera.view)
 		clearTimeout(saveTimer.current)
 		saveTimer.current = setTimeout(
 			() => saveIndoorView({ ...camera, floorId: floorRef.current }),
