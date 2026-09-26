@@ -1,5 +1,4 @@
 import {
-	BoxGeometry,
 	type BufferGeometry,
 	Color,
 	CylinderGeometry,
@@ -8,9 +7,10 @@ import {
 	Group,
 	Mesh,
 	MeshBasicMaterial,
-	MeshStandardMaterial,
+	type MeshStandardMaterial,
 	Path,
 	Shape,
+	ShapeUtils,
 	SphereGeometry,
 	Vector2,
 } from "three"
@@ -24,7 +24,6 @@ import type {
 import { isRoom } from "@repo/shared/building-scheme"
 
 import { levelFloors, renderLevel, renderLevelRoute } from "./campus-layout"
-import { getFloorColor } from "./floor-colors"
 import { formatNavigationText } from "./format-navigation-text"
 import {
 	entityCenter,
@@ -33,6 +32,7 @@ import {
 	roomPoints,
 	wallSegments,
 } from "./indoor-geometry"
+import { createWallShapes } from "./indoor-walls"
 
 export const WALL_HEIGHT = 58
 const priorityLabelNames = new Set(["буфет", "столовая", "гардероб", "магазин"])
@@ -46,19 +46,23 @@ const namedMapIcons: Record<string, string> = {
 }
 export const INDOOR_PALETTES = {
 	light: {
-		slab: "#c5cbd3",
-		floor: "#eef0f3",
-		room: "#dce3ea",
+		slab: "#dce2e9",
+		floor: "#f2f5f9",
+		room: "#e6f2ff",
 		wall: "#ffffff",
-		edge: "#d2d9e1",
+		wallUpper: "#deebff",
+		wallBase: "#bfd3eb",
+		edge: "#c8d9ec",
 		accent: "#fc4c01",
 	},
 	dark: {
-		slab: "#161d29",
-		floor: "#242e3e",
-		room: "#35445a",
-		wall: "#708198",
-		edge: "#52637b",
+		slab: "#17212d",
+		floor: "#202c3a",
+		room: "#2a3d55",
+		wall: "#a9c5e5",
+		wallUpper: "#607fa3",
+		wallBase: "#354c68",
+		edge: "#4d6b8c",
 		accent: "#fc4c01",
 	},
 }
@@ -103,69 +107,73 @@ export const createIndoorFloor = (
 	floor: Floor,
 	theme: "light" | "dark",
 ) => {
-	const palette = {
-		...INDOOR_PALETTES[theme],
-		floor: getFloorColor(floor, theme, INDOOR_PALETTES[theme].floor),
-	}
+	const palette = INDOOR_PALETTES[theme]
 	const group = new Group()
-	const rooms = new Map<number, Mesh<BufferGeometry, MeshStandardMaterial>>()
+	const rooms = new Map<number, Mesh<BufferGeometry, MeshBasicMaterial>>()
 	const labels: IndoorLabel[] = []
 	const world = (p: Coordinate) => ({
 		x: p.x + floor.position.x,
 		y: p.y + floor.position.y,
 	})
 	const floorShape = shapeFor(floor.wallsPosition.map(world))
-	for (const hole of floor.holes ?? [])
-		floorShape.holes.push(
-			new Path(hole.map(world).map((p) => new Vector2(p.x, -p.y))),
-		)
+	for (const hole of floor.holes ?? []) {
+		const ring = hole.map(world).map((p) => new Vector2(p.x, -p.y))
+		if (ShapeUtils.isClockWise(ring)) ring.reverse()
+		floorShape.holes.push(new Path(ring))
+	}
 	if (floor.wallsPosition.length >= 3) {
 		const slab = new Mesh(extrude(floorShape, 22), [
-			new MeshStandardMaterial({ color: palette.floor, roughness: 1 }),
-			new MeshStandardMaterial({ color: palette.slab, roughness: 1 }),
+			new MeshBasicMaterial({ color: palette.floor, toneMapped: false }),
+			new MeshBasicMaterial({ color: palette.slab, toneMapped: false }),
 		])
 		slab.position.y = -22
-		slab.receiveShadow = true
 		group.add(slab)
 	}
 	const walls: BufferGeometry[] = []
+	const roomWalls: ReturnType<typeof wallSegments> = []
+	const wallRim = new Color(palette.wall)
+	const wallTop = new Color(palette.wallUpper)
+	const wallBase = new Color(palette.wallBase)
+	const wallColor = new Color()
 	const addWalls = (
 		points: Coordinate[],
 		doors: Coordinate[] = [],
 		height = WALL_HEIGHT,
+		coveredBy: ReturnType<typeof wallSegments> = [],
 	) => {
-		for (const { start, end } of wallSegments(points, doors)) {
-			const length = Math.hypot(end.x - start.x, end.y - start.y)
-			const geometry = new BoxGeometry(length, height, 6)
-			geometry.rotateY(-Math.atan2(end.y - start.y, end.x - start.x))
-			geometry.translate(
-				(start.x + end.x) / 2,
-				height / 2,
-				(start.y + end.y) / 2,
-			)
+		for (const shape of createWallShapes(points, doors, 6, coveredBy)) {
+			const geometry = extrude(shape, height)
+			const positions = geometry.getAttribute("position")
+			const normals = geometry.getAttribute("normal")
+			const colors = new Float32BufferAttribute(positions.count * 3, 3)
+			// Normalize per wall so low perimeter walls have the same gradient.
+			for (let i = 0; i < positions.count; i++) {
+				const progress = Math.min(1, Math.max(0, positions.getY(i) / height))
+				if (normals.getY(i) > 0.5) wallColor.copy(wallRim)
+				else wallColor.lerpColors(wallBase, wallTop, progress)
+				colors.setXYZ(i, wallColor.r, wallColor.g, wallColor.b)
+			}
+			geometry.setAttribute("color", colors)
 			walls.push(geometry)
 		}
 	}
-	// A low perimeter describes the building without hiding entrances or corridors.
-	addWalls(floor.wallsPosition.map(world), [], 16)
-	for (const hole of floor.holes ?? []) addWalls(hole.map(world), [], 24)
 	for (const entity of data.entities.filter((e) => e.floorId === floor.id)) {
 		if (isRoom(entity)) {
 			const points = roomPoints(entity, floor)
 			if (points.length < 3) continue
-			const material = new MeshStandardMaterial({
+			const material = new MeshBasicMaterial({
 				color: palette.room,
-				roughness: 1,
+				toneMapped: false,
 			})
 			const mesh = new Mesh(extrude(shapeFor(points), 3), material)
 			mesh.userData.entityId = entity.id
-			mesh.receiveShadow = true
 			rooms.set(entity.id, mesh)
 			group.add(mesh)
 			const doors = (entity.doorsPosition ?? []).map((p) =>
 				world({ x: p.x + entity.position.x, y: p.y + entity.position.y }),
 			)
 			addWalls(points, doors)
+			roomWalls.push(...wallSegments(points, doors))
 			if (entity.nameHidden) continue
 		} else if (entity.hiddenOnMap) continue
 		const name = entity.name.trim().toLocaleLowerCase("ru-RU")
@@ -184,16 +192,19 @@ export const createIndoorFloor = (
 				: (entity.priority ?? 0),
 		})
 	}
+	// Low perimeter walls only fill edges not already occupied by room walls.
+	addWalls(floor.wallsPosition.map(world), [], 16, roomWalls)
+	for (const hole of floor.holes ?? [])
+		addWalls(hole.map(world), [], 24, roomWalls)
 	if (walls.length) {
 		const geometry = mergeGeometries(walls)
 		for (const wall of walls) wall.dispose()
 		if (geometry) {
 			const mesh = new Mesh(
 				geometry,
-				new MeshStandardMaterial({ color: palette.wall, roughness: 1 }),
+				new MeshBasicMaterial({ vertexColors: true, toneMapped: false }),
 			)
-			mesh.castShadow = true
-			mesh.receiveShadow = true
+			mesh.name = "indoor-walls"
 			group.add(mesh)
 		}
 	}
@@ -392,8 +403,6 @@ export const highlightIndoorRoom = (
 					)
 				: model.palette.room,
 		)
-		room.material.emissive.set(roomId === id ? model.palette.accent : "#000000")
-		room.material.emissiveIntensity = roomId === id ? 0.12 : 0
 	}
 }
 

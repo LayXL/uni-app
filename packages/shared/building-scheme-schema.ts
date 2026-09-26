@@ -50,6 +50,7 @@ const baseEntitySchema = z.object({
 
 const roomSchema = baseEntitySchema.extend({
 	type: z.literal("room"),
+	labelPosition: coordinateSchema.optional(),
 	nameHidden: z.boolean().optional(),
 	clickable: z.boolean().optional(),
 	wallsPosition: z.array(coordinateSchema).min(3),

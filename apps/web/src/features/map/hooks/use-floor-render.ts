@@ -7,7 +7,6 @@ import { getFloorContours } from "@repo/shared/building-scheme-geometry"
 
 import { renderLevel, renderLevelRoute } from "../lib/campus-layout"
 import { getMapColors } from "../lib/colors"
-import { getFloorColor } from "../lib/floor-colors"
 import { clamp, getRoomPolygon } from "../lib/geometry"
 import { updateIconLabelVisibility } from "../lib/icon-label-visibility"
 import {
@@ -237,6 +236,7 @@ export const useFloorRender = ({
 		})
 	}, [data])
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: Theme changes must redraw the canvas because getMapColors reads CSS variables.
 	useEffect(() => {
 		if (!enabled) return
 
@@ -279,7 +279,7 @@ export const useFloorRender = ({
 				)
 				.join(" "),
 			{
-				fill: getFloorColor(floor, colorScheme ?? "light", colors.floorFill),
+				fill: colors.floorFill,
 				fillRule: "evenodd",
 				stroke: colors.floorStroke,
 				strokeWidth: 2,
@@ -345,7 +345,9 @@ export const useFloorRender = ({
 			canvas.add(roomPolygon)
 
 			if (!room.nameHidden && !getRoomMapIcon(room)) {
-				const walls = room.wallsPosition ?? []
+				const walls = room.labelPosition
+					? [room.labelPosition]
+					: (room.wallsPosition ?? [])
 				const centroid = walls.length
 					? walls.reduce(
 							(acc, point) => ({
@@ -508,7 +510,9 @@ export const useFloorRender = ({
 			const roomIcon = getRoomMapIcon(room)
 
 			if (!room.nameHidden && roomIcon) {
-				const walls = room.wallsPosition ?? []
+				const walls = room.labelPosition
+					? [room.labelPosition]
+					: (room.wallsPosition ?? [])
 				const centroid = walls.length
 					? walls.reduce(
 							(acc, point) => ({

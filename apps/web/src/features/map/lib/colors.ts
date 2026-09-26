@@ -1,11 +1,11 @@
 import type { MapColors } from "../types"
 
 const defaultMapColors: MapColors = {
-	floorFill: "#f3f4f6",
-	floorStroke: "#cbd5e1",
-	roomFill: "#e5e7eb",
-	roomFillClickable: "#e2e8f0",
-	roomStroke: "#94a3b8",
+	floorFill: "#f2f5f9",
+	floorStroke: "#dce2e9",
+	roomFill: "#e6f2ff",
+	roomFillClickable: "#e6f2ff",
+	roomStroke: "#c8d9ec",
 	selectedRoomStroke: "#fc4c01",
 	roomLabel: "#0f172a",
 	stairsIcon: "#ffffff",

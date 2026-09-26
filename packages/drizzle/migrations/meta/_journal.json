@@ -253,6 +253,34 @@
       "when": 1789295709202,
       "tag": "0035_feedback_notification_queue",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1790456202000,
+      "tag": "0036_simplify_canteen_corner",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1790456549000,
+      "tag": "0037_straighten_canteen_top_wall",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1790456817000,
+      "tag": "0038_add_first_floor_service_room",
+      "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1790457056000,
+      "tag": "0039_hide_service_room_map_label",
+      "breakpoints": true
     }
   ]
 }

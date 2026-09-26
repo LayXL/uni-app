@@ -53,6 +53,8 @@ export type BaseEntity = {
 
 export type Room = BaseEntity & {
 	type: "room"
+	/** положение подписи внутри комнаты, относительно position */
+	labelPosition?: Coordinate
 	/** скрытое имя/служебные */
 	nameHidden?: boolean
 	/** можно ли кликать по комнате */

@@ -1,7 +1,6 @@
 import { expect, test } from "bun:test"
 import {
 	BoxGeometry,
-	DirectionalLight,
 	Group,
 	Mesh,
 	MeshBasicMaterial,
@@ -14,9 +13,6 @@ import { createIndoorFloorTransition } from "./indoor-floor-transition"
 
 const setup = (levelDelta = 1) => {
 	const scene = new Scene()
-	const shadow = new DirectionalLight().shadow
-	shadow.intensity = 0.8
-	const refreshed: boolean[] = []
 	const camera = new OrthographicCamera()
 	camera.zoom = 2
 	const outgoing = new Group()
@@ -30,14 +26,9 @@ const setup = (levelDelta = 1) => {
 		outgoing,
 		incoming,
 		material,
-		shadow,
-		refreshed,
 		transition: createIndoorFloorTransition(outgoing, incoming, 100, {
 			levelDelta,
 			pivot: new Vector3(10, 0, 20),
-			shadow,
-			refresh: () =>
-				refreshed.push(outgoing.visible && outgoing.parent !== null),
 		}),
 	}
 }
@@ -81,35 +72,6 @@ test("interruption preserves the current zoom and releases the outgoing floor on
 	expect(incoming.scale.toArray()).toEqual([1, 1, 1])
 	expect(incoming.position.toArray()).toEqual([0, 0, 0])
 	expect(disposals).toBe(1)
-})
-
-test("fades cached shadows out and refreshes only after the old geometry is hidden", () => {
-	const { shadow, refreshed, transition } = setup()
-	transition.update(100)
-	expect(shadow.intensity).toBe(0.8)
-	transition.update(152.5)
-	expect(shadow.intensity).toBeCloseTo(0.4)
-	transition.update(205)
-	expect(shadow.intensity).toBe(0)
-	transition.update(250)
-	expect(shadow.intensity).toBe(0)
-	expect(refreshed).toHaveLength(0)
-	transition.update(295)
-	expect(shadow.intensity).toBe(0)
-	expect(refreshed).toEqual([false])
-	transition.update(347.5)
-	expect(shadow.intensity).toBeCloseTo(0.4)
-	transition.finish()
-	expect(shadow.intensity).toBe(0.8)
-	expect(refreshed).toEqual([false, false, false])
-})
-
-test("refreshes shadows immediately when a floor transition is interrupted", () => {
-	const { shadow, refreshed, transition } = setup()
-	transition.update(250)
-	transition.finish()
-	expect(shadow.intensity).toBe(0.8)
-	expect(refreshed).toEqual([false])
 })
 
 test("visual zoom stays one-way in both directions without changing the final scale", () => {

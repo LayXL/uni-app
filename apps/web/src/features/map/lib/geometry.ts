@@ -63,6 +63,11 @@ export const getRoomPolygon = (
 	)
 
 export const getRoomWorldCenter = (room: Room, floor: Floor): Coordinate => {
+	if (room.labelPosition)
+		return {
+			x: room.labelPosition.x + room.position.x + floor.position.x,
+			y: room.labelPosition.y + room.position.y + floor.position.y,
+		}
 	const points = getRoomPolygon(room, floor.position)
 
 	if (points.length === 0) {

@@ -3,23 +3,23 @@ export const MAP_ICON_RADIUS = 14
 export const MAP_ICON_LABEL_TOP = MAP_ICON_RADIUS + 5
 
 const iconColors: Record<string, string> = {
-	food: "#a34b14",
-	wardrobe: "#b45309",
-	"storefront-outline-24": "#b45309",
-	stairs: "#475569",
-	toilet: "#7c3aed",
-	"toilet-women": "#be185d",
-	"toilet-men": "#2563eb",
-	entry: "#047857",
-	ecobox: "#4d7c0f",
-	waterSource: "#0284c7",
-	"water-source": "#0284c7",
-	fountain: "#0e7490",
-	terminal: "#1d4ed8",
-	typography: "#be185d",
-	projectAnalyticCenter: "#c2410c",
-	"project-analytic-center": "#c2410c",
+	food: "#d24700",
+	wardrobe: "#c95000",
+	"storefront-outline-24": "#c95000",
+	stairs: "#526b91",
+	toilet: "#8035ee",
+	"toilet-women": "#d52378",
+	"toilet-men": "#2467ed",
+	entry: "#008755",
+	ecobox: "#29851c",
+	waterSource: "#007bc4",
+	"water-source": "#007bc4",
+	fountain: "#008096",
+	terminal: "#3159ed",
+	typography: "#d52378",
+	projectAnalyticCenter: "#d73f2a",
+	"project-analytic-center": "#d73f2a",
 }
 
 export const getMapIconColor = (icon: string): string =>
-	iconColors[icon] ?? "#475569"
+	iconColors[icon] ?? "#526b91"

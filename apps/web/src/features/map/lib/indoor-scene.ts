@@ -4,7 +4,6 @@ import {
 	HemisphereLight,
 	MathUtils,
 	OrthographicCamera,
-	PCFShadowMap,
 	Raycaster,
 	Scene,
 	TOUCH,
@@ -68,9 +67,6 @@ export function createIndoorScene(
 		powerPreference: "low-power",
 	})
 	renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-	renderer.shadowMap.enabled = true
-	renderer.shadowMap.type = PCFShadowMap
-	renderer.shadowMap.autoUpdate = false
 	const canvas = renderer.domElement
 	canvas.className = "indoor-canvas"
 	canvas.setAttribute("role", "img")
@@ -82,10 +78,6 @@ export function createIndoorScene(
 	const scene = new Scene()
 	scene.add(new HemisphereLight(0xffffff, 0x64748b, 1.2))
 	const light = new DirectionalLight(0xffffff, 1.8)
-	light.castShadow = true
-	light.shadow.mapSize.set(2048, 2048)
-	light.shadow.normalBias = 2
-	light.shadow.bias = -0.0001
 	light.position.set(-1000, 2400, -1600)
 	scene.add(light, light.target)
 	const camera = new OrthographicCamera(-1, 1, 1, -1, 1, 100000)
@@ -639,13 +631,6 @@ export function createIndoorScene(
 			light.position
 				.copy(center)
 				.add(new Vector3(-size * 0.4, size, -size * 0.6))
-			light.shadow.camera.left = -size / 2
-			light.shadow.camera.right = size / 2
-			light.shadow.camera.top = size / 2
-			light.shadow.camera.bottom = -size / 2
-			light.shadow.camera.far = size * 3
-			light.shadow.camera.updateProjectionMatrix()
-			renderer.shadowMap.needsUpdate = true
 			highlightIndoorRoom(model, selectedId)
 			rebuildLabels()
 			if (initial) fit(false)
@@ -676,10 +661,6 @@ export function createIndoorScene(
 					{
 						levelDelta,
 						pivot: controls.target,
-						shadow: light.shadow,
-						refresh: () => {
-							renderer.shadowMap.needsUpdate = true
-						},
 					},
 				)
 			}
@@ -734,7 +715,6 @@ export function createIndoorScene(
 			if (model) disposeIndoorGroup(model.group)
 			if (routeModel) disposeIndoorGroup(routeModel.group)
 			renderer.dispose()
-			light.shadow.dispose()
 			canvas.remove()
 			clearLabels()
 			labelLayer.remove()

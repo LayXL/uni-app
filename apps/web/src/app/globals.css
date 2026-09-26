@@ -108,12 +108,12 @@
 		--accent-foreground: #ffffff;
 		--destructive: #ff3b30;
 
-		--map-background: #ffffff;
-		--map-floor-fill: #f0efde;
-		--map-floor-stroke: #d6d2c7;
-		--map-room-fill: #fefef0;
-		--map-room-fill-clickable: #fefef0;
-		--map-room-stroke: #d6d2c7;
+		--map-background: #f4f7fb;
+		--map-floor-fill: #f2f5f9;
+		--map-floor-stroke: #dce2e9;
+		--map-room-fill: #e6f2ff;
+		--map-room-fill-clickable: #e6f2ff;
+		--map-room-stroke: #c8d9ec;
 		--map-room-label: #000000;
 		--map-stairs-icon: #000000;
 		--map-route: #fc4c01;
@@ -130,12 +130,12 @@
 		--accent-foreground: #ffffff;
 		--destructive: #ff3b30;
 
-		--map-background: #191d25;
-		--map-floor-fill: #222832;
-		--map-floor-stroke: #323232;
-		--map-room-fill: #2d3444;
-		--map-room-fill-clickable: #2d3444;
-		--map-room-stroke: #505050;
+		--map-background: #18212d;
+		--map-floor-fill: #202c3a;
+		--map-floor-stroke: #17212d;
+		--map-room-fill: #2a3d55;
+		--map-room-fill-clickable: #2a3d55;
+		--map-room-stroke: #4d6b8c;
 		--map-room-label: #ffffff;
 		--map-stairs-icon: #ffffff;
 		--map-route: #fc4c01;

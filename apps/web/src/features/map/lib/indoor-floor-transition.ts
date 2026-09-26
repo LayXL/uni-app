@@ -1,10 +1,4 @@
-import {
-	type Group,
-	type LightShadow,
-	type Material,
-	Mesh,
-	type Vector3,
-} from "three"
+import { type Group, type Material, Mesh, type Vector3 } from "three"
 
 import { disposeIndoorGroup } from "./indoor-model"
 
@@ -57,15 +51,12 @@ export const createIndoorFloorTransition = (
 	options: {
 		levelDelta: number
 		pivot: Vector3
-		shadow: LightShadow
-		refresh: () => void
 	},
 ) => {
 	const pivot = options.pivot.clone()
 	const scaleOut = scaleAround(outgoing, pivot)
 	const scaleIn = scaleAround(incoming, pivot)
 	const factor = 1.08 ** -Math.sign(options.levelDelta)
-	const shadowIntensity = options.shadow.intensity
 	const smoothstep = (value: number) => {
 		const t = Math.min(Math.max(value, 0), 1)
 		return t * t * (3 - 2 * t)
@@ -82,8 +73,6 @@ export const createIndoorFloorTransition = (
 		fadeIn(1)
 		scaleIn(1)
 		disposeIndoorGroup(outgoing)
-		options.shadow.intensity = shadowIntensity
-		options.refresh()
 	}
 	return {
 		get revealed() {
@@ -96,16 +85,9 @@ export const createIndoorFloorTransition = (
 			const easedBlend = smoothstep((progress - 0.35) / 0.3)
 			fadeOut(1 - easedBlend)
 			fadeIn(easedBlend)
-			// Shadow depth does not follow material opacity. Hide shadows while
-			// both floors overlap, then rebuild before fading the new shadows in.
-			options.shadow.intensity =
-				shadowIntensity *
-				(1 - smoothstep(progress / 0.35) + smoothstep((progress - 0.65) / 0.35))
 			const movement = smoothstep(progress)
 			scaleOut(factor ** movement)
 			scaleIn(factor ** (movement - 1))
-			// Incoming geometry is still moving as its shadows reappear.
-			if (progress >= 0.65) options.refresh()
 			revealed = progress === 1
 			if (progress === 1) finish()
 			return finished

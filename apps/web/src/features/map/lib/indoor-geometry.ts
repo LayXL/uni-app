@@ -19,6 +19,11 @@ export const roomPoints = (room: Room, floor: Floor): Coordinate[] =>
 	}))
 
 export const entityCenter = (entity: MapEntity, floor: Floor): Coordinate => {
+	if (isRoom(entity) && entity.labelPosition)
+		return {
+			x: entity.labelPosition.x + entity.position.x + floor.position.x,
+			y: entity.labelPosition.y + entity.position.y + floor.position.y,
+		}
 	const points = isRoom(entity) ? roomPoints(entity, floor) : []
 	if (!points.length)
 		return {
