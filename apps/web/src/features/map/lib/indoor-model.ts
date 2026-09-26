@@ -25,6 +25,7 @@ import { isRoom } from "@repo/shared/building-scheme"
 
 import { levelFloors, renderLevel, renderLevelRoute } from "./campus-layout"
 import { formatNavigationText } from "./format-navigation-text"
+import { createIndoorFountain } from "./indoor-fountain"
 import {
 	entityCenter,
 	floorRouteChains,
@@ -68,7 +69,7 @@ export const INDOOR_PALETTES = {
 }
 
 export type IndoorLabel = {
-	kind?: "campus"
+	kind?: "campus" | "model"
 	position: Coordinate
 	text: string
 	icon?: string
@@ -110,6 +111,8 @@ export const createIndoorFloor = (
 	const palette = INDOOR_PALETTES[theme]
 	const group = new Group()
 	const rooms = new Map<number, Mesh<BufferGeometry, MeshBasicMaterial>>()
+	const pickTargets: Mesh[] = []
+	const landmarkMaterials = new Map<number, MeshBasicMaterial>()
 	const labels: IndoorLabel[] = []
 	const world = (p: Coordinate) => ({
 		x: p.x + floor.position.x,
@@ -168,6 +171,7 @@ export const createIndoorFloor = (
 			const mesh = new Mesh(extrude(shapeFor(points), 3), material)
 			mesh.userData.entityId = entity.id
 			rooms.set(entity.id, mesh)
+			pickTargets.push(mesh)
 			group.add(mesh)
 			const doors = (entity.doorsPosition ?? []).map((p) =>
 				world({ x: p.x + entity.position.x, y: p.y + entity.position.y }),
@@ -181,8 +185,26 @@ export const createIndoorFloor = (
 			entity.icon ??
 			namedMapIcons[name] ??
 			(isRoom(entity) ? undefined : entity.placeType)
+		const position = entityCenter(entity, floor)
+		if (!isRoom(entity) && icon === "fountain") {
+			const fountain = createIndoorFountain(theme, entity.id)
+			fountain.group.position.set(position.x, 0, position.y)
+			group.add(fountain.group)
+			pickTargets.push(...fountain.pickTargets)
+			landmarkMaterials.set(entity.id, fountain.stone)
+			// A transparent semantic button keeps keyboard and touch access.
+			labels.push({
+				position,
+				text: entity.name,
+				entityId: entity.id,
+				kind: "model",
+				iconOnly: true,
+				priority: entity.priority ?? 0,
+			})
+			continue
+		}
 		labels.push({
-			position: entityCenter(entity, floor),
+			position,
 			text: entity.name,
 			entityId: entity.id,
 			icon,
@@ -241,7 +263,7 @@ export const createIndoorFloor = (
 		// 	group.add(step)
 		// }
 	}
-	return { group, rooms, labels, palette }
+	return { group, rooms, pickTargets, landmarkMaterials, labels, palette }
 }
 
 export const createIndoorRoute = (
@@ -394,6 +416,8 @@ export const highlightIndoorRoom = (
 	model: ReturnType<typeof createIndoorFloor>,
 	id: number | null,
 ) => {
+	for (const [entityId, material] of model.landmarkMaterials)
+		material.color.set(entityId === id ? model.palette.accent : "#ffffff")
 	for (const [roomId, room] of model.rooms) {
 		room.material.color.set(
 			roomId === id
@@ -444,6 +468,9 @@ export const createIndoorLevel = (
 	for (const other of models.slice(1)) {
 		model.group.add(other.group)
 		for (const [id, room] of other.rooms) model.rooms.set(id, room)
+		model.pickTargets.push(...other.pickTargets)
+		for (const [id, material] of other.landmarkMaterials)
+			model.landmarkMaterials.set(id, material)
 		model.labels.push(...other.labels)
 	}
 	for (const part of parts) {

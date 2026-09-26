@@ -206,7 +206,11 @@ export function createIndoorScene(
 	const layoutLabels = () => {
 		const projected = labels.map((label) => {
 			projection
-				.set(label.data.position.x, WALL_HEIGHT + 12, label.data.position.y)
+				.set(
+					label.data.position.x,
+					label.data.kind === "model" ? 26 : WALL_HEIGHT + 12,
+					label.data.position.y,
+				)
 				.project(camera)
 			return {
 				x: ((projection.x + 1) * width) / 2,
@@ -294,6 +298,7 @@ export function createIndoorScene(
 					label.text,
 					label.icon,
 					label.iconOnly,
+					label.kind,
 				])
 				activeKeys.add(key)
 				let node = labelNodes.get(key)
@@ -303,6 +308,7 @@ export function createIndoorScene(
 						interactive ? "button" : "span",
 					)
 					element.className = "indoor-label"
+					if (label.kind) element.dataset.kind = label.kind
 					element.dataset.visible = "false"
 					element.inert = true
 					element.setAttribute("aria-hidden", "true")
@@ -532,7 +538,7 @@ export function createIndoorScene(
 			),
 			camera,
 		)
-		const hit = raycaster.intersectObjects([...model.rooms.values()], false)[0]
+		const hit = raycaster.intersectObjects(model.pickTargets, false)[0]
 		if (hit) callbacks.onSelect(hit.object.userData.entityId)
 	}
 	const pointerCancel = (event: PointerEvent) => {

@@ -112,6 +112,16 @@ button.indoor-label {
 	outline-offset: 3px;
 }
 
+/* The fountain itself is rendered in WebGL; retain a semantic touch target. */
+.indoor-label[data-kind="model"] {
+	width: 36px;
+	min-height: 36px;
+	padding: 0;
+	background: transparent;
+	border-color: transparent;
+	box-shadow: none;
+}
+
 /* Labels follow the camera immediately; only their visibility is animated. */
 .indoor-label {
 	opacity: 0;
