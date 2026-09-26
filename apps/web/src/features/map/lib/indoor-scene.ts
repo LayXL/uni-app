@@ -22,6 +22,7 @@ import type {
 
 import { floorLevel, levelFloors } from "./campus-layout"
 import { getMapIconColor } from "./icon-style"
+import { createIndoorCameraConstraint } from "./indoor-camera-bounds"
 import {
 	indoorFocusTarget,
 	stopIndoorInertia,
@@ -107,6 +108,7 @@ export function createIndoorScene(
 	let floor: Floor | undefined
 	let data: BuildingScheme | undefined
 	let model: ReturnType<typeof createIndoorLevel> | undefined
+	let constrainCamera = createIndoorCameraConstraint([])
 	let floorTransition:
 		| ReturnType<typeof createIndoorFloorTransition>
 		| undefined
@@ -132,7 +134,7 @@ export function createIndoorScene(
 			performance.now() - shineStarted,
 			!reducedMotion.matches,
 		)
-		renderer.render(scene, camera)
+		drawScene()
 		if (reducedMotion.matches) return
 		if (delay > 0) shineTimer = setTimeout(animateRouteShine, delay)
 		else shineFrame = requestAnimationFrame(animateRouteShine)
@@ -178,12 +180,19 @@ export function createIndoorScene(
 	const raycaster = new Raycaster()
 	const projection = new Vector3()
 	const bounds = new Box3()
-	const cameraView = (): IndoorCameraView => ({
-		target: controls.target.toArray(),
-		offset: camera.position.clone().sub(controls.target).toArray(),
-		zoom: camera.zoom,
-		view,
-	})
+	const cameraView = (): IndoorCameraView => {
+		constrainCamera(camera, controls.target, width, height)
+		return {
+			target: controls.target.toArray(),
+			offset: camera.position.clone().sub(controls.target).toArray(),
+			zoom: camera.zoom,
+			view,
+		}
+	}
+	const drawScene = () => {
+		constrainCamera(camera, controls.target, width, height)
+		renderer.render(scene, camera)
+	}
 	const requestRender = () => {
 		if (!frame && !disposed && active) frame = requestAnimationFrame(render)
 	}
@@ -258,7 +267,7 @@ export function createIndoorScene(
 			controls.update()
 		}
 		if (touchRotation.update(now)) requestRender()
-		renderer.render(scene, camera)
+		drawScene()
 		layoutLabels()
 		if (!tween && !floorTransition && !frame) callbacks.onCamera?.(cameraView())
 	}
@@ -619,6 +628,9 @@ export function createIndoorScene(
 			stopRouteShine()
 			routeModel = undefined
 			model = createIndoorLevel(data, floor, theme)
+			constrainCamera = createIndoorCameraConstraint(
+				levelFloors(data, floor.id),
+			)
 			scene.add(model.group)
 			bounds.setFromObject(model.group)
 			const center = bounds.getCenter(new Vector3())
