@@ -15,22 +15,16 @@ import {
 	MAP_ICON_RADIUS,
 	MAP_ICON_SIZE,
 } from "../lib/icon-style"
+import { getMapEntityLabel } from "../lib/map-entity-label"
 import type { ViewportState } from "../types"
 
 const iconImageCache = new Map<string, Promise<HTMLImageElement>>()
 const TOILET_ROOM_NAME = "туалет"
-const TOILET_ROOM_ICON = "toilet"
 
 const isToiletRoom = (room: Room) =>
 	room.name.trim().toLowerCase() === TOILET_ROOM_NAME
 
-const getRoomMapIcon = (room: Room) =>
-	room.icon ??
-	(isToiletRoom(room)
-		? TOILET_ROOM_ICON
-		: /^(столовая|буфет|бистро "апельсин")$/i.test(room.name.trim())
-			? "food"
-			: undefined)
+const getRoomMapIcon = (room: Room) => getMapEntityLabel(room).icon
 
 const getCachedIcon = (src: string) => {
 	if (!iconImageCache.has(src)) {
@@ -533,7 +527,7 @@ export const useFloorRender = ({
 				const extraObjects = isToiletRoom(room)
 					? []
 					: [
-							new fabric.FabricText(room.name, {
+							new fabric.FabricText(getMapEntityLabel(room).text, {
 								fontSize: 14,
 								fontFamily,
 								fill: colors.roomLabel,

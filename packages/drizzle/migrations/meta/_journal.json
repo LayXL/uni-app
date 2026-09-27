@@ -288,6 +288,20 @@
       "when": 1790501760000,
       "tag": "0040_move_psychologist_to_room_404",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1790501760001,
+      "tag": "0041_remove_room_105_admissions_description",
+      "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1790501760002,
+      "tag": "0042_remove_unnamed_room_upper_door",
+      "breakpoints": true
     }
   ]
 }

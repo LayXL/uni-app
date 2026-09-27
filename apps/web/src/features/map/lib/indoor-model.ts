@@ -35,17 +35,10 @@ import {
 } from "./indoor-geometry"
 import { clipWallGeometry, wallFootprints } from "./indoor-wall-clipping"
 import { createWallShapes } from "./indoor-walls"
+import { getMapEntityLabel } from "./map-entity-label"
 
 export const WALL_HEIGHT = 58
 const priorityLabelNames = new Set(["буфет", "столовая", "гардероб", "магазин"])
-const namedMapIcons: Record<string, string> = {
-	туалет: "toilet",
-	столовая: "food",
-	буфет: "food",
-	'бистро "апельсин"': "food",
-	лестница: "stairs",
-	магазин: "storefront-outline-24",
-}
 export const INDOOR_PALETTES = {
 	light: {
 		slab: "#dce2e9",
@@ -182,10 +175,7 @@ export const createIndoorFloor = (
 			if (entity.nameHidden) continue
 		} else if (entity.hiddenOnMap) continue
 		const name = entity.name.trim().toLocaleLowerCase("ru-RU")
-		const icon =
-			entity.icon ??
-			namedMapIcons[name] ??
-			(isRoom(entity) ? undefined : entity.placeType)
+		const { icon, text } = getMapEntityLabel(entity)
 		const position = entityCenter(entity, floor)
 		if (!isRoom(entity) && icon === "fountain") {
 			const fountain = createIndoorFountain(theme, entity.id)
@@ -206,7 +196,7 @@ export const createIndoorFloor = (
 		}
 		labels.push({
 			position,
-			text: entity.name,
+			text,
 			entityId: entity.id,
 			icon,
 			iconOnly: icon === "stairs" || /^toilet(?:-|$)/.test(icon ?? ""),
