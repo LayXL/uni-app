@@ -1,4 +1,5 @@
 import { skipToken, useQuery } from "@tanstack/react-query"
+import { useMotionValue } from "motion/react"
 import { useCallback, useEffect, useRef, useState } from "react"
 
 import { orpc } from "@repo/orpc/react"
@@ -43,6 +44,7 @@ export const IndoorMapViewer = ({
 	)
 	const [view, setView] = useState<IndoorView>(savedView?.view ?? "3d")
 	const sceneRef = useRef<IndoorScene | null>(null)
+	const rotation = useMotionValue(0)
 	const initialized = useRef(false)
 	const initialId = useRef<number | undefined>(undefined)
 	const cameraRef = useRef<IndoorCameraView | null>(null)
@@ -179,6 +181,7 @@ export const IndoorMapViewer = ({
 				onFloor={changeFloor}
 				onError={onUnavailable}
 				onCamera={onCamera}
+				onRotation={(angle) => rotation.set(angle)}
 			/>
 			{active && (
 				<>
@@ -187,6 +190,8 @@ export const IndoorMapViewer = ({
 						onChangeFloor={changeFloor}
 						view={view}
 						onToggleView={() => setView(view === "3d" ? "top" : "3d")}
+						rotation={rotation}
+						resetRotation={() => sceneRef.current?.resetRotation()}
 					/>
 					<RoomModal
 						roomId={selectedRoomId}

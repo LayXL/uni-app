@@ -1,3 +1,5 @@
+import type { MotionValue } from "motion/react"
+
 import { cn } from "@/shared/utils/cn"
 
 import { FloorControls } from "./floor-control"
@@ -7,7 +9,7 @@ type MapControlsProps = {
 	hidden?: boolean
 	activeFloor: number
 	onChangeFloor: (floorId: number) => void
-	rotation?: number
+	rotation?: number | MotionValue<number>
 	resetRotation?: () => void
 	view?: "3d" | "top"
 	onToggleView?: () => void

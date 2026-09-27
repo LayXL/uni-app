@@ -4,7 +4,10 @@ import { MapControls } from "three/addons/controls/MapControls.js"
 
 import type { Floor } from "@repo/shared/building-scheme"
 
-import { createIndoorCameraConstraint } from "./indoor-camera-bounds"
+import {
+	createIndoorCameraConstraint,
+	createIndoorPanConstraint,
+} from "./indoor-camera-bounds"
 
 const floor: Floor = {
 	id: 1,
@@ -18,6 +21,13 @@ const floor: Floor = {
 		{ x: 200, y: 1000 },
 		{ x: 0, y: 1000 },
 	],
+}
+
+const envelope: Floor = {
+	...floor,
+	wallsPosition: floor.wallsPosition.filter(
+		(point) => point.x !== 200 || point.y !== 200,
+	),
 }
 
 function setup(width = 800, height = 600, zoom = 1, tilt = 0.7, heading = 0) {
@@ -60,7 +70,7 @@ function hasVisibleBoundary(camera: OrthographicCamera, floors: Floor[]) {
 	return false
 }
 
-test("dragging in every direction keeps the building visible at different zooms, headings, tilts and screen sizes", () => {
+test("dragging in every direction keeps the floor envelope visible at different zooms, headings, tilts and screen sizes", () => {
 	const constrain = createIndoorCameraConstraint([floor])
 	for (const [width, height] of [
 		[800, 600],
@@ -81,7 +91,7 @@ test("dragging in every direction keeps the building visible at different zooms,
 						const offset = camera.position.clone().sub(target)
 						const rotation = camera.quaternion.clone()
 						expect(constrain(camera, target, width, height)).toBe(true)
-						expect(hasVisibleBoundary(camera, [floor])).toBe(true)
+						expect(hasVisibleBoundary(camera, [envelope])).toBe(true)
 						expect(
 							camera.position.clone().sub(target).distanceTo(offset),
 						).toBeLessThan(1e-8)
@@ -105,7 +115,83 @@ test("normal navigation over the floor is unchanged", () => {
 	expect(camera.position.equals(position)).toBe(true)
 })
 
-test("empty space inside a concave outline, between buildings, and inside a courtyard is constrained", () => {
+// A straight edge at x=1300 makes the outward travel measurable in pixels.
+function setupPan() {
+	const { camera, target } = setup(800, 600, 1, 0.000001)
+	camera.position.x += 900
+	target.x += 900
+	const constrain = createIndoorPanConstraint([floor])
+	constrain(camera, target, 800, 600)
+	const move = (dx: number, dy = 0) => {
+		camera.position.x += dx
+		target.x += dx
+		camera.position.z += dy
+		target.z += dy
+		return constrain(camera, target, 800, 600)
+	}
+	return { camera, target, constrain, move }
+}
+
+test("outward dragging progressively slows down and stays within the limit", () => {
+	const { camera, target, move } = setupPan()
+	const offset = camera.position.clone().sub(target)
+	let previousTravel = 10
+	for (let step = 0; step < 50; step++) {
+		const before = target.x
+		move(10)
+		const travel = target.x - before
+		expect(travel).toBeGreaterThan(0)
+		expect(travel).toBeLessThan(previousTravel)
+		expect(target.x).toBeLessThanOrEqual(1340)
+		previousTravel = travel
+	}
+	expect(previousTravel).toBeLessThan(0.01)
+	expect(camera.position.clone().sub(target).distanceTo(offset)).toBeLessThan(
+		1e-8,
+	)
+})
+
+test("a stationary map stays still; inward and tangential dragging are immediate", () => {
+	const { camera, target, constrain, move } = setupPan()
+	move(60)
+	const restingTarget = target.clone()
+	const restingCamera = camera.position.clone()
+	for (let frame = 0; frame < 120; frame++)
+		expect(constrain(camera, target, 800, 600)).toBe(false)
+	expect(target.equals(restingTarget)).toBe(true)
+	expect(camera.position.equals(restingCamera)).toBe(true)
+	move(0, 5)
+	expect(target.z).toBeCloseTo(restingTarget.z + 5, 8)
+	expect(target.x).toBeCloseTo(restingTarget.x, 8)
+	move(-10)
+	expect(target.x).toBeCloseTo(restingTarget.x - 10, 8)
+})
+
+test("resistance depends on travel, not pointer event frequency", () => {
+	const results = [1, 10, 20].map((steps) => {
+		const { target, move } = setupPan()
+		for (let step = 0; step < steps; step++) move(100 / steps)
+		return target.x
+	})
+	expect(results[0]).toBeCloseTo(results[1], 8)
+	expect(results[0]).toBeCloseTo(results[2], 8)
+})
+
+test("ordinary pan and programmatic positioning bypass resistance", () => {
+	const { camera, target } = setup()
+	const constrain = createIndoorPanConstraint([floor])
+	constrain(camera, target, 800, 600)
+	camera.position.x += 10
+	target.x += 10
+	expect(constrain(camera, target, 800, 600)).toBe(false)
+	expect(target.x).toBe(410)
+	camera.position.x += 910
+	target.x += 910
+	expect(constrain(camera, target, 800, 600, false)).toBe(false)
+	expect(target.x).toBe(1320)
+})
+
+test("empty space between wings and inside courtyards allows free navigation", () => {
 	const courtyard: Floor = {
 		...floor,
 		wallsPosition: [
@@ -123,19 +209,37 @@ test("empty space inside a concave outline, between buildings, and inside a cour
 			],
 		],
 	}
-	for (const floors of [
-		[floor],
-		[floor, { ...floor, position: { x: 3000, y: 3000 } }],
-		[courtyard],
-	]) {
-		const { camera, target } = setup(800, 600, 12, 0.000001)
-		const shift = new Vector3(500, 0, 500)
-		camera.position.add(shift)
-		target.add(shift)
-		expect(createIndoorCameraConstraint(floors)(camera, target, 800, 600)).toBe(
-			true,
-		)
-		expect(hasVisibleBoundary(camera, floors)).toBe(true)
+	const cases: { floors: Floor[]; center: Vector3 }[] = [
+		{ floors: [floor], center: new Vector3(800, 0, 300) },
+		{
+			floors: [floor, { ...floor, position: { x: 3000, y: 3000 } }],
+			center: new Vector3(1750, 0, 1500),
+		},
+		{ floors: [courtyard], center: new Vector3(800, 0, 300) },
+	]
+	for (const { floors, center } of cases) {
+		for (const tilt of [0.000001, 0.7]) {
+			for (const heading of [-2.3, 0, 1.2]) {
+				for (const createConstraint of [
+					createIndoorCameraConstraint,
+					createIndoorPanConstraint,
+				]) {
+					const { camera, target } = setup(800, 600, 12, tilt, heading)
+					camera.position.add(center.clone().sub(target))
+					target.copy(center)
+					const constrain = createConstraint(floors)
+					for (let step = 0; step < 10; step++) {
+						const position = camera.position.clone()
+						const expected = target.clone()
+						expect(constrain(camera, target, 800, 600)).toBe(false)
+						expect(camera.position.equals(position)).toBe(true)
+						expect(target.equals(expected)).toBe(true)
+						camera.position.x += 2
+						target.x += 2
+					}
+				}
+			}
+		}
 	}
 })
 
@@ -152,12 +256,14 @@ test("zooming, resizing, and changing floors reapply the constraint", () => {
 	camera.right = 100
 	camera.updateProjectionMatrix()
 	expect(constrain(camera, target, 200, 600)).toBe(true)
-	expect(hasVisibleBoundary(camera, [floor])).toBe(true)
+	expect(hasVisibleBoundary(camera, [envelope])).toBe(true)
 	const next = { ...floor, position: { x: -3000, y: -2000 } }
 	expect(createIndoorCameraConstraint([next])(camera, target, 200, 600)).toBe(
 		true,
 	)
-	expect(hasVisibleBoundary(camera, [next])).toBe(true)
+	expect(
+		hasVisibleBoundary(camera, [{ ...envelope, position: next.position }]),
+	).toBe(true)
 })
 
 test("inertia cannot move the building out of view and settles at the boundary", () => {
@@ -173,7 +279,7 @@ test("inertia cannot move the building out of view and settles at the boundary",
 	for (let frame = 0; frame < 300; frame++) {
 		controls.update()
 		constrain(camera, controls.target, 800, 600)
-		expect(hasVisibleBoundary(camera, [floor])).toBe(true)
+		expect(hasVisibleBoundary(camera, [envelope])).toBe(true)
 	}
 	expect(controls.update()).toBe(false)
 })

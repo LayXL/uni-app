@@ -4,6 +4,7 @@ import { MapControls } from "three/addons/controls/MapControls.js"
 
 import {
 	indoorFocusTarget,
+	resetIndoorHeading,
 	stopIndoorInertia,
 	withIndoorViewTilt,
 } from "./indoor-controls"
@@ -48,6 +49,23 @@ function setup(top: boolean) {
 }
 
 describe("indoor gesture inertia", () => {
+	test("compass reset follows the shortest arc without changing tilt or distance in 2D and 3D", () => {
+		for (const heading of [-Math.PI, -3.13, -1, 0, 1, 3.13, Math.PI]) {
+			for (const tilt of [0.000001, 0.7, Math.PI / 3]) {
+				const offset = new Vector3().setFromSphericalCoords(2400, tilt, heading)
+				for (const progress of [0, 0.25, 0.5, 0.75, 1]) {
+					const current = resetIndoorHeading(offset, progress)
+					expect(Math.atan2(current.x, current.z)).toBeCloseTo(
+						heading * (1 - progress),
+						8,
+					)
+					expect(current.length()).toBeCloseTo(offset.length(), 8)
+					expect(current.y).toBeCloseTo(offset.y, 8)
+				}
+			}
+		}
+	})
+
 	test("switching views preserves heading throughout the transition and after top-view rotation", () => {
 		for (const heading of [-Math.PI + 0.01, -1.2, 0, 0.8, Math.PI - 0.01]) {
 			const offset = new Vector3().setFromSphericalCoords(2400, 0.7, heading)

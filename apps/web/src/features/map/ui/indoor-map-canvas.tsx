@@ -27,6 +27,7 @@ type IndoorMapCanvasProps = {
 	onFloor: (id: number) => void
 	onError: () => void
 	onCamera?: (camera: IndoorCameraView) => void
+	onRotation?: (rotation: number) => void
 }
 
 export const IndoorMapCanvas = (props: IndoorMapCanvasProps) => {
@@ -57,6 +58,7 @@ export const IndoorMapCanvas = (props: IndoorMapCanvasProps) => {
 				onFloor: (id) => callbacks.current.onFloor(id),
 				onError: () => callbacks.current.onError(),
 				onCamera: (camera) => callbacks.current.onCamera?.(camera),
+				onRotation: (rotation) => callbacks.current.onRotation?.(rotation),
 			})
 		} catch {
 			callbacks.current.onError()

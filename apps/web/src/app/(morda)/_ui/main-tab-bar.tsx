@@ -70,7 +70,7 @@ export function MainTabBar() {
 			/>
 			<nav
 				aria-label="Основные разделы"
-				className="fixed right-[max(0.75rem,var(--safe-area-inset-right))] bottom-[calc(var(--safe-area-inset-bottom)+0.75rem)] left-[max(0.75rem,var(--safe-area-inset-left))] isolate z-40 mx-auto max-w-lg rounded-[1.75rem] border border-border px-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.16)]"
+				className="fixed right-[max(0.75rem,var(--safe-area-inset-right))] bottom-[calc(var(--safe-area-inset-bottom)+0.75rem)] left-[max(0.75rem,var(--safe-area-inset-left))] isolate z-40 mx-auto max-w-lg rounded-[1.75rem] border border-border px-1.5 shadow-(--tab-bar-shadow)"
 			>
 				<span
 					aria-hidden="true"

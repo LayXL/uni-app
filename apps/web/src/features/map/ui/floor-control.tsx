@@ -31,7 +31,7 @@ export const FloorControls = ({
 	)
 
 	return (
-		<div className="floor-control flex flex-col items-stretch gap-1 overflow-hidden rounded-3xl border border-border bg-background/90 p-1 shadow-[0_8px_32px_rgba(0,0,0,0.16)] backdrop-blur-xl">
+		<div className="floor-control flex flex-col items-stretch gap-1 overflow-hidden rounded-3xl border border-border bg-background/90 p-1 backdrop-blur-xl">
 			<div
 				role="group"
 				aria-label="Этажи вуза и школы"

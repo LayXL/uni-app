@@ -29,6 +29,13 @@ export function withIndoorViewTilt(offset: Vector3, view: "top" | "3d") {
 	return new Vector3().setFromSpherical(spherical)
 }
 
+export function resetIndoorHeading(offset: Vector3, progress: number) {
+	const spherical = new Spherical().setFromVector3(offset)
+	// atan2 gives the shortest signed arc to north, including across ±π.
+	spherical.theta *= 1 - progress
+	return new Vector3().setFromSpherical(spherical)
+}
+
 export function stopIndoorInertia(
 	controls: MapControls,
 	camera: OrthographicCamera,

@@ -1,12 +1,12 @@
-import { motion } from "motion/react"
+import { type MotionValue, motion, useTransform } from "motion/react"
+import { useCallback, useSyncExternalStore } from "react"
 
 import { Icon } from "@/shared/ui/icon"
 import { Touchable } from "@/shared/ui/touchable"
-
-import { ViewModeIcon } from "./view-mode-icon"
+import { cn } from "@/shared/utils/cn"
 
 type PositionControlsProps = {
-	rotation?: number
+	rotation?: number | MotionValue<number>
 	resetRotation?: () => void
 	view?: "3d" | "top"
 	onToggleView?: () => void
@@ -18,10 +18,30 @@ export const PositionControls = ({
 	view,
 	onToggleView,
 }: PositionControlsProps) => {
-	if (!onToggleView && (rotation === 0 || !resetRotation)) return null
+	const subscribe = useCallback(
+		(onChange: () => void) =>
+			typeof rotation === "number" ? () => {} : rotation.on("change", onChange),
+		[rotation],
+	)
+	const getIsRotated = useCallback(() => {
+		const angle = typeof rotation === "number" ? rotation : rotation.get()
+		return Math.abs(Math.atan2(Math.sin(angle), Math.cos(angle))) > 0.001
+	}, [rotation])
+	const isRotated = useSyncExternalStore(subscribe, getIsRotated, getIsRotated)
+	const compassRotation = useTransform(() => {
+		const angle = typeof rotation === "number" ? rotation : rotation.get()
+		return (angle * 180) / Math.PI - 45
+	})
+	if (!onToggleView && !resetRotation) return null
 
 	return (
-		<div className="bg-background border border-border flex flex-col gap-2 rounded-3xl">
+		<div
+			className={cn(
+				"t-acc bg-background border border-border flex flex-col rounded-3xl transition-opacity duration-(--acc-collapse) ease-(--acc-ease) motion-reduce:transition-none",
+				!onToggleView && !isRotated && "opacity-0 pointer-events-none",
+			)}
+			data-open={isRotated}
+		>
 			{onToggleView && (
 				<Touchable>
 					<button
@@ -29,29 +49,40 @@ export const PositionControls = ({
 						aria-label={view === "3d" ? "Переключить в 2D" : "Переключить в 3D"}
 						title={view === "3d" ? "Переключить в 2D" : "Переключить в 3D"}
 						aria-pressed={view === "3d"}
-						className="size-11 grid place-items-center rounded-3xl bg-background"
+						className="size-11 grid place-items-center rounded-3xl bg-background text-sm font-semibold"
 						onClick={onToggleView}
 					>
-						<ViewModeIcon view={view} />
+						{view === "3d" ? "2D" : "3D"}
 					</button>
 				</Touchable>
 			)}
-			{!onToggleView && rotation !== 0 && (
-				<Touchable>
-					<button
-						type="button"
-						aria-label="Сбросить поворот карты"
-						className="size-11 text-lg grid place-items-center rounded-3xl bg-background"
-						onClick={resetRotation}
-					>
-						<motion.span
-							initial={{ rotate: (rotation * 180 - 140) / Math.PI }}
-							animate={{ rotate: (rotation * 180 - 140) / Math.PI }}
-						>
-							<Icon name="compass-24" size={16} />
-						</motion.span>
-					</button>
-				</Touchable>
+			{resetRotation && (
+				<div
+					className="t-acc-panel"
+					inert={!isRotated}
+					aria-hidden={!isRotated}
+				>
+					<div className="t-acc-panel-inner">
+						<div className={onToggleView ? "pt-2" : undefined}>
+							<Touchable>
+								<button
+									type="button"
+									aria-label="Сбросить поворот карты"
+									title="Сбросить поворот карты"
+									className="size-11 text-lg grid place-items-center rounded-3xl bg-background"
+									onClick={resetRotation}
+								>
+									<motion.span
+										aria-hidden="true"
+										style={{ rotate: compassRotation }}
+									>
+										<Icon name="compass-24" size={20} />
+									</motion.span>
+								</button>
+							</Touchable>
+						</div>
+					</div>
+				</div>
 			)}
 		</div>
 	)

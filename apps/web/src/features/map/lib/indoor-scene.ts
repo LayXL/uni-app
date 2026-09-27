@@ -22,9 +22,10 @@ import type {
 
 import { floorLevel, levelFloors } from "./campus-layout"
 import { getMapIconColor } from "./icon-style"
-import { createIndoorCameraConstraint } from "./indoor-camera-bounds"
+import { createIndoorPanConstraint } from "./indoor-camera-bounds"
 import {
 	indoorFocusTarget,
+	resetIndoorHeading,
 	stopIndoorInertia,
 	withIndoorViewTilt,
 } from "./indoor-controls"
@@ -61,6 +62,7 @@ export function createIndoorScene(
 		onFloor: (id: number) => void
 		onError: () => void
 		onCamera?: (camera: IndoorCameraView) => void
+		onRotation?: (rotation: number) => void
 	},
 ) {
 	const renderer = new WebGLRenderer({
@@ -111,7 +113,8 @@ export function createIndoorScene(
 	let floor: Floor | undefined
 	let data: BuildingScheme | undefined
 	let model: ReturnType<typeof createIndoorLevel> | undefined
-	let constrainCamera = createIndoorCameraConstraint([])
+	let constrainCamera = createIndoorPanConstraint([])
+	let skipPanResistance = false
 	let floorTransition:
 		| ReturnType<typeof createIndoorFloorTransition>
 		| undefined
@@ -155,6 +158,7 @@ export function createIndoorScene(
 				toOffset: Vector3
 				fromZoom: number
 				toZoom: number
+				resetHeading?: boolean
 		  }
 		| undefined
 	type LabelNode = {
@@ -184,7 +188,6 @@ export function createIndoorScene(
 	const projection = new Vector3()
 	const bounds = new Box3()
 	const cameraView = (): IndoorCameraView => {
-		constrainCamera(camera, controls.target, width, height)
 		return {
 			target: controls.target.toArray(),
 			offset: camera.position.clone().sub(controls.target).toArray(),
@@ -193,8 +196,6 @@ export function createIndoorScene(
 		}
 	}
 	const drawScene = () => {
-		if (constrainCamera(camera, controls.target, width, height))
-			panInertia.stop()
 		renderer.render(scene, camera)
 	}
 	const requestRender = () => {
@@ -256,6 +257,8 @@ export function createIndoorScene(
 	function render(now: number) {
 		frame = 0
 		if (disposed) return
+		const resistPan = !tween && !skipPanResistance
+		skipPanResistance = false
 		if (floorTransition) {
 			if (floorTransition.update(now)) finishFloorTransition()
 			else requestRender()
@@ -266,9 +269,12 @@ export function createIndoorScene(
 			const progress = Math.min((now - tween.start) / 360, 1)
 			const t = 1 - (1 - progress) ** 3
 			controls.target.lerpVectors(tween.fromTarget, tween.toTarget, t)
-			camera.position
-				.lerpVectors(tween.fromOffset, tween.toOffset, t)
-				.add(controls.target)
+			if (tween.resetHeading) {
+				camera.position.copy(resetIndoorHeading(tween.fromOffset, t))
+			} else {
+				camera.position.lerpVectors(tween.fromOffset, tween.toOffset, t)
+			}
+			camera.position.add(controls.target)
 			camera.zoom = MathUtils.lerp(tween.fromZoom, tween.toZoom, t)
 			camera.updateProjectionMatrix()
 			updateRotationLimits(progress < 1)
@@ -279,8 +285,10 @@ export function createIndoorScene(
 			if (panInertia.update(now)) requestRender()
 			controls.update()
 		}
+		constrainCamera(camera, controls.target, width, height, resistPan)
 		drawScene()
 		layoutLabels()
+		callbacks.onRotation?.(-controls.getAzimuthalAngle())
 		if (!tween && !floorTransition && !frame) callbacks.onCamera?.(cameraView())
 	}
 	const activateLabel = (label: IndoorLabel) => {
@@ -409,6 +417,7 @@ export function createIndoorScene(
 		zoom: number,
 		animate = true,
 	) => {
+		skipPanResistance = true
 		finishFloorTransition()
 		touchRotation.stop()
 		panInertia.stop()
@@ -492,6 +501,15 @@ export function createIndoorScene(
 		)
 		view = next
 		moveCamera(controls.target.clone(), offset, camera.zoom)
+	}
+	const resetRotation = () => {
+		const offset = camera.position.clone().sub(controls.target)
+		moveCamera(
+			controls.target.clone(),
+			resetIndoorHeading(offset, 1),
+			camera.zoom,
+		)
+		if (tween) tween.resetHeading = true
 	}
 	controls.addEventListener("change", requestRender)
 	const interrupt = () => {
@@ -617,6 +635,7 @@ export function createIndoorScene(
 		focus,
 		zoom,
 		setView,
+		resetRotation,
 		getView: cameraView,
 		restore: (saved: IndoorCameraView) => {
 			view = saved.view
@@ -655,9 +674,7 @@ export function createIndoorScene(
 			stopRouteShine()
 			routeModel = undefined
 			model = createIndoorLevel(data, floor, theme)
-			constrainCamera = createIndoorCameraConstraint(
-				levelFloors(data, floor.id),
-			)
+			constrainCamera = createIndoorPanConstraint(levelFloors(data, floor.id))
 			scene.add(model.group)
 			bounds.setFromObject(model.group)
 			const center = bounds.getCenter(new Vector3())
