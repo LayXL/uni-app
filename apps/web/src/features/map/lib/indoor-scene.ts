@@ -41,6 +41,7 @@ import {
 	type IndoorLabel,
 	WALL_HEIGHT,
 } from "./indoor-model"
+import { createIndoorPanInertia } from "./indoor-pan-inertia"
 import { createIndoorTouchRotation } from "./indoor-touch-rotation"
 import { safeCameraTarget } from "./safe-camera-target"
 
@@ -182,12 +183,18 @@ export function createIndoorScene(
 		}
 	}
 	const drawScene = () => {
-		constrainCamera(camera, controls.target, width, height)
+		if (constrainCamera(camera, controls.target, width, height))
+			panInertia.stop()
 		renderer.render(scene, camera)
 	}
 	const requestRender = () => {
 		if (!frame && !disposed && active) frame = requestAnimationFrame(render)
 	}
+	const panInertia = createIndoorPanInertia(
+		controls,
+		reducedMotion,
+		requestRender,
+	)
 	const touchRotation = createIndoorTouchRotation(
 		host,
 		camera,
@@ -260,6 +267,7 @@ export function createIndoorScene(
 			if (progress === 1) tween = undefined
 			else requestRender()
 		} else {
+			if (panInertia.update(now)) requestRender()
 			controls.update()
 		}
 		if (touchRotation.update(now)) requestRender()
@@ -395,6 +403,7 @@ export function createIndoorScene(
 	) => {
 		finishFloorTransition()
 		touchRotation.stop()
+		panInertia.stop()
 		stopIndoorInertia(controls, camera)
 		updateRotationLimits(animate && !reducedMotion.matches)
 		if (animate && !reducedMotion.matches) {
@@ -480,6 +489,7 @@ export function createIndoorScene(
 	const interrupt = () => {
 		finishFloorTransition()
 		tween = undefined
+		panInertia.stop()
 		stopIndoorInertia(controls, camera)
 		updateRotationLimits()
 		controls.update()
@@ -496,6 +506,7 @@ export function createIndoorScene(
 	const pointerDown = (event: PointerEvent) => {
 		if (!active) return
 		touchRotation.down(event)
+		panInertia.down(event)
 		pointers.add(event.pointerId)
 		down =
 			pointers.size === 1 && event.button === 0
@@ -505,12 +516,14 @@ export function createIndoorScene(
 	const pointerMove = (event: PointerEvent) => {
 		if (!active) return
 		touchRotation.move(event)
+		panInertia.move(event)
 		if (down && Math.hypot(event.clientX - down.x, event.clientY - down.y) > 6)
 			down = undefined
 	}
 	const pointerUp = (event: PointerEvent) => {
 		if (!active) return
 		touchRotation.up(event)
+		panInertia.up(event)
 		pointers.delete(event.pointerId)
 		if (!down || down.id !== event.pointerId || !model) return
 		down = undefined
@@ -545,6 +558,7 @@ export function createIndoorScene(
 	}
 	const pointerCancel = (event: PointerEvent) => {
 		touchRotation.up(event, true)
+		panInertia.up(event, true)
 		pointers.delete(event.pointerId)
 		down = undefined
 	}
@@ -580,6 +594,7 @@ export function createIndoorScene(
 			}
 			clearLabels()
 			touchRotation.reset()
+			panInertia.reset()
 			pointers.clear()
 			down = undefined
 			if (tween) moveCamera(tween.toTarget, tween.toOffset, tween.toZoom, false)
@@ -710,6 +725,7 @@ export function createIndoorScene(
 			reducedMotion.removeEventListener("change", motionPreferenceChanged)
 			controls.dispose()
 			touchRotation.reset()
+			panInertia.reset()
 			host.removeEventListener("pointerdown", pointerDown)
 			host.ownerDocument.removeEventListener("pointermove", pointerMove, true)
 			host.ownerDocument.removeEventListener("pointerup", pointerUp, true)
