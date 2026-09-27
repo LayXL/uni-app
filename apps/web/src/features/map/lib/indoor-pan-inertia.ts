@@ -1,3 +1,4 @@
+import { MOUSE, TOUCH } from "three"
 import type { MapControls } from "three/addons/controls/MapControls.js"
 
 type Sample = { x: number; y: number; time: number }
@@ -6,6 +7,7 @@ export function createIndoorPanInertia(
 	controls: MapControls,
 	reducedMotion: MediaQueryList,
 	onChange: () => void,
+	now: () => number = () => performance.now(),
 ) {
 	const pointers = new Map<number, Sample>()
 	let history: Sample[] = []
@@ -23,6 +25,13 @@ export function createIndoorPanInertia(
 		velocityX = velocityY = 0
 		history = []
 	}
+	const record = (point: Sample) => {
+		history.push(point)
+		const cutoff = point.time - 100
+		while (history.length > 2 && history[1].time <= cutoff) history.shift()
+		// A stationary hold must not dilute the speed of the following flick.
+		if (history[0].time < cutoff) history[0] = { ...history[0], time: cutoff }
+	}
 	return {
 		stop,
 		reset() {
@@ -31,7 +40,20 @@ export function createIndoorPanInertia(
 		},
 		down(event: PointerEvent) {
 			stop()
-			if (event.pointerType !== "touch") return
+			if (event.pointerType === "touch") {
+				if (controls.touches.ONE !== TOUCH.PAN) return
+			} else {
+				const action =
+					event.button === 0
+						? controls.mouseButtons.LEFT
+						: event.button === 1
+							? controls.mouseButtons.MIDDLE
+							: event.button === 2
+								? controls.mouseButtons.RIGHT
+								: null
+				const modified = event.ctrlKey || event.metaKey || event.shiftKey
+				if (action !== (modified ? MOUSE.ROTATE : MOUSE.PAN)) return
+			}
 			const point = sample(event)
 			pointers.set(event.pointerId, point)
 			if (pointers.size === 1) history = [point]
@@ -44,10 +66,7 @@ export function createIndoorPanInertia(
 				history = []
 				return
 			}
-			history.push(point)
-			// Keep a short velocity window, including its leading sample.
-			while (history.length > 2 && history[1].time < point.time - 80)
-				history.shift()
+			record(point)
 		},
 		up(event: PointerEvent, cancelled = false) {
 			if (!pointers.delete(event.pointerId)) return
@@ -59,6 +78,13 @@ export function createIndoorPanInertia(
 					history = [{ ...remaining, time: event.timeStamp }]
 				return
 			}
+			// Some touch browsers deliver the final position only on pointerup.
+			const previous = history[history.length - 1]
+			if (
+				previous &&
+				(previous.x !== event.clientX || previous.y !== event.clientY)
+			)
+				record(sample(event))
 			const first = history[0]
 			const last = history[history.length - 1]
 			if (
@@ -66,7 +92,7 @@ export function createIndoorPanInertia(
 				!controls.enabled ||
 				!controls.enablePan ||
 				history.length < 2 ||
-				event.timeStamp - last.time >= 80 ||
+				event.timeStamp - last.time >= 120 ||
 				Math.hypot(last.x - first.x, last.y - first.y) <= 6
 			) {
 				stop()
@@ -81,7 +107,8 @@ export function createIndoorPanInertia(
 			velocityY *= limit
 			coasting = speed > 0.08
 			history = []
-			lastFrame = event.timeStamp
+			// RAF and the browser event timestamp may use different time origins.
+			lastFrame = now()
 			if (coasting) onChange()
 		},
 		update(now: number) {

@@ -525,6 +525,8 @@ export function createIndoorScene(
 		touchRotation.up(event)
 		panInertia.up(event)
 		pointers.delete(event.pointerId)
+		if (down && Math.hypot(event.clientX - down.x, event.clientY - down.y) > 6)
+			down = undefined
 		if (!down || down.id !== event.pointerId || !model) return
 		down = undefined
 		const label = labels.find((node) => {

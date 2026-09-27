@@ -4,7 +4,14 @@ import { MapControls } from "three/addons/controls/MapControls.js"
 
 import { createIndoorPanInertia } from "./indoor-pan-inertia"
 
-function setup(top = false, reducedMotion = false) {
+function setup(
+	top = false,
+	reducedMotion = false,
+	pointerType = "touch",
+	button = 0,
+	shiftKey = false,
+	eventTimeOrigin = 0,
+) {
 	const camera = new OrthographicCamera(-400, 400, 300, -300, 1, 10000)
 	camera.position.set(0, 2000, top ? 0.001 : 1200)
 	const document = new EventTarget()
@@ -13,6 +20,7 @@ function setup(top = false, reducedMotion = false) {
 		style: {},
 		clientWidth: 800,
 		clientHeight: 600,
+		getBoundingClientRect: () => ({ left: 0, top: 0, width: 800, height: 600 }),
 		getRootNode: () => document,
 		setPointerCapture: () => {},
 		releasePointerCapture: () => {},
@@ -22,10 +30,12 @@ function setup(top = false, reducedMotion = false) {
 	controls.enableDamping = false
 	controls.update()
 	let requested = 0
+	let clock = 0
 	const inertia = createIndoorPanInertia(
 		controls,
 		{ matches: reducedMotion } as MediaQueryList,
 		() => requested++,
+		() => clock,
 	)
 	controls.addEventListener("start", inertia.stop)
 	const dispatch = (
@@ -35,15 +45,18 @@ function setup(top = false, reducedMotion = false) {
 		time: number,
 		id = 1,
 	) => {
+		clock = time
 		const event = Object.assign(new Event(type), {
 			pointerId: id,
-			pointerType: "touch",
+			pointerType,
+			button,
+			shiftKey,
 			clientX: x,
 			clientY: y,
 			pageX: x,
 			pageY: y,
 		}) as PointerEvent
-		Object.defineProperty(event, "timeStamp", { value: time })
+		Object.defineProperty(event, "timeStamp", { value: eventTimeOrigin + time })
 		if (type === "pointerdown") {
 			host.dispatchEvent(event)
 			inertia.down(event)
@@ -135,14 +148,84 @@ describe("indoor pan release inertia", () => {
 			if (reason !== "tap") dispatch("pointermove", 340, 320, 32)
 			dispatch(
 				reason === "cancel" ? "pointercancel" : "pointerup",
-				340,
-				320,
+				reason === "tap" ? 300 : 340,
+				reason === "tap" ? 300 : 320,
 				reason === "pause" ? 200 : 36,
 			)
 			if (reason === "two fingers") dispatch("pointerup", 500, 300, 40, 2)
 			const target = controls.target.clone()
 			expect(inertia.update(250)).toBe(false)
 			expect(controls.target.distanceTo(target)).toBe(0)
+			controls.dispose()
+		})
+	}
+
+	for (const pointerType of ["touch", "mouse", "pen"]) {
+		test(`${pointerType} release continues a drag after a stationary hold`, () => {
+			const { controls, inertia, dispatch } = setup(false, false, pointerType)
+			dispatch("pointerdown", 300, 300, 0)
+			dispatch("pointermove", 340, 320, 1532)
+			dispatch("pointerup", 340, 320, 1536)
+			const released = controls.target.clone()
+			expect(inertia.update(1552)).toBe(true)
+			expect(controls.target.distanceTo(released)).toBeGreaterThan(1)
+			controls.dispose()
+		})
+	}
+
+	test("a touch release supplies the final movement when move events were coalesced", () => {
+		const { controls, inertia, dispatch } = setup()
+		dispatch("pointerdown", 300, 300, 0)
+		dispatch("pointermove", 301, 300, 16)
+		dispatch("pointerup", 340, 320, 32)
+		const released = controls.target.clone()
+		expect(inertia.update(48)).toBe(true)
+		expect(controls.target.distanceTo(released)).toBeGreaterThan(1)
+		controls.dispose()
+	})
+
+	test("a final touch event delayed by 100 ms still glides", () => {
+		const { controls, inertia, dispatch } = setup()
+		dispatch("pointerdown", 300, 300, 0)
+		dispatch("pointermove", 340, 320, 32)
+		dispatch("pointerup", 340, 320, 132)
+		expect(inertia.update(148)).toBe(true)
+		controls.dispose()
+	})
+
+	test("event timestamps with a different origin cannot freeze the animation", () => {
+		const { controls, inertia, flick } = setup(
+			false,
+			false,
+			"touch",
+			0,
+			false,
+			1_700_000_000_000,
+		)
+		flick()
+		const released = controls.target.clone()
+		expect(inertia.update(52)).toBe(true)
+		expect(controls.target.distanceTo(released)).toBeGreaterThan(1)
+		controls.dispose()
+	})
+
+	for (const [button, shiftKey] of [
+		[2, false],
+		[0, true],
+		[1, false],
+	] as const) {
+		test(`mouse button ${button}, shift ${shiftKey} never turns rotation/zoom into a pan`, () => {
+			const { controls, inertia, flick } = setup(
+				false,
+				false,
+				"mouse",
+				button,
+				shiftKey,
+			)
+			flick()
+			const released = controls.target.clone()
+			expect(inertia.update(52)).toBe(false)
+			expect(controls.target.distanceTo(released)).toBe(0)
 			controls.dispose()
 		})
 	}
