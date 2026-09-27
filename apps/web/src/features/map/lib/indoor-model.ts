@@ -31,8 +31,9 @@ import {
 	floorRouteChains,
 	type IndoorRoutePoint,
 	roomPoints,
-	wallSegments,
+	roundRouteCorners,
 } from "./indoor-geometry"
+import { clipWallGeometry, wallFootprints } from "./indoor-wall-clipping"
 import { createWallShapes } from "./indoor-walls"
 
 export const WALL_HEIGHT = 58
@@ -133,19 +134,18 @@ export const createIndoorFloor = (
 		group.add(slab)
 	}
 	const walls: BufferGeometry[] = []
-	const roomWalls: ReturnType<typeof wallSegments> = []
+	const roomWalls: ReturnType<typeof wallFootprints> = []
 	const wallRim = new Color(palette.wall)
 	const wallTop = new Color(palette.wallUpper)
 	const wallBase = new Color(palette.wallBase)
 	const wallColor = new Color()
 	const addWalls = (
-		points: Coordinate[],
-		doors: Coordinate[] = [],
+		shapes: Shape[],
 		height = WALL_HEIGHT,
-		coveredBy: ReturnType<typeof wallSegments> = [],
+		coveredBy: ReturnType<typeof wallFootprints> = [],
 	) => {
-		for (const shape of createWallShapes(points, doors, 6, coveredBy)) {
-			const geometry = extrude(shape, height)
+		for (const shape of shapes) {
+			const geometry = clipWallGeometry(extrude(shape, height), coveredBy)
 			const positions = geometry.getAttribute("position")
 			const normals = geometry.getAttribute("normal")
 			const colors = new Float32BufferAttribute(positions.count * 3, 3)
@@ -176,8 +176,9 @@ export const createIndoorFloor = (
 			const doors = (entity.doorsPosition ?? []).map((p) =>
 				world({ x: p.x + entity.position.x, y: p.y + entity.position.y }),
 			)
-			addWalls(points, doors)
-			roomWalls.push(...wallSegments(points, doors))
+			const shapes = createWallShapes(points, doors)
+			addWalls(shapes)
+			roomWalls.push(...wallFootprints(shapes))
 			if (entity.nameHidden) continue
 		} else if (entity.hiddenOnMap) continue
 		const name = entity.name.trim().toLocaleLowerCase("ru-RU")
@@ -214,10 +215,10 @@ export const createIndoorFloor = (
 				: (entity.priority ?? 0),
 		})
 	}
-	// Low perimeter walls only fill edges not already occupied by room walls.
-	addWalls(floor.wallsPosition.map(world), [], 16, roomWalls)
+	// Cut the full perimeter surfaces against room walls, including their corners.
+	addWalls(createWallShapes(floor.wallsPosition.map(world)), 16, roomWalls)
 	for (const hole of floor.holes ?? [])
-		addWalls(hole.map(world), [], 24, roomWalls)
+		addWalls(createWallShapes(hole.map(world)), 24, roomWalls)
 	if (walls.length) {
 		const geometry = mergeGeometries(walls)
 		for (const wall of walls) wall.dispose()
@@ -309,8 +310,9 @@ ${shader.vertexShader}`
 		radius: number,
 		distance: number,
 		white = false,
+		renderOrder = white ? 11 : 10,
 	) => {
-		const geometry = new SphereGeometry(radius, 12, 8)
+		const geometry = new SphereGeometry(radius, 20, 12)
 		geometry.setAttribute(
 			"routeDistance",
 			new Float32BufferAttribute(
@@ -327,18 +329,19 @@ ${shader.vertexShader}`
 				: material,
 		)
 		dot.position.set(p.x, 12, p.y)
-		dot.renderOrder = white ? 11 : 10
+		dot.renderOrder = renderOrder
 		group.add(dot)
 	}
 	let distance = 0
-	for (const chain of floorRouteChains(route, floor)) {
+	for (const points of floorRouteChains(route, floor)) {
+		const chain = roundRouteCorners(points)
 		if (chain.length) addDot(chain[0], 6, distance)
 		for (let i = 1; i < chain.length; i++) {
 			const a = chain[i - 1]
 			const b = chain[i]
 			const length = Math.hypot(b.x - a.x, b.y - a.y)
 			if (length < 0.01) continue
-			const geometry = new CylinderGeometry(6, 6, length, 8)
+			const geometry = new CylinderGeometry(6, 6, length, 16)
 			const positions = geometry.getAttribute("position")
 			const distances = new Float32Array(positions.count)
 			for (let vertex = 0; vertex < positions.count; vertex++) {
@@ -367,8 +370,9 @@ ${shader.vertexShader}`
 		}
 		if (index === 0 || index === route.length - 1) {
 			const endpointDistance = index === 0 ? 0 : distance
-			addDot(position, 15, endpointDistance)
-			addDot(position, 7, endpointDistance, true)
+			addDot(position, 19, endpointDistance, true, 11)
+			addDot(position, 15, endpointDistance, false, 12)
+			addDot(position, 7, endpointDistance, true, 13)
 			labels.push({
 				position,
 				text: index === 0 ? "Старт" : "Финиш",
@@ -399,15 +403,21 @@ ${shader.vertexShader}`
 		labels,
 		hasRoute: group.children.length > 0,
 		updateShine: (elapsed: number, enabled: boolean) => {
-			// Same 2s initial delay, 7s cycle and 20% active window as premium.css.
-			const cycle = ((elapsed - 2000) % 7000) / 7000
-			const visible = enabled && elapsed >= 2000 && cycle < 0.2
-			const progress = Math.min(Math.max(cycle / 0.18, 0), 1)
+			const initialDelay = 800
+			const interval = 3500
+			const duration = 1400
+			const cycle = Math.max(0, elapsed - initialDelay) % interval
+			const visible = enabled && elapsed >= initialDelay && cycle < duration
+			const progress = Math.min(cycle / 1260, 1)
 			shinePosition.value = -0.5 + 2 * (0.5 - Math.cos(progress * Math.PI) / 2)
 			shineOpacity.value = visible
-				? Math.min(cycle / 0.02, 1, (0.2 - cycle) / 0.02)
+				? Math.min(cycle / 140, 1, (duration - cycle) / 140)
 				: 0
-			return elapsed < 2000 ? 2000 - elapsed : visible ? 0 : (1 - cycle) * 7000
+			return elapsed < initialDelay
+				? initialDelay - elapsed
+				: visible
+					? 0
+					: interval - cycle
 		},
 	}
 }

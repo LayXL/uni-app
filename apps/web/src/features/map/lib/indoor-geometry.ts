@@ -103,3 +103,51 @@ export const floorRouteChains = (route: IndoorRoutePoint[], floor: Floor) => {
 	if (chain.length) chains.push(chain)
 	return chains
 }
+
+/** Round only the immediate corner; keep endpoints and most of each edge intact. */
+export const roundRouteCorners = (
+	points: Coordinate[],
+	radius = 14,
+): Coordinate[] => {
+	const chain = points.filter(
+		(point, index) =>
+			index === 0 ||
+			Math.hypot(point.x - points[index - 1].x, point.y - points[index - 1].y) >
+				0.01,
+	)
+	if (chain.length < 3) return chain
+	const rounded = [chain[0]]
+	for (let i = 1; i < chain.length - 1; i++) {
+		const a = chain[i - 1]
+		const b = chain[i]
+		const c = chain[i + 1]
+		const incoming = Math.hypot(b.x - a.x, b.y - a.y)
+		const outgoing = Math.hypot(c.x - b.x, c.y - b.y)
+		const turn =
+			((b.x - a.x) * (c.y - b.y) - (b.y - a.y) * (c.x - b.x)) /
+			(incoming * outgoing)
+		if (Math.abs(turn) < 0.01) {
+			rounded.push(b)
+			continue
+		}
+		const trim = Math.min(radius, incoming * 0.2, outgoing * 0.2)
+		const start = {
+			x: b.x + ((a.x - b.x) * trim) / incoming,
+			y: b.y + ((a.y - b.y) * trim) / incoming,
+		}
+		const end = {
+			x: b.x + ((c.x - b.x) * trim) / outgoing,
+			y: b.y + ((c.y - b.y) * trim) / outgoing,
+		}
+		for (let step = 0; step <= 6; step++) {
+			const t = step / 6
+			const u = 1 - t
+			rounded.push({
+				x: u * u * start.x + 2 * u * t * b.x + t * t * end.x,
+				y: u * u * start.y + 2 * u * t * b.y + t * t * end.y,
+			})
+		}
+	}
+	rounded.push(chain[chain.length - 1])
+	return rounded
+}

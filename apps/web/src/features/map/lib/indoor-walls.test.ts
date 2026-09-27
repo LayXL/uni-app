@@ -7,8 +7,13 @@ import {
 	Vector3,
 } from "three"
 
-import type { Coordinate, Floor } from "@repo/shared/building-scheme"
+import type {
+	BuildingScheme,
+	Coordinate,
+	Floor,
+} from "@repo/shared/building-scheme"
 
+import scheme from "../../../../../../scripts/v3.json"
 import { createIndoorFloor, disposeIndoorGroup } from "./indoor-model"
 import { createWallShapes } from "./indoor-walls"
 
@@ -68,6 +73,50 @@ const withWalls = (
 }
 
 describe("joined indoor walls", () => {
+	test("clips the perimeter against the full corner of room 103 by the entrance", () => {
+		const data = scheme as BuildingScheme
+		const floor = data.floors.find((floor) => floor.id === 0)
+		const room = data.entities.find((entity) => entity.name === "103")
+		if (!floor || !room) throw new Error("Missing room 103 fixture")
+		const model = createIndoorFloor(
+			{ floors: [floor], entities: [room] },
+			floor,
+			"light",
+		)
+		model.group.updateMatrixWorld(true)
+		const walls = model.group.children.filter(
+			(mesh) => mesh.name === "indoor-walls",
+		)
+		try {
+			// The centerline ends at x=1281, but the miter extends to x=1284.
+			for (const x of [1280, 1282, 1283.5]) {
+				const hits = new Raycaster(
+					new Vector3(x, 100, 2314.2),
+					new Vector3(0, -1, 0),
+				)
+					.intersectObjects(walls)
+					.map((hit) => hit.point.y)
+				expect(hits).toEqual([58])
+				const sideHits = new Raycaster(
+					new Vector3(x, 8, 2340),
+					new Vector3(0, 0, -1),
+				)
+					.intersectObjects(walls)
+					.filter((hit) => Math.abs(hit.point.z - 2318) < 0.001)
+				expect(sideHits).toHaveLength(1)
+			}
+			const uncovered = new Raycaster(
+				new Vector3(1285, 100, 2314.2),
+				new Vector3(0, -1, 0),
+			)
+				.intersectObjects(walls)
+				.map((hit) => hit.point.y)
+			expect(uncovered).toEqual([16])
+		} finally {
+			disposeIndoorGroup(model.group)
+		}
+	})
+
 	test("closed walls face both the room interior and the outside in either winding", () => {
 		for (const points of [square, [...square].reverse()]) {
 			const geometry = new ExtrudeGeometry(createWallShapes(points), {
@@ -92,6 +141,81 @@ describe("joined indoor walls", () => {
 			}
 		}
 	})
+	for (const angle of [0, Math.PI / 5]) {
+		for (const offset of [0, 2]) {
+			test(`clips crossings and parallel overlaps at angle ${angle}, offset ${offset}`, () => {
+				const rotate = ({ x, y }: Coordinate) => ({
+					x: x * Math.cos(angle) - y * Math.sin(angle),
+					y: x * Math.sin(angle) + y * Math.cos(angle),
+				})
+				const floor: Floor = {
+					id: 0,
+					name: "Test",
+					position: { x: 3000, y: -1200 },
+					wallsPosition: [
+						{ x: -100, y: offset },
+						{ x: 300, y: offset },
+						{ x: 300, y: 300 },
+						{ x: -100, y: 300 },
+					].map(rotate),
+					// Also exercise the taller courtyard perimeter crossing a room.
+					holes: [
+						[
+							{ x: -50, y: 90 },
+							{ x: 250, y: 90 },
+							{ x: 250, y: 110 },
+							{ x: -50, y: 110 },
+						].map(rotate),
+					],
+				}
+				const model = createIndoorFloor(
+					{
+						floors: [floor],
+						entities: [
+							{
+								id: 1,
+								floorId: 0,
+								type: "room",
+								name: "Test",
+								position: { x: 0, y: 0 },
+								wallsPosition: square.map(rotate),
+								doorsPosition: [{ x: 100, y: 0 }].map(rotate),
+							},
+						],
+					},
+					floor,
+					"light",
+				)
+				model.group.updateMatrixWorld(true)
+				const walls = model.group.children.filter(
+					(mesh) => mesh.name === "indoor-walls",
+				)
+				const heights = (x: number, y: number) => {
+					const p = rotate({ x, y })
+					return new Raycaster(
+						new Vector3(p.x + 3000, 100, p.y - 1200),
+						new Vector3(0, -1, 0),
+					)
+						.intersectObjects(walls)
+						.map((hit) => Math.round(hit.point.y))
+				}
+				try {
+					for (const x of [-2, 1, 199, 202]) {
+						expect(heights(x, 1.2)).toEqual([58])
+						expect(heights(x, 90.2)).toEqual([58])
+					}
+					// Preserve the lower wall through a room doorway and room interior.
+					expect(heights(100, 1.2)).toEqual([16])
+					expect(heights(100, 90.2)).toEqual([24])
+					expect(heights(50, 50)).toEqual([])
+					expect(heights(205, 1.2)).toEqual([16])
+					if (offset) expect(heights(50, 4)).toEqual([16])
+				} finally {
+					disposeIndoorGroup(model.group)
+				}
+			})
+		}
+	}
 
 	test("does not put a low perimeter wall inside a coincident room wall", () => {
 		const floor: Floor = {

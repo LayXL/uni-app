@@ -208,7 +208,7 @@ export function createIndoorScene(
 			projection
 				.set(
 					label.data.position.x,
-					label.data.kind === "model" ? 26 : WALL_HEIGHT + 12,
+					label.data.kind === "model" ? 26 : WALL_HEIGHT / 2,
 					label.data.position.y,
 				)
 				.project(camera)
@@ -326,20 +326,22 @@ export function createIndoorScene(
 						}
 					}
 					if (label.icon && /^[\w-]+$/.test(label.icon)) {
-						const icon = document.createElement("img")
-						icon.src = `/icons/${label.icon}.svg`
-						icon.alt = ""
-						icon.draggable = false
-						icon.width = 18
-						icon.height = 18
-						icon.onerror = () => {
-							icon.remove()
-							requestRender()
-						}
-						element.append(icon)
+						const badge = document.createElement("span")
+						badge.className = "indoor-label-badge"
+						badge.setAttribute("aria-hidden", "true")
+						const icon = document.createElement("span")
+						icon.className = "indoor-label-icon"
+						const iconName = label.icon.replace(
+							/[A-Z]/g,
+							(letter) => `-${letter.toLowerCase()}`,
+						)
+						icon.style.maskImage = `url("/icons/${iconName}.svg")`
+						badge.append(icon)
+						element.append(badge)
 					}
 					if (!label.iconOnly) {
 						const text = document.createElement("span")
+						text.className = "indoor-label-text"
 						text.textContent = label.text
 						element.append(text)
 					}

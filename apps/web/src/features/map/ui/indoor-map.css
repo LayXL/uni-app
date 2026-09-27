@@ -9,13 +9,11 @@
 	--tt-out-ease: ease-out;
 	--indoor-label-bg: #ffffff;
 	--indoor-label-text: #243247;
-	--indoor-label-border: #d5dce5;
 }
 
 .indoor-map-host[data-theme="dark"] {
 	--indoor-label-bg: #273447;
 	--indoor-label-text: #f1f5fa;
-	--indoor-label-border: #52637b;
 }
 
 .indoor-canvas {
@@ -51,14 +49,15 @@
 .indoor-label {
 	position: relative;
 	display: flex;
+	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	gap: 5px;
+	gap: 4px;
 	max-width: 146px;
 	min-height: 28px;
-	padding: 4px 7px;
-	border: 1px solid var(--indoor-label-border);
-	border-radius: 8px;
+	padding: 2px 4px;
+	border: 0;
+	border-radius: 4px;
 	color: var(--indoor-label-text);
 	font-family: inherit;
 	font-size: 12px;
@@ -67,46 +66,63 @@
 	text-align: center;
 	text-wrap: balance;
 	user-select: none;
-	background: color-mix(in srgb, var(--indoor-label-bg) 88%, transparent);
+	background: transparent;
 	touch-action: none;
 }
 
-.indoor-label[data-kind="campus"] {
-	background: transparent;
-	border-color: transparent;
+.indoor-label-text {
+	text-shadow:
+		0 1px 2px var(--indoor-label-bg),
+		0 0 4px var(--indoor-label-bg);
+	font-variant-numeric: tabular-nums;
 }
 
 button.indoor-label {
 	pointer-events: auto;
 	cursor: pointer;
 }
-.indoor-label img {
+
+.indoor-label-badge {
+	display: grid;
+	place-items: center;
+	width: 28px;
+	height: 28px;
 	flex-shrink: 0;
-	filter: brightness(0);
+	border-radius: 50%;
+	color: var(--indoor-place-color, #fc4c01);
+	background: var(--indoor-label-bg);
 }
-.indoor-map-host[data-theme="dark"] .indoor-label img {
-	filter: brightness(0) invert(1);
+
+.indoor-map-host[data-theme="dark"] .indoor-label-badge {
+	color: color-mix(in srgb, var(--indoor-place-color, #fc4c01), white 35%);
 }
-.indoor-label[data-kind="place"] {
-	background: var(--indoor-place-color);
-	color: #ffffff;
-	border-color: color-mix(in srgb, var(--indoor-place-color), white 35%);
+
+.indoor-label-icon {
+	width: 18px;
+	height: 18px;
+	background: currentColor;
+	mask-repeat: no-repeat;
+	mask-position: center;
+	mask-size: contain;
 }
-.indoor-label[data-kind="place"] img {
-	filter: brightness(0) invert(1);
-}
+
 .indoor-label[data-kind="route"],
 .indoor-label[data-selected="true"] {
-	background: #fc4c01;
-	color: #ffffff;
-	border-color: #ffffff;
-	box-shadow: 0 2px 10px #0000001a;
+	color: #fc4c01;
 	z-index: 2;
 }
-.indoor-label[data-kind="route"] img,
-.indoor-label[data-selected="true"] img {
-	filter: brightness(0) invert(1);
+.indoor-map-host .indoor-label[data-kind="route"] .indoor-label-badge,
+.indoor-map-host .indoor-label[data-selected="true"] .indoor-label-badge {
+	color: #fc4c01;
+	box-shadow: 0 0 0 2px currentColor;
 }
+/* A white halo keeps endpoint names legible over the orange route in both themes. */
+.indoor-label[data-kind="route"] .indoor-label-text {
+	-webkit-text-stroke: 3px #ffffff;
+	paint-order: stroke fill;
+	text-shadow: 0 1px 3px #00000033;
+}
+
 .indoor-label:focus-visible {
 	outline: 3px solid var(--accent);
 	outline-offset: 3px;

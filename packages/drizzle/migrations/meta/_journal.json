@@ -281,6 +281,13 @@
       "when": 1790457056000,
       "tag": "0039_hide_service_room_map_label",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1790501760000,
+      "tag": "0040_move_psychologist_to_room_404",
+      "breakpoints": true
     }
   ]
 }

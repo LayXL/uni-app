@@ -3,7 +3,12 @@ import { Raycaster, Vector3 } from "three"
 
 import type { BuildingScheme, Floor } from "@repo/shared/building-scheme"
 
-import { entityCenter, floorRouteChains, wallSegments } from "./indoor-geometry"
+import {
+	entityCenter,
+	floorRouteChains,
+	roundRouteCorners,
+	wallSegments,
+} from "./indoor-geometry"
 import {
 	createIndoorFloor,
 	createIndoorRoute,
@@ -172,5 +177,49 @@ describe("indoor geometry", () => {
 			"Далее: 1\u00a0этаж",
 		)
 		disposeIndoorGroup(model.group)
+	})
+})
+
+describe("route corner rounding", () => {
+	test("preserves endpoints and rounds only near the corner", () => {
+		const points = [
+			{ x: 0, y: 0 },
+			{ x: 100, y: 0 },
+			{ x: 100, y: 100 },
+		]
+		const rounded = roundRouteCorners(points)
+		expect(rounded[0]).toEqual(points[0])
+		expect(rounded.at(-1)).toEqual(points[2])
+		expect(rounded).not.toContainEqual(points[1])
+		for (const point of rounded.slice(1, -1)) {
+			expect(point.x).toBeGreaterThanOrEqual(86)
+			expect(point.x).toBeLessThanOrEqual(100)
+			expect(point.y).toBeGreaterThanOrEqual(0)
+			expect(point.y).toBeLessThanOrEqual(14)
+		}
+	})
+	test("handles duplicates and short edges without overshooting", () => {
+		const rounded = roundRouteCorners([
+			{ x: 0, y: 0 },
+			{ x: 0, y: 0 },
+			{ x: 1, y: 0 },
+			{ x: 1, y: 1 },
+		])
+		for (const point of rounded) {
+			expect(Number.isFinite(point.x + point.y)).toBe(true)
+			expect(point.x).toBeGreaterThanOrEqual(0)
+			expect(point.x).toBeLessThanOrEqual(1)
+			expect(point.y).toBeGreaterThanOrEqual(0)
+			expect(point.y).toBeLessThanOrEqual(1)
+		}
+		expect(roundRouteCorners([])).toEqual([])
+	})
+	test("keeps straight segments unchanged", () => {
+		const points = [
+			{ x: 0, y: 0 },
+			{ x: 50, y: 50 },
+			{ x: 100, y: 100 },
+		]
+		expect(roundRouteCorners(points)).toEqual(points)
 	})
 })
