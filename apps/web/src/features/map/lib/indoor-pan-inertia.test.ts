@@ -160,6 +160,32 @@ describe("indoor pan release inertia", () => {
 		})
 	}
 
+	for (const firstReleased of [1, 2]) {
+		test(`a two-finger gesture never glides when finger ${firstReleased} lifts first`, () => {
+			const { controls, inertia, dispatch } = setup()
+			dispatch("pointerdown", 300, 300, 0)
+			dispatch("pointermove", 340, 320, 16)
+			dispatch("pointerdown", 500, 300, 20, 2)
+			dispatch("pointermove", 360, 320, 32)
+			dispatch("pointermove", 520, 300, 33, 2)
+			dispatch("pointerup", 400, 320, 36, firstReleased)
+			const remaining = firstReleased === 1 ? 2 : 1
+			dispatch("pointermove", 540, 320, 48, remaining)
+			dispatch("pointermove", 560, 320, 64, remaining)
+			dispatch("pointerup", 580, 320, 68, remaining)
+			const released = controls.target.clone()
+			expect(inertia.update(84)).toBe(false)
+			expect(controls.target.distanceTo(released)).toBe(0)
+
+			// A fresh gesture with one finger can still fling normally.
+			dispatch("pointerdown", 300, 300, 100)
+			dispatch("pointermove", 340, 320, 116)
+			dispatch("pointerup", 340, 320, 120)
+			expect(inertia.update(136)).toBe(true)
+			controls.dispose()
+		})
+	}
+
 	for (const pointerType of ["touch", "mouse", "pen"]) {
 		test(`${pointerType} release continues a drag after a stationary hold`, () => {
 			const { controls, inertia, dispatch } = setup(false, false, pointerType)

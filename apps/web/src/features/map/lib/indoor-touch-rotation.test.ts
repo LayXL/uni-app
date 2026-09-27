@@ -14,7 +14,7 @@ import {
 	rotateIndoorAt,
 } from "./indoor-touch-rotation"
 
-function setup(top: boolean, reducedMotion = false) {
+function setup(top: boolean) {
 	const camera = new OrthographicCamera(-400, 400, 300, -300, 1, 10000)
 	camera.position.set(0, 2000, top ? 0.001 : 1200)
 	const controls = new MapControls(camera)
@@ -27,7 +27,6 @@ function setup(top: boolean, reducedMotion = false) {
 		host,
 		camera,
 		controls,
-		{ matches: reducedMotion } as MediaQueryList,
 		() => {},
 		() => {
 			controls.maxPolarAngle = Math.PI / 3
@@ -94,39 +93,25 @@ describe("two-finger indoor rotation", () => {
 		expect(Math.abs(controls.getAzimuthalAngle())).toBeLessThan(0.02)
 	})
 
-	test("release inertia settles and a new touch stops it", () => {
-		const { camera, touch } = setup(true)
-		const now = performance.now()
-		touch.down(pointer(1, 300, 300, now))
-		touch.down(pointer(2, 500, 300, now))
-		touch.move(pointer(2, 480, 340, now + 16))
-		touch.up(pointer(1, 300, 300, now + 20))
-		touch.up(pointer(2, 480, 340, now + 21))
-		expect(touch.update(performance.now() + 16)).toBe(true)
-		expect(touch.update(performance.now() + 2000)).toBe(false)
-		touch.down(pointer(3, 300, 300, now + 2100))
-		touch.down(pointer(4, 500, 300, now + 2100))
-		touch.move(pointer(4, 480, 340, now + 2116))
-		touch.up(pointer(3, 300, 300, now + 2120))
-		touch.up(pointer(4, 480, 340, now + 2121))
-		expect(touch.update(performance.now() + 16)).toBe(true)
-		touch.down(pointer(5, 300, 300, now + 2130))
-		const rotation = camera.quaternion.clone()
-		expect(touch.update(performance.now() + 2200)).toBe(false)
-		expect(camera.quaternion.angleTo(rotation)).toBeLessThan(1e-7)
-	})
-
-	test("reduced motion keeps direct twist but disables release inertia", () => {
-		const { controls, touch } = setup(true, true)
-		touch.down(pointer(1, 300, 300, 0))
-		touch.down(pointer(2, 500, 300, 0))
-		touch.move(pointer(2, 480, 340, 16))
-		touch.up(pointer(1, 300, 300, 20))
-		touch.up(pointer(2, 480, 340, 21))
-		controls.update()
-		expect(controls.getAzimuthalAngle()).toBeGreaterThan(0.1)
-		expect(touch.update(performance.now() + 16)).toBe(false)
-	})
+	for (const firstReleased of [1, 2]) {
+		test(`rotation stops immediately when finger ${firstReleased} lifts first`, () => {
+			const { camera, controls, touch } = setup(true)
+			touch.down(pointer(1, 300, 300, 0))
+			touch.down(pointer(2, 500, 300, 0))
+			touch.move(pointer(2, 480, 340, 16))
+			controls.update()
+			expect(controls.getAzimuthalAngle()).toBeGreaterThan(0.1)
+			const rotation = camera.quaternion.clone()
+			const target = controls.target.clone()
+			const position = camera.position.clone()
+			touch.up(pointer(firstReleased, 300, 300, 20))
+			touch.up(pointer(firstReleased === 1 ? 2 : 1, 480, 340, 21))
+			for (let i = 0; i < 120; i++) controls.update()
+			expect(camera.quaternion.angleTo(rotation)).toBeLessThan(1e-7)
+			expect(camera.position.distanceTo(position)).toBeLessThan(1e-7)
+			expect(controls.target.distanceTo(target)).toBeLessThan(1e-7)
+		})
+	}
 })
 
 describe("two-finger indoor tilt", () => {
@@ -151,7 +136,7 @@ describe("two-finger indoor tilt", () => {
 			expect(camera.zoom).toBe(1)
 			touch.up(pointer(1, 300, 300, 50))
 			touch.up(pointer(2, 500, 300, 51))
-			expect(touch.update(performance.now() + 16)).toBe(false)
+			expect(controls.update()).toBe(false)
 		})
 	}
 
@@ -191,7 +176,7 @@ describe("two-finger indoor tilt", () => {
 		touch.move(pointer(1, 300, 290, 16))
 		touch.move(pointer(2, 500, 290, 17))
 		expect(controls.enablePan).toBe(false)
-		touch.up(pointer(1, 300, 290, 20), true)
+		touch.up(pointer(1, 300, 290, 20))
 		expect(controls.enablePan).toBe(true)
 		expect(controls.enableZoom).toBe(true)
 		touch.reset()

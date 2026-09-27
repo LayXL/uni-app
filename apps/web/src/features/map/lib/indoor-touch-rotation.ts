@@ -22,7 +22,7 @@ export function rotateIndoorAt(
 	camera.updateMatrixWorld()
 	ray.setFromCamera(pivot, camera)
 	const before = ray.ray.intersectPlane(ground, new Vector3())
-	// Direct manipulation follows the fingers 1:1; damping is applied on release.
+	// Direct manipulation follows the fingers 1:1, without release inertia.
 	camera.position
 		.sub(controls.target)
 		.applyAxisAngle(up, angle)
@@ -43,17 +43,12 @@ export function createIndoorTouchRotation(
 	host: HTMLElement,
 	camera: OrthographicCamera,
 	controls: MapControls,
-	reducedMotion: MediaQueryList,
 	onChange: () => void,
 	onTiltStart: () => void = () => {},
 ) {
 	const pointers = new Map<number, Vector2>()
 	const pivot = new Vector2()
 	let angle: number | null = null
-	let velocity = 0
-	let lastMove = 0
-	let lastFrame = 0
-	let coasting = false
 	let gesture: {
 		start: Vector2[]
 		mode: "pending" | "tilt" | "map"
@@ -86,8 +81,6 @@ export function createIndoorTouchRotation(
 	const stop = () => {
 		resumeMapControls()
 		gesture = null
-		coasting = false
-		velocity = 0
 		angle = sample()
 	}
 	return {
@@ -109,16 +102,12 @@ export function createIndoorTouchRotation(
 				}
 			}
 			angle = sample()
-			lastMove = event.timeStamp
 		},
 		move(event: PointerEvent) {
 			const pointer = pointers.get(event.pointerId)
 			if (!pointer) return
 			pointer.set(event.clientX, event.clientY)
-			if (pointers.size !== 2) {
-				velocity = 0
-				return
-			}
+			if (pointers.size !== 2) return
 			if (gesture && gesture.mode !== "map") {
 				const [a, b] = [...pointers.values()]
 				const [startA, startB] = gesture.start
@@ -148,7 +137,6 @@ export function createIndoorTouchRotation(
 				}
 				if (gesture.mode !== "map") {
 					suspendMapControls()
-					velocity = 0
 					if (gesture.mode === "tilt") {
 						const offset = camera.position.clone().sub(controls.target)
 						const spherical = new Spherical().setFromVector3(offset)
@@ -174,49 +162,21 @@ export function createIndoorTouchRotation(
 			}
 			const next = sample()
 			if (next == null) {
-				velocity = 0
 				angle = null
 				return
 			}
 			if (angle == null) {
 				angle = next
-				lastMove = event.timeStamp
 				return
 			}
 			const delta = Math.atan2(Math.sin(next - angle), Math.cos(next - angle))
-			const elapsed = Math.max(8, event.timeStamp - lastMove)
-			velocity = MathUtils.clamp(delta / elapsed, -0.008, 0.008)
 			angle = next
-			lastMove = event.timeStamp
 			rotateIndoorAt(camera, controls, pivot, delta)
 			onChange()
 		},
-		up(event: PointerEvent, cancelled = false) {
+		up(event: PointerEvent) {
 			if (!pointers.delete(event.pointerId)) return
-			resumeMapControls()
-			gesture = null
-			if (cancelled || pointers.size >= 2) {
-				stop()
-				return
-			}
-			if (pointers.size === 0) {
-				coasting =
-					!reducedMotion.matches &&
-					event.timeStamp - lastMove < 80 &&
-					Math.abs(velocity) > 0.00002
-				lastFrame = performance.now()
-				if (coasting) onChange()
-			}
-		},
-		update(now: number) {
-			if (!coasting) return false
-			const elapsed = Math.max(0, now - lastFrame)
-			lastFrame = now
-			const decay = Math.exp(-elapsed / 160)
-			rotateIndoorAt(camera, controls, pivot, velocity * 160 * (1 - decay))
-			velocity *= decay
-			coasting = Math.abs(velocity) > 0.00002
-			return coasting
+			stop()
 		},
 	}
 }

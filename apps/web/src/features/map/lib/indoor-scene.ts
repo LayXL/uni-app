@@ -1,6 +1,7 @@
 import {
 	Box3,
 	DirectionalLight,
+	GridHelper,
 	HemisphereLight,
 	MathUtils,
 	OrthographicCamera,
@@ -77,6 +78,15 @@ export function createIndoorScene(
 	labelLayer.className = "indoor-labels"
 	host.append(labelLayer)
 	const scene = new Scene()
+	// Keep the grid below the slab so it only shows outside the floor plan.
+	const groundGrid = new GridHelper(100000, 1000, 0xffffff, 0xffffff)
+	groundGrid.material.color.set(0x64748b)
+	groundGrid.position.y = -24
+	groundGrid.material.transparent = true
+	groundGrid.material.opacity = 0.12
+	groundGrid.material.depthWrite = false
+	groundGrid.material.toneMapped = false
+	scene.add(groundGrid)
 	scene.add(new HemisphereLight(0xffffff, 0x64748b, 1.2))
 	const light = new DirectionalLight(0xffffff, 1.8)
 	light.position.set(-1000, 2400, -1600)
@@ -199,7 +209,6 @@ export function createIndoorScene(
 		host,
 		camera,
 		controls,
-		reducedMotion,
 		requestRender,
 		() => {
 			view = "3d"
@@ -270,7 +279,6 @@ export function createIndoorScene(
 			if (panInertia.update(now)) requestRender()
 			controls.update()
 		}
-		if (touchRotation.update(now)) requestRender()
 		drawScene()
 		layoutLabels()
 		if (!tween && !floorTransition && !frame) callbacks.onCamera?.(cameraView())
@@ -559,7 +567,7 @@ export function createIndoorScene(
 		if (hit) callbacks.onSelect(hit.object.userData.entityId)
 	}
 	const pointerCancel = (event: PointerEvent) => {
-		touchRotation.up(event, true)
+		touchRotation.up(event)
 		panInertia.up(event, true)
 		pointers.delete(event.pointerId)
 		down = undefined
@@ -626,6 +634,8 @@ export function createIndoorScene(
 		) => {
 			const nextFloor = nextData.floors.find((f) => f.id === floorId)
 			if (!nextFloor) return
+			groundGrid.material.color.set(theme === "dark" ? 0x94a3b8 : 0x64748b)
+			groundGrid.material.opacity = theme === "dark" ? 0.09 : 0.12
 			finishFloorTransition()
 			const levelDelta = floor ? floorLevel(nextFloor) - floorLevel(floor) : 0
 			const initial = !floor
@@ -741,6 +751,7 @@ export function createIndoorScene(
 			if (model) disposeIndoorGroup(model.group)
 			if (routeModel) disposeIndoorGroup(routeModel.group)
 			renderer.dispose()
+			groundGrid.dispose()
 			canvas.remove()
 			clearLabels()
 			labelLayer.remove()

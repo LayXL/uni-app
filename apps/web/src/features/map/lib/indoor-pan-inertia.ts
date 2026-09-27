@@ -15,6 +15,7 @@ export function createIndoorPanInertia(
 	let velocityY = 0
 	let lastFrame = 0
 	let coasting = false
+	let hadMultiplePointers = false
 	const sample = (event: PointerEvent): Sample => ({
 		x: event.clientX,
 		y: event.clientY,
@@ -37,6 +38,7 @@ export function createIndoorPanInertia(
 		reset() {
 			stop()
 			pointers.clear()
+			hadMultiplePointers = false
 		},
 		down(event: PointerEvent) {
 			stop()
@@ -55,14 +57,16 @@ export function createIndoorPanInertia(
 				if (action !== (modified ? MOUSE.ROTATE : MOUSE.PAN)) return
 			}
 			const point = sample(event)
+			if (pointers.size === 0) hadMultiplePointers = false
 			pointers.set(event.pointerId, point)
+			if (pointers.size > 1) hadMultiplePointers = true
 			if (pointers.size === 1) history = [point]
 		},
 		move(event: PointerEvent) {
 			if (!pointers.has(event.pointerId)) return
 			const point = sample(event)
 			pointers.set(event.pointerId, point)
-			if (pointers.size !== 1 || !controls.enablePan) {
+			if (hadMultiplePointers || pointers.size !== 1 || !controls.enablePan) {
 				history = []
 				return
 			}
@@ -70,12 +74,9 @@ export function createIndoorPanInertia(
 		},
 		up(event: PointerEvent, cancelled = false) {
 			if (!pointers.delete(event.pointerId)) return
-			if (cancelled || pointers.size > 0) {
+			// Lifting two fingers is staggered; the last finger must not fling.
+			if (cancelled || hadMultiplePointers || pointers.size > 0) {
 				stop()
-				// Rebase after a pinch or tilt before the remaining finger pans.
-				const remaining = pointers.values().next().value
-				if (!cancelled && pointers.size === 1 && remaining)
-					history = [{ ...remaining, time: event.timeStamp }]
 				return
 			}
 			// Some touch browsers deliver the final position only on pointerup.
